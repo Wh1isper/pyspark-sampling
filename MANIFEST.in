@@ -1,0 +1,14 @@
+include CONTRIBUTING.rst
+include HISTORY.rst
+include LICENSE
+include README.rst
+
+recursive-include sparksampling/tests/requestbody *
+recursive-include sparksampling/tests/log *
+recursive-include sparksampling/manager/*
+recursive-include sparksampling/log/*
+recursive-include sparksampling/utilities *
+recursive-exclude * __pycache__
+recursive-exclude * *.py[co]
+
+recursive-include docs *.rst conf.py Makefile make.bat *.jpg *.png *.gif
