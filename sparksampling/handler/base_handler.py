@@ -9,16 +9,15 @@ from tornado.web import RequestHandler
 
 from json import JSONDecodeError
 
-from sparksampling.manager.processmodule.base_process_module import BaseProcessModule
+from sparksampling.processmodule.base_process_module import BaseProcessModule
 from sparksampling.utilities.code import NORMAL_FAILD as NOT_FOUND_FAIL
 from sparksampling.utilities.code import PROCESS_ERROR
-
-from sparksampling.utilities.custom_error import CustomErrorWithCode
 
 
 class BaseProcessHandler(RequestHandler):
     """
     通用处理框架，接收post方法，调用fetch进行操作
+    每次执行都将初始化ProcessModule，如果任务足够简单，只需初始化一次，请使用SingletonHandler
     """
     logger = logging.getLogger('SAMPLING')
 
@@ -43,10 +42,10 @@ class BaseProcessHandler(RequestHandler):
                 # 在handler层面就尝试对json进行解析，作为通用框架，解析失败将传递原文
                 # 如果使用BaseProcessHandler接受请求，需要在ProcessModule内验证数据是否符合要求
                 json_data = json.loads(data)
-                self.processmodule.param_format(json_data, kw)
+                await self.processmodule.prepare(json_data, kw)
             except JSONDecodeError:
                 self.logger.warning(f"Request body JSON Decode Failed, body : {data}")
-                self.processmodule.param_format(data, kw)
+                await self.processmodule.prepare(data, kw)
             try:
                 return_data = await self.processmodule.process()
                 if return_data is not None:

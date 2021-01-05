@@ -1,8 +1,12 @@
-from sparksampling.manager.process_handler import BaseProcessHandler
-from sparksampling.manager.processmodule.base_process_module import EmptyProcessModule
+"""
+路由表
+"""
+
+from sparksampling.handler import BaseProcessHandler, SingletonHandler
+from sparksampling.processmodule import DummyProcessModule
 
 
-class HelloHandler(BaseProcessHandler):
+class HelloHandler(SingletonHandler):
     async def get(self):
         self.logger.info('Debug Mod is Running...')
         self.write({
@@ -17,5 +21,5 @@ default_handlers = [
 ]
 
 test_handlers = [
-    (r'/', HelloHandler, dict(processmodule=EmptyProcessModule)),
+    (r'/', HelloHandler, dict(processmodule=DummyProcessModule)),
 ]

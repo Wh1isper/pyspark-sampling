@@ -3,16 +3,38 @@
 """
 from typing import Any, Dict
 import logging
-from sparksampling.utilities import CustomErrorWithCode
+from sparksampling.utilities import CustomErrorWithCode, DatabaseConnector
 
 
 class BaseProcessModule(object):
-    logger = logging.getLogger('YAB_APPLICATION')
+    logger = logging.getLogger('SAMPLING')
     required_keys = {}
 
     def __init__(self):
+        super(BaseProcessModule, self).__init__()
         self._request_data = None
         self._kw = None
+
+    async def prepare(self, data, kw, *args, **kwargs):
+        """
+        前置工作，配置sql engine，格式化数据以及prepare_hook
+        子类应使用prepare_hook而非覆写这个方法
+
+        Returns:
+
+        """
+        self.engine = await DatabaseConnector.engine
+        self.param_format(data, kw)
+        await self.prepare_hook(args, kwargs)
+
+    async def prepare_hook(self, *args, **kwargs):
+        """
+        在默认的前置工作执行完之后执行，子类自定义的处理程序应该在这里
+
+        Returns:
+
+        """
+        ...
 
     def param_format(self, data=None, kw=None):
         """
@@ -40,15 +62,11 @@ class BaseProcessModule(object):
         if missing_keys:
             raise TypeError(f"Missing Param: {missing_keys}")
 
-    def error_response(self, e: CustomErrorWithCode):
-        return {
-            'code': e.code,
-            'msg': e.errorinfo,
-            'data': {},
-        }
 
+class DummyProcessModule(BaseProcessModule):
+    def __init__(self):
+        super(DummyProcessModule, self).__init__()
 
-class EmptyProcessModule(BaseProcessModule):
     async def process(self) -> Dict[str, Any]:
         response_data = {
             'code': 0,
@@ -56,8 +74,9 @@ class EmptyProcessModule(BaseProcessModule):
             'data': {},
         }
         try:
-            # do something
-            ...
+            async with self.engine.acquire() as conn:
+                ret = await conn.execute("SELECT * FROM test_table")
+                print(await ret.fetchone())
         except CustomErrorWithCode as e:
-            response_data = self.error_response(e)
+            response_data = e.error_response()
         return response_data
