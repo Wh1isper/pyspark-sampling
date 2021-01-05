@@ -27,3 +27,9 @@ Accept: application/json
         client.assert(type === "application/json", "Expected 'application/json' but received '" + type + "'");
     });
 %}
+
+###
+POST http://{{host}}:{{port}}/sampling
+Accept: application/json
+
+< requestbody/empty.json

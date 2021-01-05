@@ -8,7 +8,7 @@ from sparksampling.utilities import CustomErrorWithCode, DatabaseConnector
 
 class BaseProcessModule(object):
     logger = logging.getLogger('SAMPLING')
-    required_keys = {}
+    required_keys = set()
 
     def __init__(self):
         super(BaseProcessModule, self).__init__()
@@ -78,5 +78,6 @@ class DummyProcessModule(BaseProcessModule):
                 ret = await conn.execute("SELECT * FROM test_table")
                 print(await ret.fetchone())
         except CustomErrorWithCode as e:
+            # catch or rise
             response_data = e.error_response()
         return response_data

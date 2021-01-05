@@ -12,7 +12,7 @@ from json import JSONDecodeError
 from sparksampling.processmodule.base_process_module import BaseProcessModule
 from sparksampling.utilities.code import NORMAL_FAILD as NOT_FOUND_FAIL
 from sparksampling.utilities.code import PROCESS_ERROR
-
+from sparksampling.utilities import CustomErrorWithCode
 
 class BaseProcessHandler(RequestHandler):
     """
@@ -42,14 +42,17 @@ class BaseProcessHandler(RequestHandler):
                 # 在handler层面就尝试对json进行解析，作为通用框架，解析失败将传递原文
                 # 如果使用BaseProcessHandler接受请求，需要在ProcessModule内验证数据是否符合要求
                 json_data = json.loads(data)
+                self.logger.info(f"request data : {json_data}")
                 await self.processmodule.prepare(json_data, kw)
             except JSONDecodeError:
-                self.logger.warning(f"Request body JSON Decode Failed, body : {data}")
+                self.logger.warning(f"Request body JSON Decode Failed, data : {data}")
                 await self.processmodule.prepare(data, kw)
             try:
                 return_data = await self.processmodule.process()
                 if return_data is not None:
                     response_data = return_data
+            except CustomErrorWithCode as e:
+                response_data = e.error_response()
             except NotImplementedError as e:
                 self.logger.error(e)
                 raise
