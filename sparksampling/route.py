@@ -3,7 +3,7 @@
 """
 
 from sparksampling.handler import BaseProcessHandler, SingletonHandler
-from sparksampling.handler.processmodule import DummyProcessModule, SamplingProcessModule
+from sparksampling.handler.processmodule import DummyProcessModule, SamplingProcessModule, MLSamplingProcessModule
 
 
 class HelloHandler(SingletonHandler):
@@ -17,7 +17,8 @@ class HelloHandler(SingletonHandler):
 
 
 default_handlers = [
-    (r'/v1/submit_sampling_job/(.*)', BaseProcessHandler, dict(processmodule=SamplingProcessModule)),
+    (r'/v1/sampling/simplejob/(.*)', BaseProcessHandler, dict(processmodule=SamplingProcessModule)),
+    (r'/v1/sampling/mljob/(.*)', BaseProcessHandler, dict(processmodule=MLSamplingProcessModule)),
 ]
 
 test_handlers = [

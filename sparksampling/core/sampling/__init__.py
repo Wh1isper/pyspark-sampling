@@ -1,5 +1,5 @@
-from sparksampling.core.sampling.sampling_engine import SamplingEngine
+from sparksampling.core.sampling.engine import SimpleSamplingEngine
 
 __all__ = [
-    'SamplingEngine',
+    'SimpleSamplingEngine',
 ]

@@ -2,7 +2,7 @@ from sparksampling.handler.processmodule import BaseProcessModule
 from typing import Dict, Any
 import random
 from sparksampling.utilities import JsonDecodeError, TypeCheckError
-from sparksampling.core import SamplingEngine
+from sparksampling.core.sampling.engine import SimpleSamplingEngine
 from sparksampling.utilities.var import SIMPLE_RANDOM_SAMPLING_METHOD, FILE_TYPE_TEXT
 from sparksampling.utilities.var import JOB_CANCELED, JOB_CREATED, JOB_CREATING
 from sparksampling.utilities.utilities import convert_dict_value_to_string_value
@@ -62,8 +62,8 @@ class SamplingProcessModule(BaseProcessModule):
             'col_key': conf.get('key')
         }
 
-    def config_engine(self, conf) -> SamplingEngine:
-        return SamplingEngine(**conf)
+    def config_engine(self, conf) -> SimpleSamplingEngine:
+        return SimpleSamplingEngine(**conf)
 
     async def run_job(self):
         try:
