@@ -4,6 +4,7 @@
 from typing import Any, Dict
 import logging
 from sparksampling.utilities import CustomErrorWithCode, DatabaseConnector
+from sparksampling.utilities.var import JOB_CANCELED, JOB_CREATED, JOB_CREATING
 
 
 class BaseProcessModule(object):
@@ -14,6 +15,8 @@ class BaseProcessModule(object):
         super(BaseProcessModule, self).__init__()
         self._request_data = None
         self._kw = None
+        self.sqlengine = None
+        self.job_stats = JOB_CREATING
 
     async def prepare(self, data, kw, *args, **kwargs):
         """
@@ -23,7 +26,7 @@ class BaseProcessModule(object):
         Returns:
 
         """
-        self.engine = await DatabaseConnector.engine
+        self.sqlengine = await DatabaseConnector.engine
         self.param_format(data, kw)
         await self.prepare_hook(args, kwargs)
 
@@ -51,16 +54,28 @@ class BaseProcessModule(object):
 
     async def process(self) -> Dict[str, Any]:
         """
-        覆写这个函数，完成所需功能
+        覆写这个函数，完成响应
         Returns:
             response_data:Dict，handler会将其转换成json
         """
         raise NotImplementedError(f"No Processing...Check Implementation: {self.__class__.__name__}")
 
+    async def run_job(self):
+        """
+        process 结束之后将返回响应，此函数在process后执行，如需要则覆写
+        Returns:
+
+        """
+        ...
+
     def check_param(self, request_data):
         missing_keys = set(self.required_keys) - set(request_data.keys())
         if missing_keys:
             raise TypeError(f"Missing Param: {missing_keys}")
+
+    @property
+    def is_job_created(self):
+        return self.job_stats == JOB_CREATED
 
 
 class DummyProcessModule(BaseProcessModule):
@@ -74,7 +89,7 @@ class DummyProcessModule(BaseProcessModule):
             'data': {},
         }
         try:
-            async with self.engine.acquire() as conn:
+            async with self.sqlengine.acquire() as conn:
                 ret = await conn.execute("SELECT * FROM test_table")
                 print(await ret.fetchone())
         except CustomErrorWithCode as e:

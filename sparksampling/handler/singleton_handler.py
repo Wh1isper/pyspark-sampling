@@ -1,5 +1,5 @@
 from sparksampling.handler import BaseProcessHandler
-from sparksampling.processmodule import BaseProcessModule
+from sparksampling.handler.processmodule import BaseProcessModule
 
 
 class SingletonHandler(BaseProcessHandler):

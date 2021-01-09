@@ -29,7 +29,7 @@ Accept: application/json
 %}
 
 ###
-POST http://{{host}}:{{port}}/sampling
+POST http://{{host}}:{{port}}/v1/submit_sampling_job/
 Accept: application/json
 
-< requestbody/empty.json
+< requestbody/simple-random-sampling.json

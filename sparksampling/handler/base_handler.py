@@ -5,14 +5,19 @@ import json
 import sys
 import logging
 import traceback
+from concurrent.futures.thread import ThreadPoolExecutor
+
 from tornado.web import RequestHandler
+from tornado.concurrent import run_on_executor
 
 from json import JSONDecodeError
 
-from sparksampling.processmodule.base_process_module import BaseProcessModule
+from sparksampling.handler.processmodule.base_process_module import BaseProcessModule
+from sparksampling.utilities.var import JOB_CREATED
 from sparksampling.utilities.code import NORMAL_FAILD as NOT_FOUND_FAIL
 from sparksampling.utilities.code import PROCESS_ERROR
 from sparksampling.utilities import CustomErrorWithCode
+
 
 class BaseProcessHandler(RequestHandler):
     """
@@ -20,12 +25,17 @@ class BaseProcessHandler(RequestHandler):
     每次执行都将初始化ProcessModule，如果任务足够简单，只需初始化一次，请使用SingletonHandler
     """
     logger = logging.getLogger('SAMPLING')
+    executor = ThreadPoolExecutor(20)
 
     def initialize(self, processmodule: type = BaseProcessModule):
         self.processmodule = processmodule()
 
     def prepare(self):
+        self.logger.info(f'-----{self.request.path}@{self.request.remote_ip} begin -----')
         self.set_header('Content-Type', 'application/json;')
+
+    def on_finish(self) -> None:
+        self.logger.info(f'-----{self.request.path}@{self.request.remote_ip} finished -----')
 
     async def fetch(self, data=None, kw=None):
         # 通用处理框架，接受请求、交给ProcessModule处理
@@ -84,11 +94,12 @@ class BaseProcessHandler(RequestHandler):
             self.finish()
 
     async def post(self, kw=None):
-        # 请求入口
+        # 请求入口，由于pyspark的限制，一般来说在生成job之后就将run_job
         self.logger.debug("type:" + str(kw))
         try:
             result = await self.fetch(self.request.body, kw)
             self.write(result)
-            return self.finish()
+            self.finish()
+            await self.processmodule.run_job()
         except Exception:
             self.send_error(500, exc_info=sys.exc_info())

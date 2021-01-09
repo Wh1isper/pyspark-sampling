@@ -1,0 +1,8 @@
+{
+    "path": "hdfs://localhost:9000/dataset/titanic/train.csv",
+    "method": 1,
+    "conf": {
+        "type": 2,
+        "fraction": 0.4
+    }
+}

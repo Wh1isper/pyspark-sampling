@@ -1,0 +1,12 @@
+{
+    "path": "hdfs://localhost:9000/dataset/titanic/train.csv",
+    "method": 2,
+    "conf": {
+        "type": 2,
+        "key": "Survived",
+        "fraction": {
+            "0": 0.5,
+            "1": 0.5
+        }
+    }
+}

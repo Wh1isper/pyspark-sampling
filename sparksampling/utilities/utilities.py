@@ -203,3 +203,9 @@ def match_array_index(source_array=None, match_array=None):
                 return result
 
     return result
+
+
+def convert_dict_value_to_string_value(d: dict):
+    for k, v in d.items():
+        if type(v) is dict:
+            d[k] = str(v)

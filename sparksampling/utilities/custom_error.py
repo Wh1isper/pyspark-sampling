@@ -1,7 +1,7 @@
 """
 自定义错误类
 """
-from sparksampling.utilities.code import JSON_DECODE_ERROR
+from sparksampling.utilities.code import JSON_DECODE_ERROR, TYPE_ERROR
 
 
 class CustomErrorWithCode(Exception):
@@ -24,3 +24,8 @@ class CustomErrorWithCode(Exception):
 class JsonDecodeError(CustomErrorWithCode):
     def __init__(self):
         super(JsonDecodeError, self).__init__(JSON_DECODE_ERROR, "Json decode error. Data must be json.")
+
+
+class TypeCheckError(CustomErrorWithCode):
+    def __init__(self, msg: str):
+        super(TypeCheckError, self).__init__(TYPE_ERROR, msg)
