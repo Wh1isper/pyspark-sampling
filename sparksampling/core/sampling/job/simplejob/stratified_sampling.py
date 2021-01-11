@@ -4,12 +4,13 @@ from sparksampling.core.sampling.job.simplejob.base_sampling import BaseSampling
 
 class StratifiedSamplingJob(BaseSamplingJob):
     type_map = {
-        'key': str,
-        'fraction': dict
+        'col_key': str,
+        'fraction': dict,
+        'seed': int
     }
 
     def __init__(self, *args, **kwargs):
         super(StratifiedSamplingJob, self).__init__(*args, **kwargs)
 
     def _generate(self, df: DataFrame, *args, **kwargs) -> DataFrame:
-        return df.sampleBy(col=self.key, fractions=self.fraction, seed=self.seed)
+        return df.sampleBy(col=self.col_key, fractions=self.fraction, seed=self.seed)

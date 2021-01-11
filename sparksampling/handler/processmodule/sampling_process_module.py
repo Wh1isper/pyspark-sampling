@@ -2,7 +2,7 @@ from sparksampling.handler.processmodule import BaseProcessModule
 from typing import Dict, Any
 import random
 from sparksampling.utilities import JsonDecodeError, TypeCheckError
-from sparksampling.core.sampling.engine import SimpleSamplingEngine
+from sparksampling.core.sampling.engine import SamplingEngine
 from sparksampling.utilities.var import SIMPLE_RANDOM_SAMPLING_METHOD, FILE_TYPE_TEXT
 from sparksampling.utilities.var import JOB_CANCELED, JOB_CREATED, JOB_CREATING
 from sparksampling.utilities.utilities import convert_dict_value_to_string_value
@@ -11,8 +11,11 @@ from datetime import datetime
 
 
 class SamplingProcessModule(BaseProcessModule):
+    sql_table = SampleJobTable
+
     required_keys = {
-        'path'
+        'path',
+        'method',
     }
 
     def __init__(self):
@@ -52,18 +55,39 @@ class SamplingProcessModule(BaseProcessModule):
 
     def format_conf(self, request_data: Dict):
         conf = request_data.get('conf', dict())
+        formatted = self.base_conf(request_data)
+        formatted.update(self.job_conf(conf))
+        return formatted
+
+    def base_conf(self, request_data):
         return {
             'path': request_data.get('path'),
             'method': request_data.get('method', SIMPLE_RANDOM_SAMPLING_METHOD),
-            'fraction': conf.get('fraction', '0.5'),
-            'file_type': conf.get('type', FILE_TYPE_TEXT),
-            'with_header': bool(conf.get('with_header', True)),
-            'seed': int(conf.get('seed', random.randint(1, 65535))),
+            'file_type': request_data.get('type', FILE_TYPE_TEXT),
+            'with_header': request_data.get('with_header', True),
+        }
+
+    def job_conf(self, conf):
+        job_conf = self.__random_job_conf(conf)
+        job_conf.update(self.__stratified_job_conf(conf))
+        return job_conf
+
+    def __random_job_conf(self, conf):
+        return {
+            'fraction': conf.get('fraction', 0.5),
+            'seed': conf.get('seed', random.randint(1, 65535)),
+            'with_replacement': conf.get('with_replacement', True)
+        }
+
+    def __stratified_job_conf(self, conf):
+        return {
+            'fraction': conf.get('fraction'),
+            'seed': conf.get('seed', random.randint(1, 65535)),
             'col_key': conf.get('key')
         }
 
-    def config_engine(self, conf) -> SimpleSamplingEngine:
-        return SimpleSamplingEngine(**conf)
+    def config_engine(self, conf) -> SamplingEngine:
+        return SamplingEngine(**conf)
 
     async def run_job(self):
         try:
@@ -85,7 +109,7 @@ class SamplingProcessModule(BaseProcessModule):
         self.logger.info("Store Spark job conf into DB...")
         async with self.sqlengine.acquire() as conn:
             convert_dict_value_to_string_value(conf)
-            await conn.execute(SampleJobTable.insert().values(start_time=datetime.now(), **conf))
+            await conn.execute(self.sql_table.insert().values(start_time=datetime.now(), **conf))
             result = await conn.execute("select @@IDENTITY")
             job_id = (await result.fetchone())[0]
             await conn._commit_impl()
@@ -96,7 +120,7 @@ class SamplingProcessModule(BaseProcessModule):
             return
         self.logger.info("Spark job finished...Record job in DB...")
         async with self.sqlengine.acquire() as conn:
-            await conn.execute(SampleJobTable.update().where(SampleJobTable.c.job_id == self.job_id).values(
+            await conn.execute(self.sql_table.update().where(self.sql_table.c.job_id == self.job_id).values(
                 msg='succeed',
                 end_time=datetime.now(),
                 simpled_path=new_path
@@ -106,7 +130,7 @@ class SamplingProcessModule(BaseProcessModule):
     async def error_job(self, msg):
         self.logger.info("Spark job failed...Record job in DB...")
         async with self.sqlengine.acquire() as conn:
-            await conn.execute(SampleJobTable.update().where(SampleJobTable.c.job_id == self.job_id).values(
+            await conn.execute(self.sql_table.update().where(self.sql_table.c.job_id == self.job_id).values(
                 msg=msg,
                 end_time=datetime.now(),
             ))

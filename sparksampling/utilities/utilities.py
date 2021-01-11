@@ -209,3 +209,18 @@ def convert_dict_value_to_string_value(d: dict):
     for k, v in d.items():
         if type(v) is dict:
             d[k] = str(v)
+
+
+def extract_none_in_dict(d: dict):
+    items = list(d.items())
+    for k, v in items:
+        if v is None:
+            d.pop(k)
+
+
+def get_value_by_require_dict(d: dict, request):
+    job_conf = {}
+    for k in d.keys():
+        job_conf[k] = request.get(k)
+    extract_none_in_dict(job_conf)
+    return job_conf

@@ -29,7 +29,19 @@ Accept: application/json
 %}
 
 ###
-POST http://{{host}}:{{port}}/v1/submit_sampling_job/
+POST http://{{host}}:{{port}}/v1/sampling/simplejob/
 Accept: application/json
 
 < requestbody/simple-random-sampling.json
+
+###
+POST http://{{host}}:{{port}}/v1/sampling/simplejob/
+Accept: application/json
+
+< requestbody/stratified-sampling.json
+
+###
+POST http://{{host}}:{{port}}/v1/sampling/mljob/
+Accept: application/json
+
+< requestbody/smote-sampling.json
