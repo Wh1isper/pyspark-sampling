@@ -16,6 +16,7 @@ class SmoteSamplingJob(BaseJob):
     }
 
     def __init__(self, k=3, multiplier=2, bucket_length=10, seed=random.randint(1, 65535), restore=True, col_key=None):
+        super(SmoteSamplingJob, self).__init__()
         self.k = k
         self.bucket_length = bucket_length
         self.multiplier = multiplier
@@ -23,10 +24,6 @@ class SmoteSamplingJob(BaseJob):
         self.restore = bool(restore)
         self.col_key = col_key
         self.check_type()
-
-    def generate(self, df: DataFrame, *args, **kwargs) -> DataFrame:
-        self.logger.info("Generate Sampling Job...")
-        return self._generate(df, *args, **kwargs)
 
     def _generate(self, df: DataFrame, *args, **kwargs) -> DataFrame:
         num_cols, cat_cols = get_num_cat_feat(df)

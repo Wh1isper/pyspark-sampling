@@ -14,5 +14,5 @@ class BaseEngine(Logger):
     conf = SparkConf()
     spark = SparkSession.builder.config(conf=conf).master('local').appName('Spark Sampling').getOrCreate()
 
-    def submit(self):
+    def submit(self, job_id):
         raise NotImplementedError

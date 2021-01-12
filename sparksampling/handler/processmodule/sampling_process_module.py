@@ -91,7 +91,7 @@ class SamplingProcessModule(BaseProcessModule):
 
     async def run_job(self):
         try:
-            new_path = self.sample_engine.submit()
+            new_path = self.sample_engine.submit(self.job_id)
         except Exception as e:
             await self.error_job(str(e))
             return
@@ -109,7 +109,9 @@ class SamplingProcessModule(BaseProcessModule):
         self.logger.info("Store Spark job conf into DB...")
         async with self.sqlengine.acquire() as conn:
             convert_dict_value_to_string_value(conf)
-            await conn.execute(self.sql_table.insert().values(start_time=datetime.now(), **conf))
+            await conn.execute(self.sql_table.insert().values(start_time=datetime.now(), path=conf.get('path'),
+                                                              method=conf.get('method'),
+                                                              request_data=str(self._request_data)))
             result = await conn.execute("select @@IDENTITY")
             job_id = (await result.fetchone())[0]
             await conn._commit_impl()
@@ -118,7 +120,7 @@ class SamplingProcessModule(BaseProcessModule):
     async def finish_job(self, new_path):
         if not self.is_job_created:
             return
-        self.logger.info("Spark job finished...Record job in DB...")
+        self.logger.info(f"Spark job {self.job_id} finished...Record job in DB...")
         async with self.sqlengine.acquire() as conn:
             await conn.execute(self.sql_table.update().where(self.sql_table.c.job_id == self.job_id).values(
                 msg='succeed',
@@ -128,7 +130,7 @@ class SamplingProcessModule(BaseProcessModule):
             await conn._commit_impl()
 
     async def error_job(self, msg):
-        self.logger.info("Spark job failed...Record job in DB...")
+        self.logger.info(f"Spark job {self.job_id} failed...Record job in DB...")
         async with self.sqlengine.acquire() as conn:
             await conn.execute(self.sql_table.update().where(self.sql_table.c.job_id == self.job_id).values(
                 msg=msg,

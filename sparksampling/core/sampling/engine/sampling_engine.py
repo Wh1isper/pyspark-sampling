@@ -15,6 +15,7 @@ class SamplingEngine(BaseEngine):
     }
 
     def __init__(self, path, method, file_type, *args, **kwargs):
+        self.job_id = None
         self.path = path
         self.method = method
         self.data_io_conf = {
@@ -28,8 +29,9 @@ class SamplingEngine(BaseEngine):
         self.data_io = self.data_io_map[file_type](spark=self.spark, path=self.path, **self.data_io_conf)
         self.sample_job = self.sampling_job_map[method](**self.sampling_job_conf)
 
-    def submit(self):
-        self.logger.info("Submit job to Spark...")
-        df = self.data_io.read()
-        sampled_df = self.sample_job.generate(df)
+    def submit(self, job_id):
+        self.job_id = job_id
+        self.logger.info(f"Submit job to Spark...job_id: {self.job_id}")
+        df = self.data_io.read(self.job_id)
+        sampled_df = self.sample_job.generate(df, self.job_id)
         return self.data_io.write(sampled_df)
