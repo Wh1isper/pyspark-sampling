@@ -7,6 +7,7 @@ CREATE TABLE sampling_job
     path         VARCHAR(999) NOT NULL,
     method       INT          NOT NULL,
     request_data TEXT         NOT NULL,
+    status_code  INT          NOT NULL,
     simpled_path VARCHAR(999),
     msg          TEXT,
     start_time   DATETIME,

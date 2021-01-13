@@ -31,7 +31,7 @@ class BaseProcessHandler(RequestHandler):
         self.processmodule = processmodule()
 
     def prepare(self):
-        self.logger.info(f'-----{self.request.path}@{self.request.remote_ip} begin -----')
+        self.logger.info(f'-----{self.request.path} from {self.request.remote_ip} begin -----')
         self.set_header('Content-Type', 'application/json;')
 
     def on_finish(self) -> None:

@@ -10,7 +10,7 @@ from pyspark.ml import Pipeline
 from sparksampling.core.mlsamplinglib.func import to_array
 
 
-def pre_smote_df_process(df, num_cols, cat_cols, target_col, require_indexing=True, index_suffix="_index"):
+def pre_smote_df_process(df: DataFrame, num_cols, cat_cols, target_col, require_indexing=True, index_suffix="_index"):
     '''
     string indexer (optional) and vector assembler
     inputs:

@@ -5,6 +5,7 @@ from sparksampling.core.sampling.job import SimpleRandomSamplingJob, StratifiedS
 from sparksampling.utilities.utilities import extract_none_in_dict, get_value_by_require_dict
 from sparksampling.utilities.var import SIMPLE_RANDOM_SAMPLING_METHOD, STRATIFIED_SAMPLING_METHOD, SMOTE_SAMPLING_METHOD
 from sparksampling.core.sampling.engine.base_engine import BaseEngine
+from sparksampling.utilities.custom_error import JobKeyError, JobProcessError, JobTypeError, BadParamError
 
 
 class SamplingEngine(BaseEngine):
@@ -15,6 +16,10 @@ class SamplingEngine(BaseEngine):
     }
 
     def __init__(self, path, method, file_type, *args, **kwargs):
+        if not self.check_map(file_type, method):
+            raise BadParamError(
+                f"Sampling method or file type wrong, expected {self.data_io_map} and {self.sampling_job_map}")
+
         self.job_id = None
         self.path = path
         self.method = method
@@ -32,6 +37,13 @@ class SamplingEngine(BaseEngine):
     def submit(self, job_id):
         self.job_id = job_id
         self.logger.info(f"Submit job to Spark...job_id: {self.job_id}")
-        df = self.data_io.read(self.job_id)
-        sampled_df = self.sample_job.generate(df, self.job_id)
-        return self.data_io.write(sampled_df)
+        try:
+            df = self.data_io.read(self.job_id)
+            sampled_df = self.sample_job.generate(df, self.job_id)
+            return self.data_io.write(sampled_df)
+        except TypeError as e:
+            raise JobTypeError(str(e))
+        except KeyError as e:
+            raise JobKeyError(str(e))
+        except Exception as e:
+            raise JobProcessError(str(e))

@@ -16,3 +16,6 @@ class BaseEngine(Logger):
 
     def submit(self, job_id):
         raise NotImplementedError
+
+    def check_map(self, file_type, method):
+        return self.data_io_map.get(file_type) and self.sampling_job_map.get(method)

@@ -1,6 +1,13 @@
 from pyspark.sql.types import ArrayType, DoubleType
 from pyspark.sql.functions import udf
+from pyspark.sql.functions import col
+from pyspark.sql import DataFrame
 
+
+def df_with_column_int(df:DataFrame):
+    for c in df.columns:
+        df = df.withColumn(c, col(c).cast('int'))
+    return df
 
 def to_array(col):
     def to_array_(v):

@@ -45,3 +45,9 @@ POST http://{{host}}:{{port}}/v1/sampling/mljob/
 Accept: application/json
 
 < requestbody/smote-sampling.json
+
+###
+POST http://{{host}}:{{port}}/v1/sampling/query/
+Accept: application/json
+
+< requestbody/query.json

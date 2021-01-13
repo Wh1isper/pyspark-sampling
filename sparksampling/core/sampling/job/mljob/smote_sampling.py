@@ -2,8 +2,8 @@ from pyspark.sql import DataFrame
 from sparksampling.core.sampling.job.base_job import BaseJob
 import random
 from sparksampling.core.mlsamplinglib import pre_smote_df_process, smote, restore_smoted_df
-from sparksampling.core.mlsamplinglib.func import get_num_cat_feat
-
+from sparksampling.core.mlsamplinglib.func import get_num_cat_feat, df_with_column_int
+from pyspark.sql.functions import col
 
 class SmoteSamplingJob(BaseJob):
     type_map = {
@@ -26,6 +26,7 @@ class SmoteSamplingJob(BaseJob):
         self.check_type()
 
     def _generate(self, df: DataFrame, *args, **kwargs) -> DataFrame:
+        df = df_with_column_int(df)
         num_cols, cat_cols = get_num_cat_feat(df)
         vectorized, smote_stages = pre_smote_df_process(df, num_cols, cat_cols, self.col_key, False)
         smoted_train_df = smote(vectorized, self)

@@ -26,7 +26,7 @@ def main():
         logger.info(f"Listening port:{PORT}")
         http_server = tornado.httpserver.HTTPServer(app)
         http_server.bind(PORT)
-        http_server.start(num_processes=4)
+        http_server.start(num_processes=40)
         tornado.ioloop.IOLoop.instance().start()
 
 

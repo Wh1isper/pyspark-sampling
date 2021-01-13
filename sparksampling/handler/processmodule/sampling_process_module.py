@@ -3,8 +3,10 @@ from typing import Dict, Any
 import random
 from sparksampling.utilities import JsonDecodeError, TypeCheckError
 from sparksampling.core.sampling.engine import SamplingEngine
+from sparksampling.utilities.var import JOB_STATUS_SUCCEED, JOB_STATUS_PADDING
 from sparksampling.utilities.var import SIMPLE_RANDOM_SAMPLING_METHOD, FILE_TYPE_TEXT
 from sparksampling.utilities.var import JOB_CANCELED, JOB_CREATED, JOB_CREATING
+from sparksampling.utilities import CustomErrorWithCode
 from sparksampling.utilities.utilities import convert_dict_value_to_string_value
 from sparksampling.core.orm import SampleJobTable
 from datetime import datetime
@@ -92,10 +94,9 @@ class SamplingProcessModule(BaseProcessModule):
     async def run_job(self):
         try:
             new_path = self.sample_engine.submit(self.job_id)
-        except Exception as e:
-            await self.error_job(str(e))
-            return
-        await self.finish_job(new_path)
+            await self.finish_job(new_path)
+        except CustomErrorWithCode as e:
+            await self.error_job(e)
 
     async def create_job(self, conf):
         self.sample_engine = self.config_engine(conf)
@@ -109,9 +110,12 @@ class SamplingProcessModule(BaseProcessModule):
         self.logger.info("Store Spark job conf into DB...")
         async with self.sqlengine.acquire() as conn:
             convert_dict_value_to_string_value(conf)
-            await conn.execute(self.sql_table.insert().values(start_time=datetime.now(), path=conf.get('path'),
+            await conn.execute(self.sql_table.insert().values(start_time=datetime.now(),
+                                                              path=conf.get('path'),
                                                               method=conf.get('method'),
-                                                              request_data=str(self._request_data)))
+                                                              request_data=str(self._request_data),
+                                                              status_code=JOB_STATUS_PADDING
+                                                              ))
             result = await conn.execute("select @@IDENTITY")
             job_id = (await result.fetchone())[0]
             await conn._commit_impl()
@@ -124,16 +128,18 @@ class SamplingProcessModule(BaseProcessModule):
         async with self.sqlengine.acquire() as conn:
             await conn.execute(self.sql_table.update().where(self.sql_table.c.job_id == self.job_id).values(
                 msg='succeed',
+                status_code=JOB_STATUS_SUCCEED,
                 end_time=datetime.now(),
                 simpled_path=new_path
             ))
             await conn._commit_impl()
 
-    async def error_job(self, msg):
+    async def error_job(self, e: CustomErrorWithCode):
         self.logger.info(f"Spark job {self.job_id} failed...Record job in DB...")
         async with self.sqlengine.acquire() as conn:
             await conn.execute(self.sql_table.update().where(self.sql_table.c.job_id == self.job_id).values(
-                msg=msg,
+                msg=e.errorinfo,
+                status_code=e.code,
                 end_time=datetime.now(),
             ))
             await conn._commit_impl()
