@@ -10,7 +10,7 @@ class BaseEngine(Logger):
         FILE_TYPE_TEXT: TextDataIO,
         FILE_TYPE_CSV: CsvDataIO
     }
-    sampling_job_map = {}
+    job_map = {}
     conf = SparkConf()
     spark = SparkSession.builder.config(conf=conf).master('local').appName('Spark Sampling').getOrCreate()
 
@@ -18,4 +18,4 @@ class BaseEngine(Logger):
         raise NotImplementedError
 
     def check_map(self, file_type, method):
-        return self.data_io_map.get(file_type) and self.sampling_job_map.get(method)
+        return self.data_io_map.get(file_type) and self.job_map.get(method)

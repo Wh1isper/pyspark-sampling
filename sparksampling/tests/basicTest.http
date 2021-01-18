@@ -47,7 +47,19 @@ Accept: application/json
 < requestbody/smote-sampling.json
 
 ###
-POST http://{{host}}:{{port}}/v1/sampling/query/
+POST http://{{host}}:{{port}}/v1/sampling/query/job/
 Accept: application/json
 
 < requestbody/query.json
+
+###
+POST http://{{host}}:{{port}}/v1/sampling/query/list/
+Accept: application/json
+
+< requestbody/list.json
+
+###
+POST http://{{host}}:{{port}}/v1/statistics/
+Accept: application/json
+
+< requestbody/statistics.json

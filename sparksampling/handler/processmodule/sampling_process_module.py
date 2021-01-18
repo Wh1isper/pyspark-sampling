@@ -40,9 +40,6 @@ class SamplingProcessModule(BaseProcessModule):
             'data': {}
         }
         request_data: Dict = self._request_data
-
-        if type(request_data) is not dict:
-            raise JsonDecodeError
         self.check_param(request_data)
 
         conf = self.format_conf(request_data)

@@ -1,0 +1,7 @@
+{
+    "job_id": 10000,
+    "type": 2,
+    "method": 1,
+    "from_sampling": true,
+    "with_header": true
+}

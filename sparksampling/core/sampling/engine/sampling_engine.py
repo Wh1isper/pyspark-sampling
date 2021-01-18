@@ -9,7 +9,7 @@ from sparksampling.utilities.custom_error import JobKeyError, JobProcessError, J
 
 
 class SamplingEngine(BaseEngine):
-    sampling_job_map = {
+    job_map = {
         SIMPLE_RANDOM_SAMPLING_METHOD: SimpleRandomSamplingJob,
         STRATIFIED_SAMPLING_METHOD: StratifiedSamplingJob,
         SMOTE_SAMPLING_METHOD: SmoteSamplingJob
@@ -18,7 +18,7 @@ class SamplingEngine(BaseEngine):
     def __init__(self, path, method, file_type, *args, **kwargs):
         if not self.check_map(file_type, method):
             raise BadParamError(
-                f"Sampling method or file type wrong, expected {self.data_io_map} and {self.sampling_job_map}")
+                f"Sampling method or file type wrong, expected {self.data_io_map} and {self.job_map}")
 
         self.job_id = None
         self.path = path
@@ -28,11 +28,11 @@ class SamplingEngine(BaseEngine):
         }
         extract_none_in_dict(self.data_io_conf)
 
-        sample_job_class = self.sampling_job_map[method]
+        sample_job_class = self.job_map[method]
         self.sampling_job_conf = get_value_by_require_dict(sample_job_class.type_map, kwargs)
 
         self.data_io = self.data_io_map[file_type](spark=self.spark, path=self.path, **self.data_io_conf)
-        self.sample_job = self.sampling_job_map[method](**self.sampling_job_conf)
+        self.sample_job = self.job_map[method](**self.sampling_job_conf)
 
     def submit(self, job_id):
         self.job_id = job_id

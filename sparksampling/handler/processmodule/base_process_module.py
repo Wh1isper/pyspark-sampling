@@ -3,7 +3,8 @@
 """
 from typing import Any, Dict
 import logging
-from sparksampling.utilities import CustomErrorWithCode, DatabaseConnector
+from sparksampling.utilities import CustomErrorWithCode, DatabaseConnector, JsonDecodeError
+from sparksampling.utilities.custom_error import SQLError
 from sparksampling.utilities.var import JOB_CANCELED, JOB_CREATED, JOB_CREATING
 
 
@@ -68,7 +69,12 @@ class BaseProcessModule(object):
         """
         ...
 
+    def _check_json_request(self, request_data):
+        if type(request_data) is not dict:
+            raise JsonDecodeError
+
     def check_param(self, request_data):
+        self._check_json_request(request_data)
         missing_keys = set(self.required_keys) - set(request_data.keys())
         if missing_keys:
             raise TypeError(f"Missing Param: {missing_keys}")
@@ -76,6 +82,41 @@ class BaseProcessModule(object):
     @property
     def is_job_created(self):
         return self.job_stats == JOB_CREATED
+
+
+class BaseQueryProcessModule(BaseProcessModule):
+    sql_table = None
+
+    def __init__(self):
+        super(BaseQueryProcessModule, self).__init__()
+
+    def get_query_param_from_request_data(self, request_data):
+        raise NotImplementedError
+
+    async def query(self, query_param) -> dict or None:
+        raise NotImplementedError
+
+    def format_response(self, response_data, details) -> dict:
+        raise NotImplementedError
+
+    async def process(self) -> Dict[str, Any]:
+        response_data = {
+            'code': 0,
+            'msg': "",
+            'data': {}
+        }
+        request_data: Dict = self._request_data
+
+        if type(request_data) is not dict:
+            raise JsonDecodeError
+        self.check_param(request_data)
+        query_param = self.get_query_param_from_request_data(request_data)
+        try:
+            details = await self.query(query_param)
+        except Exception as e:
+            raise SQLError(str(e))
+        response_data = self.format_response(response_data, details)
+        return response_data
 
 
 class DummyProcessModule(BaseProcessModule):
