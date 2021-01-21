@@ -59,7 +59,7 @@ Accept: application/json
 < requestbody/list.json
 
 ###
-POST http://{{host}}:{{port}}/v1/statistics/
+POST http://{{host}}:{{port}}/v1/evaluation/statistics/
 Accept: application/json
 
 < requestbody/statistics.json

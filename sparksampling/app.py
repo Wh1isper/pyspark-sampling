@@ -3,7 +3,7 @@ import tornado.web
 
 from sparksampling.config import DEBUG_PORT, QUERY_PORT, SAMPLING_JOB_PORT, STATISTICS_JOB_PORT, DEBUG, \
     SAMPLING_PARALLEL, STATISTICS_PARALLEL, QUERY_PARALLEL
-from sparksampling.route import debug_handlers, statistics_handlers, sampling_handlers, query_handlers
+from sparksampling.route import debug_handlers, evaluation_handlers, sampling_handlers, query_handlers
 from sparksampling.utilities import logger
 
 
@@ -27,7 +27,7 @@ def sampling_app():
 
 
 def statistics_app():
-    return make_app(statistics_handlers, debug=False, autoreload=False)
+    return make_app(evaluation_handlers, debug=False, autoreload=False)
 
 
 def run_app():

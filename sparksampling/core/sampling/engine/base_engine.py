@@ -1,5 +1,7 @@
 from pyspark.conf import SparkConf
 from pyspark.sql import SparkSession
+
+from sparksampling.config import SPARK_CONF
 from sparksampling.core import Logger
 from sparksampling.core.dataio import CsvDataIO, TextDataIO
 from sparksampling.utilities.var import FILE_TYPE_TEXT, FILE_TYPE_CSV
@@ -11,8 +13,8 @@ class BaseEngine(Logger):
         FILE_TYPE_CSV: CsvDataIO
     }
     job_map = {}
-    conf = SparkConf()
-    spark = SparkSession.builder.config(conf=conf).master('local').appName('Spark Sampling').getOrCreate()
+    conf = SPARK_CONF
+    spark = SparkSession.builder.config(conf=conf).getOrCreate()
 
     def submit(self, job_id):
         raise NotImplementedError

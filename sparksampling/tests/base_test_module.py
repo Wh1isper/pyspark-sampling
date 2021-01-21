@@ -1,6 +1,6 @@
 from tornado.testing import AsyncHTTPTestCase
 from tornado.httpclient import HTTPResponse
-from sparksampling.app import make_app
+from sparksampling.app import make_app, debug_app
 
 from sparksampling.utilities.code import JSON_DECODE_ERROR
 
@@ -22,7 +22,7 @@ class BaseTestModule(AsyncHTTPTestCase):
         return data
 
     def get_app(self):
-        return make_app(debug=False)
+        return debug_app()
 
     @staticmethod
     def _get_response_data(response: HTTPResponse):
@@ -65,7 +65,7 @@ class BaseTestModule(AsyncHTTPTestCase):
 
 class DebugTestModule(BaseTestModule):
     def get_app(self):
-        return make_app(debug=True)
+        return debug_app()
 
     def test_hello_world(self):
         # test hello world in debug mod, make sure app is running

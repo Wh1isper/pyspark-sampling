@@ -214,6 +214,8 @@ def convert_dict_value_to_string_value(d: dict):
 def extract_none_in_dict(d: dict):
     items = list(d.items())
     for k, v in items:
+        if type(v) is dict:
+            extract_none_in_dict(v)
         if v is None:
             d.pop(k)
 

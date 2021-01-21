@@ -80,8 +80,6 @@ class SamplingProcessModule(BaseProcessModule):
 
     def __stratified_job_conf(self, conf):
         return {
-            'fraction': conf.get('fraction'),
-            'seed': conf.get('seed', random.randint(1, 65535)),
             'col_key': conf.get('key')
         }
 

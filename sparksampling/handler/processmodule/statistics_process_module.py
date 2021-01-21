@@ -1,5 +1,5 @@
 from sparksampling.core.orm import SampleJobTable
-from sparksampling.core.sampling.engine.statistics_engine import StatisticsEngine
+from sparksampling.core.sampling.engine.statistics_engine import EvaluationEngine
 from sparksampling.handler.processmodule import BaseProcessModule
 from typing import Dict, Any
 
@@ -32,8 +32,9 @@ class StatisticsProcessModule(BaseProcessModule):
         response_data['data'] = engine.submit()
         return response_data
 
-    def config_engine(self, conf) -> StatisticsEngine:
-        return StatisticsEngine(**conf)
+    def config_engine(self, conf) -> EvaluationEngine:
+        self.logger.info(f"Config Engine with conf: {conf}")
+        return EvaluationEngine(**conf)
 
     async def format_conf(self, request_data):
         from_sampling = request_data.get('from_sampling')
@@ -51,7 +52,7 @@ class StatisticsProcessModule(BaseProcessModule):
             'path': path,
             'method': request_data.get('method', 1),
             'file_type': request_data.get('type', 2),
-            'with_header': request_data.get('with_header')
+            'with_header': request_data.get('with_header', True)
         }
 
     async def get_path_from_sampling_job(self, job_id):

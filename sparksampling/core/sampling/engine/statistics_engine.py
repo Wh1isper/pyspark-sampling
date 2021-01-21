@@ -1,16 +1,16 @@
 from sparksampling.core.sampling.engine.base_engine import BaseEngine
 from sparksampling.utilities.custom_error import BadParamError, JobTypeError, JobKeyError, JobProcessError
 from sparksampling.utilities.utilities import extract_none_in_dict, get_value_by_require_dict
-from sparksampling.utilities.var import STATISTICS_BASIC_METHOD, STATISTICS_DNN_METHOD, STATISTICS_TESTING_METHOD
-from sparksampling.core.sampling.job.statisticsjob import BasicStatisticsJob, DNNStatisticsJob, \
+from sparksampling.utilities.var import STATISTICS_BASIC_METHOD, EVALUATION_DNN_METHOD, EVALUATION_TESTING_METHOD
+from sparksampling.core.sampling.job.evaluationjob import BasicStatisticsJob, DNNStatisticsJob, \
     HypothesisTestStatisticsJob
 
 
-class StatisticsEngine(BaseEngine):
+class EvaluationEngine(BaseEngine):
     job_map = {
         STATISTICS_BASIC_METHOD: BasicStatisticsJob,
-        STATISTICS_DNN_METHOD: DNNStatisticsJob,
-        STATISTICS_TESTING_METHOD: HypothesisTestStatisticsJob
+        EVALUATION_DNN_METHOD: DNNStatisticsJob,
+        EVALUATION_TESTING_METHOD: HypothesisTestStatisticsJob
     }
 
     def __init__(self, path, method, file_type, *args, **kwargs):
