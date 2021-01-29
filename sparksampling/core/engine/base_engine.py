@@ -27,7 +27,7 @@ class BaseEngine(Logger):
         for k, v in self.job_map.items():
             self.logger.info(f"Load job {k} : {v.__name__}")
 
-    def submit(self, job_id):
+    def submit(self, job_id=None, df_output=True):
         raise NotImplementedError
 
     def check_map(self, file_type, method):
@@ -50,21 +50,25 @@ class SparkJobEngine(BaseEngine):
         extract_none_in_dict(self.data_io_conf)
 
         sample_job_class = self.job_map[method]
-        self.sampling_job_conf = get_value_by_require_dict(sample_job_class.type_map, kwargs)
+        self.job_conf = get_value_by_require_dict(sample_job_class.type_map, kwargs)
 
         self.data_io = self.data_io_map[file_type](spark=self.spark, path=self.path, **self.data_io_conf)
-        self.sample_job = self.job_map[method](**self.sampling_job_conf)
+        self.job = self.job_map[method](**self.job_conf)
 
-    def submit(self, job_id=None, is_job=True):
+    def prepare(self, *args, **kwargs) -> dict:
+        return {}
+
+    def submit(self, job_id=None, df_output=True, *args, **kwargs):
+        kwargs.update(**self.prepare(self.prepare(*args, **kwargs)))
         self.job_id = job_id
         self.logger.info(f"{self.__class__.__name__}: Submit job to Spark...job_id: {self.job_id}")
         try:
-            df = self.data_io.read(self.job_id)
-            if is_job:
-                sampled_df = self.sample_job.generate(df, self.job_id)
-                return self.data_io.write(sampled_df)
+            df = self.data_io.read(self.job_id, *args, **kwargs)
+            if df_output:
+                sampled_df = self.job.generate(df, self.job_id, *args, **kwargs)
+                return self.data_io.write(sampled_df, *args, **kwargs)
             else:
-                return self.sample_job.statistics(df)
+                return self.job.statistics(df, *args, **kwargs)
         except NotImplementedError as e:
             self.logger.error(e)
             raise

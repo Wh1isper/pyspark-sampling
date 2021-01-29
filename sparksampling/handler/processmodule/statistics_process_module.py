@@ -1,5 +1,5 @@
 from sparksampling.core.orm import SampleJobTable
-from sparksampling.core.sampling.engine.statistics_engine import StatisticsEngine
+from sparksampling.core.engine import StatisticsEngine
 from sparksampling.handler.processmodule import BaseProcessModule
 from typing import Dict, Any
 
@@ -29,7 +29,7 @@ class StatisticsProcessModule(BaseProcessModule):
         if not conf:
             raise JobProcessError("Job status is not succeed, can't run statistics")
         engine = self.config_engine(conf)
-        response_data['data'] = engine.submit(is_job=False)
+        response_data['data'] = engine.submit(df_output=False)
         return response_data
 
     def config_engine(self, conf) -> StatisticsEngine:

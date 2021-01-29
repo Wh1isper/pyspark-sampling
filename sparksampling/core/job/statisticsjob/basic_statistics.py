@@ -1,4 +1,4 @@
-from sparksampling.core.sampling.job.base_job import BaseJob
+from sparksampling.core.job.base_job import BaseJob
 from pyspark.sql import DataFrame
 
 

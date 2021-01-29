@@ -1,3 +1,7 @@
+from sparksampling.utilities.var import STATISTICS_BASIC_METHOD
+
+compare_evaluation_code = STATISTICS_BASIC_METHOD
+
 extra_statistics_job = {
 
 }
@@ -15,7 +19,7 @@ extra_dataio = {
 }
 
 from sparksampling.core.dataio.base_dataio import BaseDataIO
-from sparksampling.core.sampling.job.base_job import BaseJob
+from sparksampling.core.job.base_job import BaseJob
 from pyspark.sql import DataFrame
 import pandas as pd
 

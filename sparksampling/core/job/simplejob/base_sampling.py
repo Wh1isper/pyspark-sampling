@@ -1,12 +1,12 @@
 import random
-from pyspark.sql import DataFrame
-from sparksampling.core.sampling.job.base_job import BaseJob
+from sparksampling.core.job.base_job import BaseJob
 
 
 class BaseSamplingJob(BaseJob):
     type_map = {}
 
-    def __init__(self, with_replacement=True, fraction: str or dict = None, seed=random.randint(1, 65535), col_key=None):
+    def __init__(self, with_replacement=True, fraction: str or dict = None, seed=random.randint(1, 65535),
+                 col_key=None):
         super(BaseSamplingJob, self).__init__()
         self.with_replacement = with_replacement
         self.fraction = float(fraction) if type(fraction) is str else fraction

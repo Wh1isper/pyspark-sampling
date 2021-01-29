@@ -1,5 +1,5 @@
 from pyspark.sql import DataFrame
-from sparksampling.core.sampling.job.simplejob.base_sampling import BaseSamplingJob
+from sparksampling.core.job.simplejob.base_sampling import BaseSamplingJob
 
 
 class StratifiedSamplingJob(BaseSamplingJob):
@@ -11,6 +11,7 @@ class StratifiedSamplingJob(BaseSamplingJob):
 
     def __init__(self, *args, **kwargs):
         super(StratifiedSamplingJob, self).__init__(*args, **kwargs)
+        self.check_type()
 
     def _generate(self, df: DataFrame, *args, **kwargs) -> DataFrame:
         return df.sampleBy(col=self.col_key, fractions=self.fraction, seed=self.seed)

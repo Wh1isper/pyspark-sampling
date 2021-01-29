@@ -1,19 +1,21 @@
+from sparksampling.core.engine import EvaluationEngine
 from sparksampling.handler.processmodule import BaseProcessModule
 from typing import Dict, Any
-import random
+
+from sparksampling.handler.processmodule.base_process_module import BaseQueryProcessModule
 from sparksampling.utilities import TypeCheckError
-from sparksampling.core.engine import SamplingEngine
 from sparksampling.utilities.var import JOB_STATUS_SUCCEED, JOB_STATUS_PADDING
-from sparksampling.utilities.var import SIMPLE_RANDOM_SAMPLING_METHOD, FILE_TYPE_TEXT
+from sparksampling.utilities.var import EVALUATION_COMPARE_METHOD, FILE_TYPE_TEXT
 from sparksampling.utilities.var import JOB_CANCELED, JOB_CREATED, JOB_CREATING
 from sparksampling.utilities import CustomErrorWithCode
 from sparksampling.utilities.utilities import convert_dict_value_to_string_value
-from sparksampling.core.orm import SampleJobTable
+from sparksampling.core.orm import EvaluationJobTable
+
 from datetime import datetime
 
 
-class SamplingProcessModule(BaseProcessModule):
-    sql_table = SampleJobTable
+class EvaluationProcessModule(BaseProcessModule):
+    sql_table = EvaluationJobTable
 
     required_keys = {
         'path',
@@ -21,14 +23,14 @@ class SamplingProcessModule(BaseProcessModule):
     }
 
     def __init__(self):
-        super(SamplingProcessModule, self).__init__()
+        super(EvaluationProcessModule, self).__init__()
         self.job_id = None
         self.sample_engine = None
         self.job_stats = JOB_CREATING
 
     async def process(self) -> Dict[str, Any]:
         """
-        配置抽样任务
+        配置评估任务
         create_job用于生成抽样任务，process在生成抽样任务后就会返回
         上级决定何时调用run_job运行抽样任务
         Returns:
@@ -43,6 +45,12 @@ class SamplingProcessModule(BaseProcessModule):
         self.check_param(request_data)
 
         conf = self.format_conf(request_data)
+        if conf.get('compare_job_id'):
+            path, source_path = await self.get_job_path(conf.get('compare_job_id'))
+            conf.update(**{
+                'path': path,
+                'source_path': source_path,
+            })
         try:
             response_data['data'] = await self.create_job(conf)
             self.job_stats = JOB_CREATED
@@ -53,43 +61,24 @@ class SamplingProcessModule(BaseProcessModule):
         return response_data
 
     def format_conf(self, request_data: Dict):
-        conf = request_data.get('conf', dict())
-        formatted = self.base_conf(request_data)
-        formatted.update(self.job_conf(conf))
-        return formatted
-
-    def base_conf(self, request_data):
         return {
             'path': request_data.get('path'),
-            'method': request_data.get('method', SIMPLE_RANDOM_SAMPLING_METHOD),
+            'source_path': request_data.get('source_path'),
+            'compare_job_id': request_data.get('compare_job_id'),
+            'method': request_data.get('method', EVALUATION_COMPARE_METHOD),
             'file_type': request_data.get('type', FILE_TYPE_TEXT),
             'with_header': request_data.get('with_header', True),
         }
 
-    def job_conf(self, conf):
-        job_conf = self.__random_job_conf(conf)
-        job_conf.update(self.__stratified_job_conf(conf))
-        return job_conf
-
-    def __random_job_conf(self, conf):
-        return {
-            'fraction': conf.get('fraction', 0.5),
-            'seed': conf.get('seed', random.randint(1, 65535)),
-            'with_replacement': conf.get('with_replacement', True)
-        }
-
-    def __stratified_job_conf(self, conf):
-        return {
-            'col_key': conf.get('key')
-        }
-
-    def config_engine(self, conf) -> SamplingEngine:
-        return SamplingEngine(**conf)
+    async def get_job_path(self, job_id):
+        async with self.sqlengine.acquire() as conn:
+            details = await BaseQueryProcessModule.query_job_id(conn, job_id, self.sql_table)
+        return details.simpled_path, details.path
 
     async def run_job(self):
         try:
-            new_path = self.sample_engine.submit(self.job_id)
-            await self.finish_job(new_path)
+            result = self.sample_engine.submit(self.job_id, df_output=False)
+            await self.finish_job(result)
         except CustomErrorWithCode as e:
             await self.error_job(e)
 
@@ -101,12 +90,16 @@ class SamplingProcessModule(BaseProcessModule):
             'job_id': self.job_id
         }
 
+    def config_engine(self, conf) -> EvaluationEngine:
+        return EvaluationEngine(**conf)
+
     async def init_job(self, conf):
         self.logger.info("Store Spark job conf into DB...")
         async with self.sqlengine.acquire() as conn:
             convert_dict_value_to_string_value(conf)
             await conn.execute(self.sql_table.insert().values(start_time=datetime.now(),
                                                               path=conf.get('path'),
+                                                              source_path=conf.get('source_path'),
                                                               method=conf.get('method'),
                                                               request_data=str(self._request_data),
                                                               status_code=JOB_STATUS_PADDING
@@ -116,7 +109,7 @@ class SamplingProcessModule(BaseProcessModule):
             await conn._commit_impl()
         return job_id
 
-    async def finish_job(self, new_path):
+    async def finish_job(self, result):
         if not self.is_job_created:
             return
         self.logger.info(f"Spark job {self.job_id} finished...Record job in DB...")
@@ -125,7 +118,7 @@ class SamplingProcessModule(BaseProcessModule):
                 msg='succeed',
                 status_code=JOB_STATUS_SUCCEED,
                 end_time=datetime.now(),
-                simpled_path=new_path
+                result=result
             ))
             await conn._commit_impl()
 

@@ -1,5 +1,5 @@
 from pyspark.sql import DataFrame
-from sparksampling.core.sampling.job.base_job import BaseJob
+from sparksampling.core.job.base_job import BaseJob
 import random
 from sparksampling.core.mlsamplinglib import pre_smote_df_process, smote, restore_smoted_df
 from sparksampling.core.mlsamplinglib.func import get_num_cat_feat, df_with_column_int
