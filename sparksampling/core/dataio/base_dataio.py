@@ -7,7 +7,7 @@ class BaseDataIO(Logger):
 
     def __init__(self, spark: SparkSession, path, *args, **kwargs):
         self.job_id = None
-        self.logger.info(f"Init DataIo for {path} with args:{args}, kwargs:{kwargs}")
+        self.logger.info(f"{self.__class__.__name__}: Init DataIo for {path} with args:{args}, kwargs:{kwargs}")
         self.spark = spark
         self.path = path
         self.write_path = self.__convert_path()
@@ -17,14 +17,14 @@ class BaseDataIO(Logger):
 
     def read(self, job_id, *args, **kwargs) -> DataFrame:
         self.job_id = job_id
-        self.logger.info(f"Job: {self.job_id} : Read from {self.path}")
+        self.logger.info(f"{self.__class__.__name__}: Job {self.job_id} : Read from {self.path}")
         return self._read(*args, **kwargs)
 
-    def _read(self, header=True, *args, **kwargs):
+    def _read(self, header=True, *args, **kwargs) -> DataFrame:
         raise NotImplementedError
 
     def write(self, *args, **kwargs):
-        self.logger.info(f'Job: {self.job_id} : Write to {self.write_path}')
+        self.logger.info(f'{self.__class__.__name__}: Job {self.job_id} : Write to {self.write_path}')
         return self._write(*args, **kwargs)
 
     def _write(self, *args, **kwargs):

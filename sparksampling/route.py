@@ -4,7 +4,7 @@
 
 from sparksampling.handler import BaseProcessHandler, SingletonHandler
 from sparksampling.handler.processmodule import DummyProcessModule, SamplingProcessModule, MLSamplingProcessModule, \
-    QueryJobProcessModule, StatisticsProcessModule, QueryListProcessModule
+    QueryJobProcessModule, StatisticsProcessModule, QueryListProcessModule, EvaluationProcessModule
 
 
 class HelloHandler(SingletonHandler):
@@ -28,6 +28,7 @@ query_handlers = [
 
 evaluation_handlers = [
     (r'/v1/evaluation/statistics/(.*)', SingletonHandler, dict(processmodule=StatisticsProcessModule)),
+    (r'/v1/evaluation/job/(.*)', BaseProcessHandler, dict(processmodule=EvaluationProcessModule)),
 ]
 
 test_handlers = [

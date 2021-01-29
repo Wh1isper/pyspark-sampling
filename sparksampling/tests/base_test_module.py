@@ -21,9 +21,6 @@ class BaseTestModule(AsyncHTTPTestCase):
         data = self._get_response_data(response)
         return data
 
-    def get_app(self):
-        return debug_app()
-
     @staticmethod
     def _get_response_data(response: HTTPResponse):
         try:

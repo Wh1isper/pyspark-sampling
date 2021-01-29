@@ -61,11 +61,12 @@ class BaseProcessHandler(RequestHandler):
                 return_data = await self.processmodule.process()
                 if return_data is not None:
                     response_data = return_data
-            except CustomErrorWithCode as e:
-                response_data = e.error_response()
             except NotImplementedError as e:
                 self.logger.error(e)
                 raise
+            except CustomErrorWithCode as e:
+                self.logger.error(f"{type(self.processmodule).__name__} Process Error: {str(e)}")
+                response_data = e.error_response()
             except:
                 # 抛给 write_error 处理
                 self.logger.error("Process Error...")

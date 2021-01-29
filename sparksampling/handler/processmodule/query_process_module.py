@@ -21,9 +21,7 @@ class QueryJobProcessModule(BaseQueryProcessModule):
     async def query(self, query_param: dict) -> dict or None:
         job_id = query_param.get('job_id')
         async with self.sqlengine.acquire() as conn:
-            result = await conn.execute(self.sql_table.select().where(self.sql_table.c.job_id == job_id))
-            details = await result.fetchone()
-        return details
+            return await self.query_job_id(conn, job_id, self.sql_table)
 
     def format_response(self, response_data, details) -> dict:
         if not details:

@@ -93,6 +93,12 @@ class BaseQueryProcessModule(BaseProcessModule):
     def get_query_param_from_request_data(self, request_data):
         raise NotImplementedError
 
+    @staticmethod
+    async def query_job_id(conn, job_id, table):
+        result = await conn.execute(table.select().where(table.c.job_id == job_id))
+        details = await result.fetchone()
+        return details
+
     async def query(self, query_param) -> dict or None:
         raise NotImplementedError
 

@@ -19,3 +19,16 @@ SampleJobTable = Table('sampling_job', Meta,
                        Column("start_time", DateTime),
                        Column("end_time", DateTime),
                        )
+
+EvaluationJobTable = Table('evaluation_job', Meta,
+                           Column("job_id", BigInteger, primary_key=True, autoincrement=True),
+                           Column("path", VARCHAR(999)),
+                           Column("source_path", VARCHAR(999)),
+                           Column("method", INT),
+                           Column("request_data", Text),
+                           Column("result", Text),
+                           Column("status_code", INT),
+                           Column("msg", Text),
+                           Column("start_time", DateTime),
+                           Column("end_time", DateTime),
+                           )

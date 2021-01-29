@@ -11,12 +11,12 @@ class BaseJob(CheckLogger):
 
     def generate(self, df: DataFrame, job_id, *args, **kwargs) -> DataFrame:
         self.job_id = job_id
-        self.logger.info(f"Job: {self.job_id} : Generate Sampling Job...")
+        self.logger.info(f"{self.__class__.__name__}: Job {self.job_id}: Generate Job...")
         return self._generate(df, *args, **kwargs)
 
     def _statistics(self, df: DataFrame, *args, **kwargs) -> dict:
         raise NotImplementedError
 
     def statistics(self, df: DataFrame, *args, **kwargs) -> dict:
-        self.logger.info(f"Running Statistics...")
+        self.logger.info(f"{self.__class__.__name__}: Running Statistics...")
         return self._statistics(df, *args, **kwargs)

@@ -1,6 +1,7 @@
 from urllib.parse import urljoin
 
-from sparksampling.utilities.var import FILE_TYPE_TEXT, SIMPLE_RANDOM_SAMPLING_METHOD, STATISTICS_BASIC_METHOD
+from sparksampling.utilities.var import FILE_TYPE_TEXT, SIMPLE_RANDOM_SAMPLING_METHOD, STATISTICS_BASIC_METHOD, \
+    SMOTE_SAMPLING_METHOD
 import json
 import requests
 
@@ -12,6 +13,23 @@ def extract_none_in_dict(d: dict):
             extract_none_in_dict(v)
         if v is None:
             d.pop(k)
+
+
+class DSResponse(object):
+    def __init__(self, code, msg, data):
+        self.code = code
+        self.msg = msg
+        self.data = data
+
+    def to_dict(self):
+        return {
+            'code': self.code,
+            'msg': self.msg,
+            'data': self.data,
+        }
+
+    def __str__(self):
+        return self.to_dict()
 
 
 class Submitter(object):
@@ -41,10 +59,19 @@ class Submitter(object):
                 'key': key
             }
         }
-        return self._post_dict_data(url, config_map)
+        return DSResponse(**self._post_dict_data(url, config_map))
 
-    def submit_sampling_mljob(self):
-        ...
+    def submit_sampling_mljob(self, path, method=SMOTE_SAMPLING_METHOD, file_type=FILE_TYPE_TEXT, with_header=None,
+                              **kwargs):
+        url = urljoin(self.sampling_prefix, '/v1/sampling/mljob')
+        config_map = {
+            'path': path,
+            'method': method,
+            'type': file_type,
+            'with_header': with_header,
+            'conf': kwargs
+        }
+        return DSResponse(**self._post_dict_data(url, config_map))
 
     def get_sampling_job_details(self, job_id):
         url = urljoin(self.sampling_prefix, '/v1/sampling/query/job/')
@@ -59,7 +86,7 @@ class Submitter(object):
             'offset': offset,
             'limit': limit,
         }
-        return self._post_dict_data(url, config_map)
+        return DSResponse(**self._post_dict_data(url, config_map))
 
     def get_statistics(self, path=None,
                        job_id=None,
@@ -78,11 +105,15 @@ class Submitter(object):
             'with_header': with_header,
             'from_sampling': from_sampling
         }
-        return self._post_dict_data(url, config_map)
+        return DSResponse(**self._post_dict_data(url, config_map))
 
     def _post_dict_data(self, url, data: dict):
         extract_none_in_dict(data)
         request_body = json.dumps(data)
         print(f"request: {url}")
         request = requests.post(url, data=request_body)
-        return request.json() if request.status_code is requests.codes.ok else request.status_code
+        return request.json() if request.status_code is requests.codes.ok else {
+            'code': request.status_code,
+            'msg': 'HTTP ERROR',
+            'data': {},
+        }

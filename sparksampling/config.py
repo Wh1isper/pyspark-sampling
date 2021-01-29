@@ -5,11 +5,16 @@ import os
 import json
 from pyspark.conf import SparkConf
 
+import os
+
+dir_pre_fix = os.path.abspath(os.path.dirname(__file__))
+
 
 def get_spark_conf():
     spark_master = os.environ.get('SAMPLING_SPARK_MASTER', 'local')
     spark_app_name = os.environ.get('SAMPLING_SPARK_APP_NAME', 'Spark Sampling')
-    spark_extra_conf_path = os.environ.get('SAMPLING_SPARK_EXTRA_CONF_PATH', 'spark_config.json')
+    spark_extra_conf_path = os.environ.get('SAMPLING_SPARK_EXTRA_CONF_PATH',
+                                           os.path.join(dir_pre_fix, 'spark_config.json'))
     spark_extra_conf = []
     with open(spark_extra_conf_path) as f:
         json_config = json.load(f)

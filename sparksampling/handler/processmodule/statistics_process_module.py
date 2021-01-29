@@ -1,8 +1,9 @@
 from sparksampling.core.orm import SampleJobTable
-from sparksampling.core.sampling.engine.statistics_engine import EvaluationEngine
+from sparksampling.core.sampling.engine.statistics_engine import StatisticsEngine
 from sparksampling.handler.processmodule import BaseProcessModule
 from typing import Dict, Any
 
+from sparksampling.handler.processmodule.base_process_module import BaseQueryProcessModule
 from sparksampling.utilities.custom_error import JobProcessError
 from sparksampling.utilities.var import JOB_STATUS_SUCCEED
 
@@ -11,7 +12,6 @@ class StatisticsProcessModule(BaseProcessModule):
     sql_table = SampleJobTable
     required_keys = {
         'method',
-        'type',
     }
 
     def __init__(self):
@@ -29,12 +29,12 @@ class StatisticsProcessModule(BaseProcessModule):
         if not conf:
             raise JobProcessError("Job status is not succeed, can't run statistics")
         engine = self.config_engine(conf)
-        response_data['data'] = engine.submit()
+        response_data['data'] = engine.submit(is_job=False)
         return response_data
 
-    def config_engine(self, conf) -> EvaluationEngine:
+    def config_engine(self, conf) -> StatisticsEngine:
         self.logger.info(f"Config Engine with conf: {conf}")
-        return EvaluationEngine(**conf)
+        return StatisticsEngine(**conf)
 
     async def format_conf(self, request_data):
         from_sampling = request_data.get('from_sampling')
@@ -57,6 +57,5 @@ class StatisticsProcessModule(BaseProcessModule):
 
     async def get_path_from_sampling_job(self, job_id):
         async with self.sqlengine.acquire() as conn:
-            result = await conn.execute(self.sql_table.select().where(self.sql_table.c.job_id == job_id))
-            details = await result.fetchone()
+            details = await BaseQueryProcessModule.query_job_id(conn, job_id, self.sql_table)
         return details.status_code == JOB_STATUS_SUCCEED, details.simpled_path
