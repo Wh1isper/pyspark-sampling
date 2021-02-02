@@ -59,8 +59,9 @@ class SparkJobEngine(BaseEngine):
         return {}
 
     def submit(self, job_id=None, df_output=True, *args, **kwargs):
-        kwargs.update(**self.prepare(self.prepare(*args, **kwargs)))
         self.job_id = job_id
+        self.logger.info(f"{self.__class__.__name__}: Prepare for job...job_id: {self.job_id}")
+        kwargs.update(**self.prepare(*args, **kwargs))
         self.logger.info(f"{self.__class__.__name__}: Submit job to Spark...job_id: {self.job_id}")
         try:
             df = self.data_io.read(self.job_id, *args, **kwargs)
@@ -68,7 +69,7 @@ class SparkJobEngine(BaseEngine):
                 sampled_df = self.job.generate(df, self.job_id, *args, **kwargs)
                 return self.data_io.write(sampled_df, *args, **kwargs)
             else:
-                return self.job.statistics(df, *args, **kwargs)
+                return self.job.statistics(df, self.job_id, *args, **kwargs)
         except NotImplementedError as e:
             self.logger.error(e)
             raise

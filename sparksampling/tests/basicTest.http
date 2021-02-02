@@ -63,3 +63,9 @@ POST http://{{host}}:{{port}}/v1/evaluation/statistics/
 Accept: application/json
 
 < requestbody/statistics.json
+
+###
+POST http://{{host}}:{{port}}/v1/evaluation/job/
+Accept: application/json
+
+< requestbody/compare-evaluation.json

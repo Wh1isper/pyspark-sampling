@@ -9,16 +9,18 @@ from sparksampling.utilities.var import EVALUATION_COMPARE_METHOD, FILE_TYPE_TEX
 from sparksampling.utilities.var import JOB_CANCELED, JOB_CREATED, JOB_CREATING
 from sparksampling.utilities import CustomErrorWithCode
 from sparksampling.utilities.utilities import convert_dict_value_to_string_value
-from sparksampling.core.orm import EvaluationJobTable
+from sparksampling.core.orm import EvaluationJobTable, SampleJobTable
 
 from datetime import datetime
 
 
 class EvaluationProcessModule(BaseProcessModule):
+    sample_table = SampleJobTable
     sql_table = EvaluationJobTable
 
     required_keys = {
         'path',
+        'source_path',
         'method',
     }
 
@@ -42,7 +44,6 @@ class EvaluationProcessModule(BaseProcessModule):
             'data': {}
         }
         request_data: Dict = self._request_data
-        self.check_param(request_data)
 
         conf = self.format_conf(request_data)
         if conf.get('compare_job_id'):
@@ -51,6 +52,7 @@ class EvaluationProcessModule(BaseProcessModule):
                 'path': path,
                 'source_path': source_path,
             })
+        self.check_param(conf)
         try:
             response_data['data'] = await self.create_job(conf)
             self.job_stats = JOB_CREATED
@@ -72,7 +74,7 @@ class EvaluationProcessModule(BaseProcessModule):
 
     async def get_job_path(self, job_id):
         async with self.sqlengine.acquire() as conn:
-            details = await BaseQueryProcessModule.query_job_id(conn, job_id, self.sql_table)
+            details = await BaseQueryProcessModule.query_job_id(conn, job_id, self.sample_table)
         return details.simpled_path, details.path
 
     async def run_job(self):
@@ -118,7 +120,7 @@ class EvaluationProcessModule(BaseProcessModule):
                 msg='succeed',
                 status_code=JOB_STATUS_SUCCEED,
                 end_time=datetime.now(),
-                result=result
+                result=str(result)
             ))
             await conn._commit_impl()
 

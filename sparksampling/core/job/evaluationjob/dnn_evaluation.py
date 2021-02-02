@@ -1,6 +1,6 @@
 from sparksampling.core.job.base_job import BaseJob
 
 
-class DNNStatisticsJob(BaseJob):
+class DNNEvaluationJob(BaseJob):
     def __init__(self, *args, **kwargs):
-        super(DNNStatisticsJob, self).__init__()
+        super(DNNEvaluationJob, self).__init__()
