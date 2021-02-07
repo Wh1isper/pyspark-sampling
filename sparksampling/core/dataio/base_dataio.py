@@ -20,7 +20,7 @@ class BaseDataIO(Logger):
         self.logger.info(f"{self.__class__.__name__}: Job {self.job_id} : Read from {self.path}")
         return self._read(*args, **kwargs)
 
-    def _read(self, header=True, *args, **kwargs) -> DataFrame:
+    def _read(self, *args, **kwargs) -> DataFrame:
         raise NotImplementedError
 
     def write(self, *args, **kwargs):

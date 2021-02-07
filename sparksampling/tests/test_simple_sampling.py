@@ -9,5 +9,9 @@ class TestSimpleSamplingModule(BaseTestModule):
         return sampling_app()
 
     def test_random_sampling(self):
-        ...
+        response = self._post_data_from_file('simple-random-sampling.json')
+        self._check_code(response, 0, 'Sample Random Sampling Test')
 
+    def test_stratified_sampling(self):
+        response = self._post_data_from_file('stratified-sampling.json')
+        self._check_code(response, 0, 'Stratified Sampling Test')

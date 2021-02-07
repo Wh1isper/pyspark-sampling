@@ -35,7 +35,7 @@ class BaseEngine(Logger):
 
 
 class SparkJobEngine(BaseEngine):
-    def __init__(self, path, method, file_type, *args, **kwargs):
+    def __init__(self, path: str, method: str, file_type: str, *args, **kwargs):
         super(SparkJobEngine, self).__init__()
         if not self.check_map(file_type, method):
             raise BadParamError(
@@ -43,7 +43,7 @@ class SparkJobEngine(BaseEngine):
 
         self.job_id = None
         self.path = path
-        self.method = method
+        self.method = method.lower()
         self.data_io_conf = {
             'with_header': kwargs.get('with_header')
         }
@@ -52,7 +52,7 @@ class SparkJobEngine(BaseEngine):
         sample_job_class = self.job_map[method]
         self.job_conf = get_value_by_require_dict(sample_job_class.type_map, kwargs)
 
-        self.data_io = self.data_io_map[file_type](spark=self.spark, path=self.path, **self.data_io_conf)
+        self.data_io = self.data_io_map[file_type.lower()](spark=self.spark, path=self.path, **self.data_io_conf)
         self.job = self.job_map[method](**self.job_conf)
 
     def prepare(self, *args, **kwargs) -> dict:

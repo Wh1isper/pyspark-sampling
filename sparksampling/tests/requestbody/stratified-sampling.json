@@ -1,7 +1,7 @@
 {
     "path": "hdfs://localhost:9000/dataset/titanic/train.csv",
-    "method": 2,
-    "type": 2,
+    "method": "stratified",
+    "type": "csv",
     "conf": {
         "key": "Survived",
         "fraction": {

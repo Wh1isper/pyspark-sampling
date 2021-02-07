@@ -1,7 +1,7 @@
 {
     "path": "hdfs://localhost:9000/dataset/adult-smote.csv",
-    "method": 3,
-    "type": 2,
+    "method": "smote",
+    "type": "csv",
     "conf": {
         "key": "income"
     }

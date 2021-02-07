@@ -26,7 +26,7 @@ class CompareEvaluationJob(BaseJob):
 
     def prepare(self, *args, **kwargs) -> dict:
         self.logger.info(f"{self.__class__.__name__}: Prepare for job...job_id: {self.job_id}")
-        file_type = 1
+        file_type = 'txt'
         for file_type_code, data_io in kwargs.get('data_io_map').items():
             if type(kwargs.get('data_io')) is data_io:
                 file_type = file_type_code

@@ -5,7 +5,7 @@ CREATE TABLE sampling_job
 (
     job_id       BIGINT AUTO_INCREMENT PRIMARY KEY,
     path         VARCHAR(999) NOT NULL,
-    method       INT          NOT NULL,
+    method       TEXT          NOT NULL,
     request_data TEXT         NOT NULL,
     status_code  INT          NOT NULL,
     simpled_path VARCHAR(999),

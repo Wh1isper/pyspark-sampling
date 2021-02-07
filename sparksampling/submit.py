@@ -1,7 +1,6 @@
 from urllib.parse import urljoin
 
-from sparksampling.utilities.var import FILE_TYPE_TEXT, SIMPLE_RANDOM_SAMPLING_METHOD, STATISTICS_BASIC_METHOD, \
-    SMOTE_SAMPLING_METHOD
+from sparksampling.utilities.var import *
 import json
 import requests
 
@@ -73,15 +72,45 @@ class Submitter(object):
         }
         return DSResponse(**self._post_dict_data(url, config_map))
 
+    def submit_evaluation_job(self, path=None, source_path=None, compare_job_id=None, method=EVALUATION_COMPARE_METHOD,
+                              file_type=FILE_TYPE_TEXT,
+                              with_header=None,
+                              **kwargs):
+        url = urljoin(self.sampling_prefix, '/v1/sampling/mljob')
+        config_map = {
+            'path': path,
+            'source_path': source_path,
+            'method': method,
+            'type': file_type,
+            'with_header': with_header,
+            'compare_job_id': compare_job_id
+        }
+        return DSResponse(**self._post_dict_data(url, config_map))
+
     def get_sampling_job_details(self, job_id):
         url = urljoin(self.sampling_prefix, '/v1/sampling/query/job/')
         config_map = {
             'job_id': job_id,
         }
-        return self._post_dict_data(url, config_map)
+        return DSResponse(**self._post_dict_data(url, config_map))
 
     def get_sampling_job_list(self, offset=None, limit=None):
         url = urljoin(self.sampling_prefix, '/v1/sampling/query/list/')
+        config_map = {
+            'offset': offset,
+            'limit': limit,
+        }
+        return DSResponse(**self._post_dict_data(url, config_map))
+
+    def get_evaluation_job_details(self, job_id):
+        url = urljoin(self.sampling_prefix, '/v1/evaluation/query/job/')
+        config_map = {
+            'job_id': job_id,
+        }
+        return DSResponse(**self._post_dict_data(url, config_map))
+
+    def get_evaluation_job_list(self, offset=None, limit=None):
+        url = urljoin(self.sampling_prefix, '/v1/evaluation/query/list/')
         config_map = {
             'offset': offset,
             'limit': limit,
