@@ -7,7 +7,7 @@ class TextDataIO(BaseDataIO):
         super(TextDataIO, self).__init__(spark, path, args, kwargs)
 
     def _read(self, *args, **kwargs):
-        df = self.spark.read.text(self.path).cache()
+        df = self.spark.read.text(self.path)
         return df
 
     def _write(self, df: DataFrame):

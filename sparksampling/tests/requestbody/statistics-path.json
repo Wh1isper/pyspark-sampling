@@ -1,0 +1,7 @@
+{
+    "path": "hdfs://localhost:9000/dataset/titanic/train.csv",
+    "type": "csv",
+    "method": "basic",
+    "from_sampling": true,
+    "with_header": true
+}

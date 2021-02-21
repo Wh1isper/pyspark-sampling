@@ -3,7 +3,7 @@ import tornado.web
 
 from sparksampling.config import DEBUG_PORT, QUERY_PORT, SAMPLING_JOB_PORT, STATISTICS_JOB_PORT, DEBUG, \
     SAMPLING_PARALLEL, STATISTICS_PARALLEL, QUERY_PARALLEL
-from sparksampling.route import debug_handlers, evaluation_handlers, sampling_handlers, query_handlers
+from sparksampling.route import debug_handlers, sampling_handlers, query_handlers, evaluation_handlers
 from sparksampling.utilities import logger
 
 
@@ -26,7 +26,7 @@ def sampling_app():
     return make_app(sampling_handlers, debug=False, autoreload=False)
 
 
-def statistics_app():
+def evaluation_app():
     return make_app(evaluation_handlers, debug=False, autoreload=False)
 
 
@@ -34,7 +34,7 @@ def run_app():
     app_port_parallel_map = [
         (query_app, QUERY_PORT, QUERY_PARALLEL),
         (sampling_app, SAMPLING_JOB_PORT, SAMPLING_PARALLEL),
-        (statistics_app, STATISTICS_JOB_PORT, STATISTICS_PARALLEL),
+        (evaluation_app, STATISTICS_JOB_PORT, STATISTICS_PARALLEL),
     ]
     servers = []
     for func, port, num_process in app_port_parallel_map:
@@ -46,6 +46,7 @@ def run_app():
     for server in servers:
         server.start()
     logger.info("All apps started!")
+
 
 def main():
     if DEBUG:

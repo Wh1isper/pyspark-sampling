@@ -8,11 +8,11 @@ class CsvDataIO(BaseDataIO):
         self.header = kwargs.get('with_header', True)
 
     def _read(self, *args, **kwargs):
-        df = self.spark.read.csv(self.path, header=self.header)
+        df = self.spark.read.csv(self.path, header=self.header).cache()
         df.show(5)
         return df
 
     def _write(self, df: DataFrame):
-        df.write.csv(self.write_path, mode='overwrite', header=self.header)
         df.show(5)
+        df.write.csv(self.write_path, mode='overwrite', header=self.header)
         return self.write_path

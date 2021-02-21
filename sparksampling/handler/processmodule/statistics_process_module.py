@@ -27,7 +27,7 @@ class StatisticsProcessModule(BaseProcessModule):
         self.check_param(request_data)
         conf = await self.format_conf(request_data)
         if not conf:
-            raise JobProcessError("Job status is not succeed, can't run statistics")
+            raise JobProcessError("Job status is not succeed or can not find file, can't run statistics")
         engine = self.config_engine(conf)
         response_data['data'] = engine.submit(df_output=False)
         return response_data
@@ -37,9 +37,8 @@ class StatisticsProcessModule(BaseProcessModule):
         return StatisticsEngine(**conf)
 
     async def format_conf(self, request_data):
-        from_sampling = request_data.get('from_sampling')
         job_id = request_data.get('job_id')
-        if from_sampling:
+        if job_id:
             self.logger.info(f"Run statistics for sampling job {job_id}")
             is_succeed, path = await self.get_path_from_sampling_job(job_id)
             self.logger.info(f"Get sampled file path {path}")
@@ -48,6 +47,8 @@ class StatisticsProcessModule(BaseProcessModule):
         else:
             path = request_data.get('path')
             self.logger.info(f"Run statistics for file {path}")
+            if not path:
+                return False
         return {
             'path': path,
             'method': request_data.get('method', 1),
@@ -58,4 +59,4 @@ class StatisticsProcessModule(BaseProcessModule):
     async def get_path_from_sampling_job(self, job_id):
         async with self.sqlengine.acquire() as conn:
             details = await BaseQueryProcessModule.query_job_id(conn, job_id, self.sql_table)
-        return details.status_code == JOB_STATUS_SUCCEED, details.simpled_path
+        return details.status_code == JOB_STATUS_SUCCEED, details.simpled_path if details else None, None

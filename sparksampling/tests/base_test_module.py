@@ -9,6 +9,8 @@ import os
 import json
 from json import JSONDecodeError
 
+os.environ['ASYNC_TEST_TIMEOUT'] = '3600'
+
 
 class BaseTestModule(AsyncHTTPTestCase):
     dir_fix = os.path.abspath(os.path.dirname(__file__))
@@ -17,7 +19,7 @@ class BaseTestModule(AsyncHTTPTestCase):
 
     def _post_data_from_file(self, filename):
         requset_data = self._get_request_data(filename)
-        response = self.fetch(self.test_url, method='POST', body=requset_data)
+        response = self.fetch(self.test_url, method='POST', body=requset_data, connect_timeout=0, request_timeout=0)
         data = self._get_response_data(response)
         return data
 
