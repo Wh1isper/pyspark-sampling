@@ -3,6 +3,7 @@ from urllib.parse import urljoin
 from sparksampling.utilities.var import *
 import json
 import requests
+import pandas as pd
 
 
 def extract_none_in_dict(d: dict):
@@ -27,8 +28,22 @@ class DSResponse(object):
             'data': self.data,
         }
 
+    def to_pandas(self):
+        if not self.is_response_ok:
+            return f"Request Error...Check: {self.to_dict()}"
+        if not self.data:
+            return f"No Data to Translate to pandas."
+        return pd.DataFrame.from_records(self.data, index='summary')
+
+    @property
+    def is_response_ok(self):
+        return self.code == 0
+
     def __str__(self):
         return self.to_dict()
+
+    def __getitem__(self, item):
+        return self.__dict__[item]
 
 
 class Submitter(object):
@@ -124,7 +139,7 @@ class Submitter(object):
                        with_header=None,
                        from_sampling=False):
         if from_sampling and not job_id:
-            return "From sampling should set a job_id"
+            return "Error: From sampling should set a job_id"
         url = urljoin(self.sampling_prefix, '/v1/evaluation/statistics/')
         config_map = {
             'path': path,

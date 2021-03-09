@@ -59,4 +59,4 @@ class StatisticsProcessModule(BaseProcessModule):
     async def get_path_from_sampling_job(self, job_id):
         async with self.sqlengine.acquire() as conn:
             details = await BaseQueryProcessModule.query_job_id(conn, job_id, self.sql_table)
-        return details.status_code == JOB_STATUS_SUCCEED, details.simpled_path if details else None, None
+        return (details.status_code == JOB_STATUS_SUCCEED, details.simpled_path) if details else (False, None)
