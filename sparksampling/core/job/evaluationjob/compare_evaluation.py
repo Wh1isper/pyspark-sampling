@@ -3,6 +3,7 @@ from sparksampling.core.job.base_job import BaseJob
 from pyspark.sql import DataFrame
 
 from sparksampling.customize.custom_config import compare_evaluation_code
+import pandas as pd
 
 
 class CompareEvaluationJob(BaseJob):
@@ -19,10 +20,29 @@ class CompareEvaluationJob(BaseJob):
         source_statistics = kwargs.get('source_statistics')
         statistics_job_class = StatisticsEngine.job_map.get(compare_evaluation_code)
         statistics = statistics_job_class().statistics(df, self.job_id, *args, **kwargs)
-        return {
-            's': statistics,
-            'ss': source_statistics,
-        }
+
+        statistics = pd.DataFrame.from_records(statistics, index='summary')
+        source_statistics = pd.DataFrame.from_records(source_statistics, index='summary')
+
+        statistics.loc['mean_bias'] = None
+        statistics.loc['stddev_bias'] = None
+        statistics.loc['score'] = None
+        columns = source_statistics.columns.values.tolist()
+
+        for c in columns:
+            if statistics[c]['mean'] is None:
+                continue
+            mean_bias = abs(float(statistics[c]['mean']) - float(source_statistics[c]['mean'])) / float(
+                source_statistics[c]['mean'])
+            stddev_bias = abs(float(statistics[c]['stddev']) - float(source_statistics[c]['stddev'])) / float(
+                source_statistics[c]['stddev'])
+            statistics[c]['mean_bias'] = mean_bias
+            statistics[c]['stddev_bias'] = stddev_bias
+            statistics[c]['score'] = 100 * (2 - mean_bias - stddev_bias) / 2
+
+        print(statistics)
+
+        return statistics.to_dict()
 
     def prepare(self, *args, **kwargs) -> dict:
         self.logger.info(f"{self.__class__.__name__}: Prepare for job...job_id: {self.job_id}")

@@ -3,6 +3,9 @@ import logging.config
 import os
 
 dir_fix = os.path.abspath(os.path.dirname(__file__))
+if not os.path.exists('log'):
+    print("Create log dir for log file.")
+    os.mkdir('log')
 logging.config.fileConfig(os.path.join(dir_fix, "logging.conf"))
 logger = logging.getLogger('SAMPLING')
 logging.getLogger('pyspark').setLevel(logging.ERROR)

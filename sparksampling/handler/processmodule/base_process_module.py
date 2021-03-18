@@ -75,6 +75,7 @@ class BaseProcessModule(object):
             raise JsonDecodeError
 
     def check_param(self, request_data):
+        self.logger.info(f"Checking Param:{request_data}")
         self._check_json_request(request_data)
         missing_keys = set(self.required_keys) - set(request_data.keys())
         if missing_keys:

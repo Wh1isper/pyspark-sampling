@@ -5,6 +5,7 @@ import json
 import requests
 import pandas as pd
 
+import ast
 
 def extract_none_in_dict(d: dict):
     items = list(d.items())
@@ -31,10 +32,13 @@ class DSResponse(object):
     def to_pandas(self):
         if not self.is_response_ok:
             return f"Request Error...Check: {self.to_dict()}"
-        if not self.data:
-            return f"No Data to Translate to pandas."
-        return pd.DataFrame.from_records(self.data, index='summary')
-
+        if type(self.data) is list:
+            return pd.DataFrame.from_records(self.data, index='summary')
+        elif self.data.get('result'):
+            data = ast.literal_eval(self.data['result'])
+            return pd.DataFrame.from_records(data)
+        else:
+            print("No Data to Translate to pandas.")
     @property
     def is_response_ok(self):
         return self.code == 0
@@ -91,7 +95,7 @@ class Submitter(object):
                               file_type=FILE_TYPE_TEXT,
                               with_header=None,
                               **kwargs):
-        url = urljoin(self.sampling_prefix, '/v1/sampling/mljob')
+        url = urljoin(self.sampling_prefix, '/v1/evaluation/job/')
         config_map = {
             'path': path,
             'source_path': source_path,

@@ -153,7 +153,7 @@ class QueryEvaluationJobProcessModule(BaseQueryProcessModule):
             'job_id': details.job_id,
             'job_status': CODE_TO_JOB_STATUS[details.status_code],
             'msg': details.msg,
-            'method': CODE_TO_SAMPLING_METHOD_NAME[details.method],
+            'method': CODE_TO_EVALUATION_METHOD_NAME[details.method],
             'start_time': details.start_time.strftime("%Y/%m/%d/ %H:%M:%S") if details.start_time else None,
             'end_time': details.end_time.strftime("%Y/%m/%d %H:%M:%S") if details.end_time else None,
             'result': details.result,
