@@ -1,7 +1,7 @@
 from tornado.testing import AsyncHTTPTestCase
 from tornado.httpclient import HTTPResponse
 from sparksampling.app import make_app, debug_app
-
+import tornado
 from sparksampling.utilities.code import JSON_DECODE_ERROR
 
 import unittest
@@ -16,6 +16,12 @@ class BaseTestModule(AsyncHTTPTestCase):
     dir_fix = os.path.abspath(os.path.dirname(__file__))
     pre_fix = './requestbody/'
     test_url = r'/'
+
+    def get_new_ioloop(self):
+        return tornado.platform.asyncio.AsyncIOMainLoop()
+
+    def get_app(self):
+        return debug_app()
 
     def _post_data_from_file(self, filename):
         requset_data = self._get_request_data(filename)
