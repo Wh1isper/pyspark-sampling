@@ -3,4 +3,7 @@ omit =
 	*/__init__.py
 	*/tests/*
 	*/venv/*
-
+	*/customize/*
+	*/utilities/*
+	app.py
+	submit.py

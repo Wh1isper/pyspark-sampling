@@ -7,6 +7,7 @@ import pandas as pd
 
 import ast
 
+
 def extract_none_in_dict(d: dict):
     items = list(d.items())
     for k, v in items:
@@ -39,6 +40,16 @@ class DSResponse(object):
             return pd.DataFrame.from_records(data)
         else:
             print("No Data to Translate to pandas.")
+            print(self.to_dict())
+
+    @property
+    def job_id(self):
+        return self.data.get('job_id')
+
+    @property
+    def sampled_path(self):
+        return self.data.get('simpled_file_path')
+
     @property
     def is_response_ok(self):
         return self.code == 0

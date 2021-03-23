@@ -20,7 +20,7 @@ class EvaluationProcessModule(BaseProcessModule):
 
     required_keys = {
         'path',
-        'source_path',
+        # 'source_path',
         'method',
     }
 
@@ -44,10 +44,11 @@ class EvaluationProcessModule(BaseProcessModule):
             'data': {}
         }
         request_data: Dict = self._request_data
-
+        self._check_json_request(request_data)
         conf = self.format_conf(request_data)
         if conf.get('compare_job_id'):
             path, source_path = await self.get_job_path(conf.get('compare_job_id'))
+            self.logger.info(f"path:{path}, source path: {source_path}")
             conf.update(**{
                 'path': path,
                 'source_path': source_path,
@@ -73,6 +74,7 @@ class EvaluationProcessModule(BaseProcessModule):
         }
 
     async def get_job_path(self, job_id):
+        self.logger.info(f"Requesting for sampling job path: {job_id}")
         async with self.sqlengine.acquire() as conn:
             details = await BaseQueryProcessModule.query_job_id(conn, job_id, self.sample_table)
         return details.simpled_path, details.path

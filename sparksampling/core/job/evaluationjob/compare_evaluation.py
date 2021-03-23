@@ -24,9 +24,9 @@ class CompareEvaluationJob(BaseJob):
         statistics = pd.DataFrame.from_records(statistics, index='summary')
         source_statistics = pd.DataFrame.from_records(source_statistics, index='summary')
 
-        statistics.loc['mean_bias'] = None
-        statistics.loc['stddev_bias'] = None
-        statistics.loc['score'] = None
+        statistics.loc['mean_bias'] = -1
+        statistics.loc['stddev_bias'] = -1
+        statistics.loc['score'] = -1
         columns = source_statistics.columns.values.tolist()
 
         for c in columns:
@@ -39,7 +39,6 @@ class CompareEvaluationJob(BaseJob):
             statistics[c]['mean_bias'] = mean_bias
             statistics[c]['stddev_bias'] = stddev_bias
             statistics[c]['score'] = 100 * (2 - mean_bias - stddev_bias) / 2
-
         print(statistics)
 
         return statistics.to_dict()
