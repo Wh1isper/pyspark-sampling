@@ -1,25 +1,53 @@
 # pyspark-sampling
 
-## 已完成功能
+基于PySpark的数据采样与评估系统
 
-- 简单随机抽样
-- 分层抽样
-- 2 class smote oversampling
-- 单任务状态查询
-- 任务列表查询
-- overview统计功能
-- 架构优化，多服务架构实现
-- 抽样、统计、评估引擎及架构搭建
+”始于采样，不止采样“
 
-## todo
+## 特点
 
-- submitter跟进
-- 单元测试
-- 评估算法功能
-- 更多的抽样功能
-- 更多的统计功能
+- 基于Spark的轻量化数据处理工具
+- 自带采样和评估算法
+- 支持用户自定义数据处理算法
+- 提供HTTP服务和任务提交工具
 
-## 需要调研
 
-- 任务调度机制问题
-- 任务停止调研
+## 如何使用
+
+### 部署
+
+#### 安装pyspark-sampling服务
+
+```bash
+pip install sparksampling
+```
+
+#### 配置数据库、Spark相关选项
+
+更多配置信息见config.py
+
+```
+export SPARK_HOME="/path/to/spark_home"
+export SAMPLING_SPARK_EXTRA_CONF_PATH="/path/to/config/json_file"
+export SAMPLING_DB_USERNAME="database username"
+export SAMPLING_DB_NAME="database name, default: sampling"
+export SAMPLING_DB_HOST="database host, default: localhost"
+export SAMPLING_DB_PASSWORD="database username"
+export SAMPLING_SERVICE_DEBUG=0 #DEBUG默认启动 这里可以关闭
+```
+
+### 使用
+
+提交工具见sparksampling_example.ipynb
+
+也可以直接使用HTTP请求对任务进行提交
+
+## 开发者指南
+
+
+
+## 架构介绍
+
+
+
+## RoadMap

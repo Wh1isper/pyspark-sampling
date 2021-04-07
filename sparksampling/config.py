@@ -38,6 +38,6 @@ STATISTICS_PARALLEL = int(os.environ.get('SAMPLING_SERVICE_STATISTICS_PARALLEL',
 DEBUG = bool(os.environ.get('SAMPLING_SERVICE_DEBUG', True))
 
 DB_USERNAME = os.environ.get('SAMPLING_DB_USERNAME', 'root')
-DB_NAME = os.environ.get('SAMPLING_DB_USERNAME', 'sampling')
+DB_NAME = os.environ.get('SAMPLING_DB_NAME', 'sampling')
 DB_HOST = os.environ.get('SAMPLING_DB_HOST', 'localhost')
 DB_PASSWORD = os.environ.get('SAMPLING_DB_PASSWORD', 'baobao')
