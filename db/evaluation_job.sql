@@ -1,13 +1,13 @@
 CREATE DATABASE IF NOT EXISTS sampling;
 USE sampling;
-DROP TABLE IF EXISTS evaluation_job;
+# DROP TABLE IF EXISTS evaluation_job;
 
-CREATE TABLE evaluation_job
+CREATE TABLE IF NOT EXISTS evaluation_job
 (
     job_id       BIGINT AUTO_INCREMENT PRIMARY KEY,
     path         VARCHAR(999) NOT NULL,
     source_path  VARCHAR(999),
-    method       TEXT          NOT NULL,
+    method       TEXT         NOT NULL,
     request_data TEXT         NOT NULL,
     status_code  INT          NOT NULL,
     result       TEXT,
