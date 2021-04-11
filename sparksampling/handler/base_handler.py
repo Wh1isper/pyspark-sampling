@@ -54,9 +54,14 @@ class BaseProcessHandler(RequestHandler):
                 json_data = json.loads(data)
                 self.logger.info(f"request data : {json_data}")
                 await self.processmodule.prepare(json_data, kw)
+            except CustomErrorWithCode as e:
+                self.logger.error(f"{type(self.processmodule).__name__} Process Error: {str(e)}")
+                response_data = e.error_response()
+                return json.dumps(response_data)
             except JSONDecodeError:
                 self.logger.warning(f"Request body JSON Decode Failed, data : {data}")
                 await self.processmodule.prepare(data, kw)
+
             try:
                 return_data = await self.processmodule.process()
                 if return_data is not None:

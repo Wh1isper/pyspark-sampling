@@ -1,7 +1,7 @@
 """
 自定义错误类
 """
-from sparksampling.utilities.code import JSON_DECODE_ERROR, TYPE_ERROR, BAD_PARAM_ERROR, SQL_ERROR
+from sparksampling.utilities.code import JSON_DECODE_ERROR, TYPE_ERROR, BAD_PARAM_ERROR, SQL_ERROR, DB_CONNECT_FAILD
 from sparksampling.utilities.var import JOB_STATUS_KEY_ERROR, JOB_STATUS_PROCESS_ERROR, JOB_STATUS_TYPE_ERROR
 
 
@@ -35,6 +35,11 @@ class TypeCheckError(CustomErrorWithCode):
 class SQLError(CustomErrorWithCode):
     def __init__(self, msg: str):
         super(SQLError, self).__init__(SQL_ERROR, msg)
+
+
+class DBConnectError(CustomErrorWithCode):
+    def __init__(self, msg: str):
+        super(DBConnectError, self).__init__(DB_CONNECT_FAILD, msg)
 
 
 class BadParamError(CustomErrorWithCode):

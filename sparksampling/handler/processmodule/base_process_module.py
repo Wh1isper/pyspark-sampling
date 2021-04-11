@@ -3,9 +3,12 @@
 """
 from typing import Any, Dict
 import logging
+
+from pymysql import OperationalError
+
 from sparksampling.core import DatabaseConnector
 from sparksampling.utilities import CustomErrorWithCode, JsonDecodeError
-from sparksampling.utilities.custom_error import SQLError
+from sparksampling.utilities.custom_error import SQLError, DBConnectError
 from sparksampling.utilities.var import JOB_CANCELED, JOB_CREATED, JOB_CREATING
 
 
@@ -28,7 +31,10 @@ class BaseProcessModule(object):
         Returns:
 
         """
-        self.sqlengine = await DatabaseConnector.engine
+        try:
+            self.sqlengine = await DatabaseConnector.engine
+        except OperationalError as e:
+            raise DBConnectError(e.args[1])
         self.param_format(data, kw)
         await self.prepare_hook(args, kwargs)
 
