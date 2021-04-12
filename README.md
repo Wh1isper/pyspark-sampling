@@ -82,7 +82,50 @@ API文档
 
 #### 自定义算法
 
+示例见customize/custom_config_example.py
 
+配置`SAMPLING_CUSTOM_CONFIG_FILE_PATH`指向自定义代码文件
+
+示例如下：
+
+当前运行sparksamling目录下有文件*custom_config_example.py*
+
+```python
+# 此文件用于说明如何自定义添加代码，替换custom_config.py文件即可生效
+from sparksampling.utilities.var import STATISTICS_BASIC_METHOD
+from sparksampling.customize.dummy_job import DummyJob
+from sparksampling.customize.dummy_dataio import DummyDataIO
+compare_evaluation_code = STATISTICS_BASIC_METHOD
+extra_statistics_job = {}
+extra_evaluation_job = {}
+
+extra_sampling_job = {
+    "dummyJob": DummyJob
+}
+extra_dataio = {
+    "dummyDatatype": DummyDataIO
+}
+```
+
+配置：
+
+```bash
+export SAMPLING_CUSTOM_CONFIG_PATH="custom_config_example.py"
+```
+
+访问api时使用`"method": "dummyJob"`即可使用`DummyJob`；`"type": "dummyDatatype"`即可使用`DummyDataIO`
+
+*output example:*
+
+```bash
+2021-04-12 16:04:24,845 INFO base_engine.py[28] Load data_io txt : TextDataIO
+2021-04-12 16:04:24,845 INFO base_engine.py[28] Load data_io csv : CsvDataIO
+2021-04-12 16:04:24,845 INFO base_engine.py[28] Load data_io dummyDatatype : DummyDataIO
+2021-04-12 16:04:24,845 INFO base_engine.py[30] Load job random : SimpleRandomSamplingJob
+2021-04-12 16:04:24,845 INFO base_engine.py[30] Load job stratified : StratifiedSamplingJob
+2021-04-12 16:04:24,845 INFO base_engine.py[30] Load job smote : SmoteSamplingJob
+2021-04-12 16:04:24,845 INFO base_engine.py[30] Load job dummyJob : DummyJob
+```
 
 
 
@@ -90,8 +133,8 @@ API文档
 
 ### 使用本地安装
 
-```
-pip install -e ./
+```bash
+$pip install -e ./
 ```
 
 ### 导入数据库
@@ -108,7 +151,11 @@ pip install -e ./
 
 ### 开发算法
 
+为本系统贡献算法代码或数据源适配代码，直接在core/job或core/dataio进行开发
 
+参考以下步骤对算法进行开发：
+
+#### 准备：确定是否有合适的dataio
 
 
 

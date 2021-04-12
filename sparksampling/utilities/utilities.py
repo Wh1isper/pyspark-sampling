@@ -5,6 +5,17 @@ from typing import Dict
 import random
 import string
 import ast
+import importlib.util
+
+
+def from_path_import(name, location, attr=None):
+    spec = importlib.util.spec_from_file_location(name, location)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    if attr:
+        return getattr(module, attr)
+    else:
+        return module
 
 
 def serialize_b64(src, to_str=False):

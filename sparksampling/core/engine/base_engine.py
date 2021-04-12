@@ -4,10 +4,11 @@ from sparksampling.config import SPARK_CONF
 from sparksampling.core import Logger
 from sparksampling.core.dataio import CsvDataIO, TextDataIO
 from sparksampling.utilities.custom_error import JobTypeError, JobProcessError, JobKeyError, BadParamError
-from sparksampling.utilities.utilities import extract_none_in_dict, get_value_by_require_dict
+from sparksampling.utilities.utilities import extract_none_in_dict, get_value_by_require_dict, from_path_import
 from sparksampling.utilities.var import FILE_TYPE_TEXT, FILE_TYPE_CSV
+from sparksampling.config import CUSTOM_CONFIG_FILE
 
-from sparksampling.customize.custom_config import extra_dataio
+extra_dataio = from_path_import("extra_dataio", CUSTOM_CONFIG_FILE, "extra_dataio")
 
 
 class BaseEngine(Logger):

@@ -1,4 +1,5 @@
 from sparksampling.utilities.custom_error import CustomErrorWithCode, JsonDecodeError, TypeCheckError
+from sparksampling.utilities.utilities import from_path_import
 import logging.config
 import os
 
@@ -16,4 +17,5 @@ __all__ = [
     'JsonDecodeError',
     'logger',
     'TypeCheckError',
+    'from_path_import',
 ]

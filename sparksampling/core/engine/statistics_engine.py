@@ -1,8 +1,10 @@
 from sparksampling.core.engine.base_engine import SparkJobEngine
+from sparksampling.utilities import from_path_import
 from sparksampling.utilities.var import STATISTICS_BASIC_METHOD
 from sparksampling.core.job.statisticsjob import BasicStatisticsJob
+from sparksampling.config import CUSTOM_CONFIG_FILE
 
-from sparksampling.customize.custom_config import extra_statistics_job
+extra_statistics_job = from_path_import("extra_statistics_job", CUSTOM_CONFIG_FILE, "extra_statistics_job")
 
 
 class StatisticsEngine(SparkJobEngine):

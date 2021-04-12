@@ -28,6 +28,8 @@ class BaseDataIO(Logger):
         return self._write(*args, **kwargs)
 
     def _write(self, *args, **kwargs):
+        # write a file or url
+        # return write path or None for failed
         raise NotImplementedError
 
     def get_sampled_data_path(self):
