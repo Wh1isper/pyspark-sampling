@@ -1,41 +1,38 @@
 from sparksampling.utilities.var import STATISTICS_BASIC_METHOD
 
+# compare evaluation方法所对应的statistics method
+# 原理见CompareEvaluationJob
+# 暂不支持其他方式
 compare_evaluation_code = STATISTICS_BASIC_METHOD
 
+# api对应字段：method
+# 示例：
+# "basic"：BasicStatisticsJob
+# PORT: EVALUATION_JOB_PORT
 extra_statistics_job = {
 
 }
 
+# api对应字段：method
+# 示例：
+# "compare"：CompareEvaluationJob
+# PORT: EVALUATION_JOB_PORT
 extra_evaluation_job = {
 
 }
 
+# api对应字段：method
+# 示例：
+# "random"：SimpleRandomSamplingJob
+# PORT: SAMPLING_JOB_PORT
 extra_sampling_job = {
 
 }
 
+# api对应字段：type
+# 示例：
+# "csv":CsvDataIO
+# 可用于所有服务
 extra_dataio = {
 
 }
-
-from sparksampling.core.dataio.base_dataio import BaseDataIO
-from sparksampling.core.job.base_job import BaseJob
-from pyspark.sql import DataFrame
-import pandas as pd
-
-
-class DummyJob(BaseJob):
-    def _generate(self, df: DataFrame, *args, **kwargs) -> DataFrame:
-        return df
-
-    def _statistics(self, df: DataFrame, *args, **kwargs) -> dict:
-        return {'auc': 888}
-
-
-class DummyDataIO(BaseDataIO):
-    def _read(self, header=True, *args, **kwargs) -> DataFrame:
-        pandas_df = pd.read_csv("this is not a path")
-        return self.spark.createDataFrame(pandas_df)
-
-    def _write(self, *args, **kwargs):
-        return

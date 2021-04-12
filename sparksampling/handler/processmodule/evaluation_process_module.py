@@ -27,7 +27,7 @@ class EvaluationProcessModule(BaseProcessModule):
     def __init__(self):
         super(EvaluationProcessModule, self).__init__()
         self.job_id = None
-        self.sample_engine = None
+        self.evaluation_engine = None
         self.job_stats = JOB_CREATING
 
     async def process(self) -> Dict[str, Any]:
@@ -81,13 +81,13 @@ class EvaluationProcessModule(BaseProcessModule):
 
     async def run_job(self):
         try:
-            result = self.sample_engine.submit(self.job_id, df_output=False)
+            result = self.evaluation_engine.submit(self.job_id, df_output=False)
             await self.finish_job(result)
         except CustomErrorWithCode as e:
             await self.error_job(e)
 
     async def create_job(self, conf):
-        self.sample_engine = self.config_engine(conf)
+        self.evaluation_engine = self.config_engine(conf)
         self.job_id = await self.init_job(conf)
         self.logger.info(f"Finish create job, job_id: {self.job_id}")
         return {
