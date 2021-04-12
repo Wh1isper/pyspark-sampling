@@ -4,12 +4,6 @@
 
 from setuptools import setup, find_packages
 
-with open('README.rst') as readme_file:
-    readme = readme_file.read()
-
-with open('HISTORY.rst') as history_file:
-    history = history_file.read()
-
 requirements = []
 
 setup_requirements = []
@@ -32,7 +26,6 @@ setup(
     ],
     description="pyspark-sampling",
     install_requires=requirements,
-    long_description=readme + '\n\n' + history,
     include_package_data=True,
     keywords='sparksampling',
     name='sparksampling',
