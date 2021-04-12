@@ -8,6 +8,8 @@ import pandas as pd
 
 class CompareEvaluationJob(BaseJob):
     # 通过两次statistics对比进行打分
+    # prepare对原始数据集进行statistics
+    # _statistics对抽样后数据集进行statistics并打分
     # 目前只支持STATISTICS_BASIC_METHOD
     type_map = {
         'source_path': str

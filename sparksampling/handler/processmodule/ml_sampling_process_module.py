@@ -5,6 +5,7 @@ import random
 class MLSamplingProcessModule(SamplingProcessModule):
     def job_conf(self, conf):
         job_conf = self.__smote_conf(conf)
+        job_conf.update(self.__customize_conf(conf))
         return job_conf
 
     def __smote_conf(self, conf):
@@ -16,3 +17,6 @@ class MLSamplingProcessModule(SamplingProcessModule):
             'restore': conf.get('restore', True),
             'col_key': conf.get('key')
         }
+
+    def __customize_conf(self, conf):
+        return {}

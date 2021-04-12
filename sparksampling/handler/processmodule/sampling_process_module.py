@@ -3,9 +3,9 @@ from typing import Dict, Any
 import random
 from sparksampling.utilities import TypeCheckError
 from sparksampling.core.engine import SamplingEngine
-from sparksampling.utilities.var import JOB_STATUS_SUCCEED, JOB_STATUS_PADDING
-from sparksampling.utilities.var import SIMPLE_RANDOM_SAMPLING_METHOD, FILE_TYPE_TEXT
-from sparksampling.utilities.var import JOB_CANCELED, JOB_CREATED, JOB_CREATING
+from sparksampling.var import JOB_STATUS_SUCCEED, JOB_STATUS_PADDING
+from sparksampling.var import SIMPLE_RANDOM_SAMPLING_METHOD, FILE_TYPE_TEXT
+from sparksampling.var import JOB_CANCELED, JOB_CREATED, JOB_CREATING
 from sparksampling.utilities import CustomErrorWithCode
 from sparksampling.utilities.utilities import convert_dict_value_to_string_value
 from sparksampling.core.orm import SampleJobTable
@@ -54,7 +54,8 @@ class SamplingProcessModule(BaseProcessModule):
 
     def format_conf(self, request_data: Dict):
         conf = request_data.get('conf', dict())
-        formatted = self.base_conf(request_data)
+        formatted = conf
+        formatted.update(self.base_conf(request_data))
         formatted.update(self.job_conf(conf))
         return formatted
 

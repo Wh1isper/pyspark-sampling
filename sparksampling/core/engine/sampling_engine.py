@@ -3,7 +3,7 @@ data_io -> dataFrame -> sampling_job -> data_io
 """
 from sparksampling.core.job import SimpleRandomSamplingJob, StratifiedSamplingJob, SmoteSamplingJob
 from sparksampling.utilities import from_path_import
-from sparksampling.utilities.var import SIMPLE_RANDOM_SAMPLING_METHOD, STRATIFIED_SAMPLING_METHOD, SMOTE_SAMPLING_METHOD
+from sparksampling.var import SIMPLE_RANDOM_SAMPLING_METHOD, STRATIFIED_SAMPLING_METHOD, SMOTE_SAMPLING_METHOD
 from sparksampling.core.engine.base_engine import SparkJobEngine
 from sparksampling.config import CUSTOM_CONFIG_FILE
 

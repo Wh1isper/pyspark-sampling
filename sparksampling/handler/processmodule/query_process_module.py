@@ -1,7 +1,7 @@
 from sparksampling.core.orm import SampleJobTable, EvaluationJobTable
 
 from sparksampling.handler.processmodule.base_process_module import BaseQueryProcessModule
-from sparksampling.utilities.var import CODE_TO_SAMPLING_METHOD_NAME, CODE_TO_JOB_STATUS, CODE_TO_EVALUATION_METHOD_NAME
+from sparksampling.var import CODE_TO_SAMPLING_METHOD_NAME, CODE_TO_JOB_STATUS, CODE_TO_EVALUATION_METHOD_NAME
 
 
 class QueryJobProcessModule(BaseQueryProcessModule):

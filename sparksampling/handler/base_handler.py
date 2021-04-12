@@ -8,12 +8,10 @@ import traceback
 from concurrent.futures.thread import ThreadPoolExecutor
 
 from tornado.web import RequestHandler
-from tornado.concurrent import run_on_executor
 
 from json import JSONDecodeError
 
 from sparksampling.handler.processmodule.base_process_module import BaseProcessModule
-from sparksampling.utilities.var import JOB_CREATED
 from sparksampling.utilities.code import NORMAL_FAILD as NOT_FOUND_FAIL
 from sparksampling.utilities.code import PROCESS_ERROR
 from sparksampling.utilities import CustomErrorWithCode

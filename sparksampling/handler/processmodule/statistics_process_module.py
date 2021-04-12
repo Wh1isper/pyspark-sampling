@@ -5,7 +5,7 @@ from typing import Dict, Any
 
 from sparksampling.handler.processmodule.base_process_module import BaseQueryProcessModule
 from sparksampling.utilities.custom_error import JobProcessError
-from sparksampling.utilities.var import JOB_STATUS_SUCCEED
+from sparksampling.var import JOB_STATUS_SUCCEED
 
 
 class StatisticsProcessModule(BaseProcessModule):
@@ -25,9 +25,11 @@ class StatisticsProcessModule(BaseProcessModule):
         }
         request_data: Dict = self._request_data
         self.check_param(request_data)
-        conf = await self.format_conf(request_data)
+        conf = request_data
+        format_conf = await self.format_conf(request_data)
         if not conf:
             raise JobProcessError("Job status is not succeed or can not find file, can't run statistics")
+        conf.update(format_conf)
         engine = self.config_engine(conf)
         response_data['data'] = engine.submit(df_output=False)
         return response_data

@@ -4,9 +4,9 @@ from typing import Dict, Any
 
 from sparksampling.handler.processmodule.base_process_module import BaseQueryProcessModule
 from sparksampling.utilities import TypeCheckError
-from sparksampling.utilities.var import JOB_STATUS_SUCCEED, JOB_STATUS_PADDING
-from sparksampling.utilities.var import EVALUATION_COMPARE_METHOD, FILE_TYPE_TEXT
-from sparksampling.utilities.var import JOB_CANCELED, JOB_CREATED, JOB_CREATING
+from sparksampling.var import JOB_STATUS_SUCCEED, JOB_STATUS_PADDING
+from sparksampling.var import EVALUATION_COMPARE_METHOD, FILE_TYPE_TEXT
+from sparksampling.var import JOB_CANCELED, JOB_CREATED, JOB_CREATING
 from sparksampling.utilities import CustomErrorWithCode
 from sparksampling.utilities.utilities import convert_dict_value_to_string_value
 from sparksampling.core.orm import EvaluationJobTable, SampleJobTable
@@ -45,7 +45,8 @@ class EvaluationProcessModule(BaseProcessModule):
         }
         request_data: Dict = self._request_data
         self._check_json_request(request_data)
-        conf = self.format_conf(request_data)
+        conf = request_data
+        conf.update(self.format_conf(request_data))
         if conf.get('compare_job_id'):
             path, source_path = await self.get_job_path(conf.get('compare_job_id'))
             self.logger.info(f"path:{path}, source path: {source_path}")

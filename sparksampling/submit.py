@@ -1,6 +1,6 @@
 from urllib.parse import urljoin
 
-from sparksampling.utilities.var import *
+from sparksampling.var import *
 import json
 import requests
 import pandas as pd

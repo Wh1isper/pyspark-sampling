@@ -9,7 +9,7 @@ from pymysql import OperationalError
 from sparksampling.core import DatabaseConnector
 from sparksampling.utilities import CustomErrorWithCode, JsonDecodeError
 from sparksampling.utilities.custom_error import SQLError, DBConnectError
-from sparksampling.utilities.var import JOB_CANCELED, JOB_CREATED, JOB_CREATING
+from sparksampling.var import JOB_CREATED, JOB_CREATING
 
 
 class BaseProcessModule(object):

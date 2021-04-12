@@ -1,6 +1,6 @@
 from sparksampling.core.engine.base_engine import SparkJobEngine
 from sparksampling.utilities import from_path_import
-from sparksampling.utilities.var import STATISTICS_BASIC_METHOD
+from sparksampling.var import STATISTICS_BASIC_METHOD
 from sparksampling.core.job.statisticsjob import BasicStatisticsJob
 from sparksampling.config import CUSTOM_CONFIG_FILE
 

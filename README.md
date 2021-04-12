@@ -91,10 +91,10 @@ API文档
 当前运行sparksamling目录下有文件*custom_config_example.py*
 
 ```python
-# 此文件用于说明如何自定义添加代码，替换custom_config.py文件即可生效
-from sparksampling.utilities.var import STATISTICS_BASIC_METHOD
+from sparksampling.var import STATISTICS_BASIC_METHOD
 from sparksampling.customize.dummy_job import DummyJob
 from sparksampling.customize.dummy_dataio import DummyDataIO
+
 compare_evaluation_code = STATISTICS_BASIC_METHOD
 extra_statistics_job = {}
 extra_evaluation_job = {}
@@ -127,8 +127,6 @@ export SAMPLING_CUSTOM_CONFIG_PATH="custom_config_example.py"
 2021-04-12 16:04:24,845 INFO base_engine.py[30] Load job dummyJob : DummyJob
 ```
 
-
-
 ## 开发者指南
 
 ### 使用本地安装
@@ -153,9 +151,119 @@ $pip install -e ./
 
 为本系统贡献算法代码或数据源适配代码，直接在core/job或core/dataio进行开发
 
-参考以下步骤对算法进行开发：
+dataio开发相对简单，继承BaseDataIO即可，实现\_read和\_write方法即可
 
-#### 准备：确定是否有合适的dataio
+**推荐使用Spark DataFrame以及其相关API以获得最佳性能**
+
+*使用别的数据结构请自行定义*
+
+```python
+class DummyDataIO(BaseDataIO):
+    def __init__(self, spark, path):
+        super(DummyDataIO, self).__init__(spark, path)
+        self.write_path = "path to write"
+
+    def _read(self, header=True, *args, **kwargs) -> DataFrame:
+        pandas_df = pd.read_csv("this is not a path")
+        return self.spark.createDataFrame(pandas_df)
+
+    def _write(self, *args, **kwargs):
+        # write a file or url
+        # return write path or None for failed
+        return self.write_path
+```
+
+job参考以下步骤对算法进行开发：
+
+#### 1：确定任务类型
+
+目前根据任务是否输出DataFrame到文件系统分为抽样任务(sampling_job)和统计评估(statistics_job & evaluation_job)任务两类
+
+根据任务同步执行或异步执行分为抽样评估任务(sampling_job && evaluation_job)和统计任务(statistics_job)两类
+
+见下表：
+
+|      job       | 异步执行 | 输出 | 需要实现的函数                                               |
+| :------------: | :------: | :--: | ------------------------------------------------------------ |
+|  sampling_job  |    是    |  是  | def _generate(self, df: DataFrame, *args, **kwargs) -> DataFrame: |
+| evaluation_job |    是    |  否  | def _statistics(self, df: DataFrame, *args, **kwargs) -> dict: |
+| statistics_job |    否    |  否  | def _statistics(self, df: DataFrame, *args, **kwargs) -> dict: |
+
+#### 2：根据任务类型在对应Engine注册
+
+|      job      |       介绍       |      对应engine      |
+| :-----------: | :--------------: | :------------------: |
+|   simplejob   |   简单抽样任务   |  sampling_engine.py  |
+|     mljob     | 机器学习采样任务 |  sampling_engine.py  |
+| evaluationjob |     评估任务     | evaluation_engine.py |
+| statisticsjob |     统计任务     | statistics_engine.py |
+
+举例说明注册
+
+*core/engine/sampling_engine.py*
+
+```python
+class SamplingEngine(SparkJobEngine):
+    job_map = {
+    	# 在这里进行注册，如 "sampling job method name": JobClass
+        SIMPLE_RANDOM_SAMPLING_METHOD: SimpleRandomSamplingJob,
+        STRATIFIED_SAMPLING_METHOD: StratifiedSamplingJob,
+        SMOTE_SAMPLING_METHOD: SmoteSamplingJob
+    }
+
+    job_map.update(extra_sampling_job)
+```
+
+#### 3：传入参数定义
+
+以`SimpleRandomSamplingJob`举例说明
+
+*core/job/simplejob/random_sampling.py*
+
+```python
+class SimpleRandomSamplingJob(BaseSamplingJob):
+    # type_map定义了需要传入的参数和数据类型，在Engine进行配置，在Job调用check_type()进行校验
+    # 如果这里的key与你想要传入的key不同，如API规定的"kseed"其实是这里的"seed"，在process_module中修改
+    type_map = {
+        'with_replacement': bool,
+        'fraction': float,
+        'seed': int
+    }
+
+    def __init__(self, *args, **kwargs):
+        super(SimpleRandomSamplingJob, self).__init__(*args, **kwargs)
+        self.check_type()  # 校验参数传递
+
+    def _generate(self, df: DataFrame, *args, **kwargs) -> DataFrame:
+        # 实现这个方法，返回的DataFrame将被传入Dataio，写入文件系统
+        return df.sample(withReplacement=self.with_replacement, fraction=self.fraction, seed=self.seed)
+```
+
+举例说明如何format参数
+
+*handler/processmodule/ml_sampling_process_module.py*
+
+```python
+class MLSamplingProcessModule(SamplingProcessModule):
+    def job_conf(self, conf):
+        job_conf = self.__smote_conf(conf)
+        job_conf.update(self.__customize_conf(conf))
+        return job_conf
+
+    def __smote_conf(self, conf):
+        return {
+            'k': conf.get('k', 3),
+            'bucket_length': conf.get('bucket_length', 10),
+            'multiplier': conf.get('multiplier', 2),
+            'seed': conf.get('seed', random.randint(1, 65535)),
+            'restore': conf.get('restore', True),
+            'col_key': conf.get('key')
+        }
+
+    def __customize_conf(self, conf):
+        # 在这里对参数进行format
+        return {}
+```
 
 
 

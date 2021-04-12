@@ -1,5 +1,4 @@
-# 此文件用于说明如何自定义添加代码，替换custom_config.py文件即可生效
-from sparksampling.utilities.var import STATISTICS_BASIC_METHOD
+from sparksampling.var import STATISTICS_BASIC_METHOD
 from sparksampling.customize.dummy_job import DummyJob
 from sparksampling.customize.dummy_dataio import DummyDataIO
 

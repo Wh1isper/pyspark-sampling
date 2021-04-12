@@ -1,4 +1,4 @@
-from sparksampling.utilities.var import STATISTICS_BASIC_METHOD
+from sparksampling.var import STATISTICS_BASIC_METHOD
 
 # compare evaluation方法所对应的statistics method
 # 原理见CompareEvaluationJob

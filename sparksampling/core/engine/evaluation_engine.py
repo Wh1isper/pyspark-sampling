@@ -1,6 +1,6 @@
 from sparksampling.core.engine.base_engine import SparkJobEngine
 from sparksampling.utilities import from_path_import
-from sparksampling.utilities.var import EVALUATION_DNN_METHOD, EVALUATION_TESTING_METHOD, EVALUATION_COMPARE_METHOD
+from sparksampling.var import EVALUATION_DNN_METHOD, EVALUATION_TESTING_METHOD, EVALUATION_COMPARE_METHOD
 from sparksampling.core.job.evaluationjob import DNNEvaluationJob, HypothesisTestEvaluationJob
 from sparksampling.core.job.evaluationjob.compare_evaluation import CompareEvaluationJob
 from sparksampling.config import CUSTOM_CONFIG_FILE
