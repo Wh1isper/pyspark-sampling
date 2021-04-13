@@ -40,4 +40,5 @@ DB_NAME = os.environ.get('SAMPLING_DB_NAME', 'sampling')
 DB_HOST = os.environ.get('SAMPLING_DB_HOST', 'localhost')
 DB_PASSWORD = os.environ.get('SAMPLING_DB_PASSWORD', 'baobao')
 
-CUSTOM_CONFIG_FILE = os.environ.get("SAMPLING_CUSTOM_CONFIG_PATH", "customize/custom_config.py")
+CUSTOM_CONFIG_FILE = os.environ.get("SAMPLING_CUSTOM_CONFIG_PATH",
+                                    os.path.join(dir_pre_fix, "customize/custom_config.py"))

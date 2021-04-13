@@ -1,0 +1,808 @@
+{
+    "swagger": "2.0",
+    "basePath": "/v1",
+    "host": "localhost:8000",
+    "info": {
+        "version": "0.1.0",
+        "title": "Spark Sampling",
+        "description": "Spark数据采样及评估系统API文档，DEBUG模式下端口默认均为8000，非DEBUG模式下见配置文件",
+        "contact": {
+            "email": "9573586@qq.com"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        }
+    },
+    "schemes": [
+        "http"
+    ],
+    "tags": [
+        {
+            "name": "sampling",
+            "description": "采样任务提交接口 port：SAMPLING_SERVICE_SAMPLING_JOB_PORT"
+        },
+        {
+            "name": "query",
+            "description": "查询接口 port：SAMPLING_SERVICE_QUERY_PORT"
+        },
+        {
+            "name": "evaluation",
+            "description": "统计评估任务提交接口 port：SAMPLING_SERVICE_EVALUATION_JOB_PORT"
+        }
+    ],
+    "paths": {
+        "/sampling/simplejob/": {
+            "post": {
+                "tags": [
+                    "sampling"
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "description": "简单随机任务",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "path",
+                        "description": "抽样文件路径",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "hdfs://localhost:9000/dataset/titanic/train.csv"
+                        }
+                    },
+                    {
+                        "in": "body",
+                        "name": "method",
+                        "description": "抽样方法，根据engine映射",
+                        "schema": {
+                            "$ref": "#/definitions/simplejob_method"
+                        }
+                    },
+                    {
+                        "in": "body",
+                        "name": "type",
+                        "description": "输入的抽样文件格式",
+                        "schema": {
+                            "$ref": "#/definitions/file_type"
+                        }
+                    },
+                    {
+                        "in": "body",
+                        "name": "with_header",
+                        "description": "输入文件是否带头，仅对csv有效",
+                        "schema": {
+                            "type": "boolean",
+                            "default": true
+                        }
+                    },
+                    {
+                        "in": "body",
+                        "name": "conf",
+                        "description": "算法配置",
+                        "schema": {
+                            "$ref": "#/definitions/simplejob_conf"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/sampling_job_create_response"
+                        }
+                    }
+                }
+            }
+        },
+        "/sampling/mljob/": {
+            "post": {
+                "tags": [
+                    "sampling"
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "description": "机器学习采样任务",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "path",
+                        "description": "抽样文件路径",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "hdfs://localhost:9000/dataset/titanic/train.csv"
+                        }
+                    },
+                    {
+                        "in": "body",
+                        "name": "method",
+                        "description": "抽样方法，根据engine映射",
+                        "schema": {
+                            "$ref": "#/definitions/simplejob_method"
+                        }
+                    },
+                    {
+                        "in": "body",
+                        "name": "type",
+                        "description": "输入的抽样文件格式",
+                        "schema": {
+                            "$ref": "#/definitions/file_type"
+                        }
+                    },
+                    {
+                        "in": "body",
+                        "name": "with_header",
+                        "description": "输入文件是否带头，仅对csv有效",
+                        "schema": {
+                            "type": "boolean",
+                            "default": true
+                        }
+                    },
+                    {
+                        "in": "body",
+                        "name": "conf",
+                        "description": "算法配置",
+                        "schema": {
+                            "$ref": "#/definitions/ml_conf"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/sampling_job_create_response"
+                        }
+                    }
+                }
+            }
+        },
+        "/query/sampling/job/": {
+            "post": {
+                "tags": [
+                    "query"
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "description": "查询抽样采样任务详情",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "job_id",
+                        "description": "抽样任务id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 10051
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/sampling_job_query_response"
+                        }
+                    }
+                }
+            }
+        },
+        "/query/sampling/list": {
+            "post": {
+                "tags": [
+                    "query"
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "description": "查询抽样采样任务列表",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "offset",
+                        "description": "起始位置",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 5
+                        }
+                    },
+                    {
+                        "in": "body",
+                        "name": "limit",
+                        "description": "返回列表长度",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 20
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/sampling_job_list_response"
+                        }
+                    }
+                }
+            }
+        },
+        "/query/evaluation/job/": {
+            "post": {
+                "tags": [
+                    "query"
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "description": "查询评估任务详情",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "job_id",
+                        "description": "抽样任务id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 50001
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/evaluation_job_query_response"
+                        }
+                    }
+                }
+            }
+        },
+        "/query/evaluation/list": {
+            "post": {
+                "tags": [
+                    "query"
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "description": "查询采样任务列表",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "offset",
+                        "description": "起始位置",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 5
+                        }
+                    },
+                    {
+                        "in": "body",
+                        "name": "limit",
+                        "description": "返回列表长度",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 20
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/evaluation_job_list_response"
+                        }
+                    }
+                }
+            }
+        },
+        "/evaluation/statistics/": {
+            "post": {
+                "tags": [
+                    "evaluation"
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "description": "统计任务",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "path",
+                        "description": "统计文件路径，与job_id选一",
+                        "schema": {
+                            "type": "string",
+                            "example": "hdfs://localhost:9000/dataset/titanic/train.csv"
+                        }
+                    },
+                    {
+                        "in": "body",
+                        "name": "job_id",
+                        "description": "抽样任务id（用于获取抽样后文件进行统计，与path选一）",
+                        "schema": {
+                            "type": "integer",
+                            "example": "10021"
+                        }
+                    },
+                    {
+                        "in": "body",
+                        "name": "method",
+                        "description": "统计方法，根据engine映射",
+                        "schema": {
+                            "$ref": "#/definitions/statistics_method"
+                        }
+                    },
+                    {
+                        "in": "body",
+                        "name": "type",
+                        "description": "输入的抽样文件格式",
+                        "schema": {
+                            "$ref": "#/definitions/file_type"
+                        }
+                    },
+                    {
+                        "in": "body",
+                        "name": "with_header",
+                        "description": "输入文件是否带头，仅对csv有效",
+                        "schema": {
+                            "type": "boolean",
+                            "default": true
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/statistics_job_response"
+                        }
+                    }
+                }
+            }
+        },
+        "/evaluation/job/": {
+            "post": {
+                "tags": [
+                    "evaluation"
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "description": "评估任务",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "path",
+                        "description": "评估文件路径",
+                        "schema": {
+                            "type": "string",
+                            "example": "hdfs://localhost:9000/dataset/titanic/train.csv-sampled-1616428937.70054"
+                        }
+                    },
+                    {
+                        "in": "body",
+                        "name": "source_path",
+                        "description": "源文件（采样前）路径，用于对比评估",
+                        "schema": {
+                            "type": "string",
+                            "example": "hdfs://localhost:9000/dataset/titanic/train.csv"
+                        }
+                    },
+                    {
+                        "in": "body",
+                        "name": "compare_job_id",
+                        "description": "对比评估时采样任务id",
+                        "schema": {
+                            "type": "integer",
+                            "example": 10051
+                        }
+                    },
+                    {
+                        "in": "body",
+                        "name": "method",
+                        "description": "评估方法，根据engine映射",
+                        "schema": {
+                            "$ref": "#/definitions/evaluation_method"
+                        }
+                    },
+                    {
+                        "in": "body",
+                        "name": "type",
+                        "description": "输入的抽样文件格式",
+                        "schema": {
+                            "$ref": "#/definitions/file_type"
+                        }
+                    },
+                    {
+                        "in": "body",
+                        "name": "with_header",
+                        "description": "输入文件是否带头，仅对csv有效",
+                        "schema": {
+                            "type": "boolean",
+                            "default": true
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/statistics_job_response"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "externalDocs": {
+        "url": "",
+        "description": "Source code"
+    },
+    "definitions": {
+        "simplejob_method": {
+            "type": "string",
+            "enum": [
+                "random",
+                "stratified"
+            ]
+        },
+        "statistics_method": {
+            "type": "string",
+            "enum": [
+                "basic"
+            ]
+        },
+        "evaluation_method": {
+            "type": "string",
+            "enum": [
+                "compare"
+            ]
+        },
+        "file_type": {
+            "type": "string",
+            "enum": [
+                "csv",
+                "txt"
+            ],
+            "default": "txt"
+        },
+        "simplejob_conf": {
+            "type": "object",
+            "properties": {
+                "fraction": {
+                    "type": "integer",
+                    "description": "采样率",
+                    "default": 0.5
+                },
+                "seed": {
+                    "type": "integer",
+                    "description": "随机种子"
+                },
+                "with_replacement": {
+                    "type": "boolean",
+                    "description": "是否可重复抽取（true: 放回抽样）",
+                    "default": true
+                },
+                "key": {
+                    "type": "string",
+                    "description": "分层抽样的key"
+                }
+            }
+        },
+        "response": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer",
+                    "description": "状态码，见code.py"
+                },
+                "msg": {
+                    "type": "string",
+                    "description": "返回信息，一般用于错误提示"
+                },
+                "data": {
+                    "type": "object",
+                    "description": "返回数据"
+                }
+            }
+        },
+        "ml_conf": {
+            "type": "object",
+            "properties": {
+                "k": {
+                    "type": "integer",
+                    "description": "SMOTE K-NN",
+                    "default": 3
+                },
+                "bucket_length": {
+                    "type": "integer",
+                    "default": 10
+                },
+                "multiplier": {
+                    "type": "integer",
+                    "default": 2
+                },
+                "seed": {
+                    "type": "integer",
+                    "description": "随机种子"
+                },
+                "restore": {
+                    "type": "boolean",
+                    "description": "是否按照原格式返回",
+                    "default": true
+                },
+                "key": {
+                    "type": "string",
+                    "description": "分类标签"
+                }
+            }
+        },
+        "sampling_job_create_response": {
+            "type": "object",
+            "allOf": [
+                {
+                    "$ref": "#/definitions/response"
+                },
+                {
+                    "example": {
+                        "code": 0,
+                        "msg": "",
+                        "data": {
+                            "job_id": 10050
+                        }
+                    }
+                }
+            ]
+        },
+        "sampling_job_query_response": {
+            "type": "object",
+            "allOf": [
+                {
+                    "$ref": "#/definitions/response"
+                },
+                {
+                    "example": {
+                        "code": 0,
+                        "msg": "",
+                        "data": {
+                            "job_id": 10000,
+                            "job_status": "Succeed",
+                            "msg": "succeed",
+                            "method": "Simple Random Sampling",
+                            "start_time": "2021/03/22/ 23:27:26",
+                            "end_time": "2021/03/22 23:27:31",
+                            "simpled_file_path": "hdfs://localhost:9000/dataset/titanic/train.csv-sampled-1616426846.480489",
+                            "request_data": "{'path': 'hdfs://localhost:9000/dataset/titanic/train.csv', 'method': 'random', 'type': 'csv', 'conf': {'fraction': 0.4}}"
+                        }
+                    }
+                }
+            ]
+        },
+        "evaluation_job_query_response": {
+            "type": "object",
+            "allOf": [
+                {
+                    "$ref": "#/definitions/response"
+                },
+                {
+                    "example": {
+                        "code": 0,
+                        "msg": "",
+                        "data": {
+                            "job_id": 50001,
+                            "job_status": "Succeed",
+                            "msg": "succeed",
+                            "method": "Compare Evaluation",
+                            "start_time": "2021/03/22/ 23:38:11",
+                            "end_time": "2021/03/22 23:38:17",
+                            "result": "{'PassengerId': {'count': '375', 'mean': '463.072', 'stddev': '259.79002759633147', 'min': '10', 'max': '99', 'mean_bias': 0.038278026905829605, 'stddev_bias': 0.009466287979323026, 'score': 97.61278425574237}, 'Survived': {'count': '375', 'mean': '0.42933333333333334', 'stddev': '0.4956423297833669', 'min': '0', 'max': '1', 'mean_bias': 0.11852631578947379, 'stddev_bias': 0.018598470730874592, 'score': 93.14376067398258}, 'Pclass': {'count': '375', 'mean': '2.3813333333333335', 'stddev': '0.8150806746812611', 'min': '1', 'max': '3', 'mean_bias': 0.03148663101604285, 'stddev_bias': 0.025106193428275334, 'score': 97.17035877778409}, 'Name': {'count': '375', 'mean': None, 'stddev': None, 'min': '\"Andersson, Mr. August Edvard (\"\"Wennerstrom\"\")\"', 'max': 'van Billiard, Mr. Austin Blyler', 'mean_bias': nan, 'stddev_bias': nan, 'score': nan}, 'Sex': {'count': '375', 'mean': None, 'stddev': None, 'min': 'female', 'max': 'male', 'mean_bias': nan, 'stddev_bias': nan, 'score': nan}, 'Age': {'count': '300', 'mean': '28.3678', 'stddev': '14.467668411237696', 'min': '0.42', 'max': '9', 'mean_bias': 0.04482684175604338, 'stddev_bias': 0.004049766419974729, 'score': 97.5561695911991}, 'SibSp': {'count': '375', 'mean': '0.52', 'stddev': '1.1672903858593995', 'min': '0', 'max': '8', 'mean_bias': 0.005751072961373263, 'stddev_bias': 0.05853306551255207, 'score': 96.78579307630373}, 'Parch': {'count': '375', 'mean': '0.3893333333333333', 'stddev': '0.75494330511595', 'min': '0', 'max': '5', 'mean_bias': 0.02028235294117645, 'stddev_bias': 0.06341226736030753, 'score': 95.81526898492581}, 'Ticket': {'count': '375', 'mean': '264134.8263888889', 'stddev': '502897.92346928484', 'min': '110152', 'max': 'WE/P 5735', 'mean_bias': 0.014660028004764548, 'stddev_bias': 0.0663444441368928, 'score': 95.94977639291713}, 'Fare': {'count': '375', 'mean': '30.589776266666647', 'stddev': '49.67628313726736', 'min': '0', 'max': '93.5', 'mean_bias': 0.05013107925161032, 'stddev_bias': 0.00034502469234939134, 'score': 97.47619480280201}, 'Cabin': {'count': '76', 'mean': None, 'stddev': None, 'min': 'A16', 'max': 'G6', 'mean_bias': nan, 'stddev_bias': nan, 'score': nan}, 'Embarked': {'count': '375', 'mean': None, 'stddev': None, 'min': 'C', 'max': 'S', 'mean_bias': nan, 'stddev_bias': nan, 'score': nan}}",
+                            "request_data": "{'compare_job_id': 10000, 'type': 'csv'}"
+                        }
+                    }
+                }
+            ]
+        },
+        "sampling_job_list_response": {
+            "type": "object",
+            "allOf": [
+                {
+                    "$ref": "#/definitions/response"
+                },
+                {
+                    "example": {
+                        "code": 0,
+                        "msg": "",
+                        "data": {
+                            "query_result": [
+                                {
+                                    "job_id": 10000,
+                                    "job_status": "Succeed",
+                                    "msg": "succeed",
+                                    "method": "Simple Random Sampling",
+                                    "start_time": "2021/03/22/ 23:27:26",
+                                    "end_time": "2021/03/22 23:27:31",
+                                    "simpled_file_path": "hdfs://localhost:9000/dataset/titanic/train.csv-sampled-1616426846.480489",
+                                    "request_data": "{'path': 'hdfs://localhost:9000/dataset/titanic/train.csv', 'method': 'random', 'type': 'csv', 'conf': {'fraction': 0.4}}"
+                                },
+                                {
+                                    "job_id": 10007,
+                                    "job_status": "Succeed",
+                                    "msg": "succeed",
+                                    "method": "Simple Random Sampling",
+                                    "start_time": "2021/03/23/ 00:02:18",
+                                    "end_time": "2021/03/23 00:02:18",
+                                    "simpled_file_path": "hdfs://localhost:9000/dataset/titanic/train.csv-sampled-1616428937.70054",
+                                    "request_data": "{'path': 'hdfs://localhost:9000/dataset/titanic/train.csv', 'method': 'random', 'type': 'csv', 'conf': {'fraction': 0.4}}"
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        "evaluation_job_list_response": {
+            "type": "object",
+            "allOf": [
+                {
+                    "$ref": "#/definitions/response"
+                },
+                {
+                    "example": {
+                        "code": 0,
+                        "msg": "",
+                        "data": {
+                            "query_result": [
+                                {
+                                    "job_id": 50000,
+                                    "job_status": "Succeed",
+                                    "msg": "succeed",
+                                    "method": "Compare Evaluation",
+                                    "start_time": "2021/03/22/ 23:35:23",
+                                    "end_time": "2021/03/22 23:35:28",
+                                    "result": "{'PassengerId': {'count': '375', 'mean': '463.072', 'stddev': '259.79002759633147', 'min': '10', 'max': '99', 'mean_bias': 0.038278026905829605, 'stddev_bias': 0.009466287979323026, 'score': 97.61278425574237}, 'Survived': {'count': '375', 'mean': '0.42933333333333334', 'stddev': '0.4956423297833669', 'min': '0', 'max': '1', 'mean_bias': 0.11852631578947379, 'stddev_bias': 0.018598470730874592, 'score': 93.14376067398258}, 'Pclass': {'count': '375', 'mean': '2.3813333333333335', 'stddev': '0.8150806746812611', 'min': '1', 'max': '3', 'mean_bias': 0.03148663101604285, 'stddev_bias': 0.025106193428275334, 'score': 97.17035877778409}, 'Name': {'count': '375', 'mean': None, 'stddev': None, 'min': '\"Andersson, Mr. August Edvard (\"\"Wennerstrom\"\")\"', 'max': 'van Billiard, Mr. Austin Blyler', 'mean_bias': nan, 'stddev_bias': nan, 'score': nan}, 'Sex': {'count': '375', 'mean': None, 'stddev': None, 'min': 'female', 'max': 'male', 'mean_bias': nan, 'stddev_bias': nan, 'score': nan}, 'Age': {'count': '300', 'mean': '28.3678', 'stddev': '14.467668411237696', 'min': '0.42', 'max': '9', 'mean_bias': 0.04482684175604338, 'stddev_bias': 0.004049766419974729, 'score': 97.5561695911991}, 'SibSp': {'count': '375', 'mean': '0.52', 'stddev': '1.1672903858593995', 'min': '0', 'max': '8', 'mean_bias': 0.005751072961373263, 'stddev_bias': 0.05853306551255207, 'score': 96.78579307630373}, 'Parch': {'count': '375', 'mean': '0.3893333333333333', 'stddev': '0.75494330511595', 'min': '0', 'max': '5', 'mean_bias': 0.02028235294117645, 'stddev_bias': 0.06341226736030753, 'score': 95.81526898492581}, 'Ticket': {'count': '375', 'mean': '264134.8263888889', 'stddev': '502897.92346928484', 'min': '110152', 'max': 'WE/P 5735', 'mean_bias': 0.014660028004764548, 'stddev_bias': 0.0663444441368928, 'score': 95.94977639291713}, 'Fare': {'count': '375', 'mean': '30.589776266666647', 'stddev': '49.67628313726736', 'min': '0', 'max': '93.5', 'mean_bias': 0.05013107925161032, 'stddev_bias': 0.00034502469234939134, 'score': 97.47619480280201}, 'Cabin': {'count': '76', 'mean': None, 'stddev': None, 'min': 'A16', 'max': 'G6', 'mean_bias': nan, 'stddev_bias': nan, 'score': nan}, 'Embarked': {'count': '375', 'mean': None, 'stddev': None, 'min': 'C', 'max': 'S', 'mean_bias': nan, 'stddev_bias': nan, 'score': nan}}",
+                                    "request_data": "{'compare_job_id': 10000, 'type': 'csv'}"
+                                },
+                                {
+                                    "job_id": 50001,
+                                    "job_status": "Succeed",
+                                    "msg": "succeed",
+                                    "method": "Compare Evaluation",
+                                    "start_time": "2021/03/22/ 23:38:11",
+                                    "end_time": "2021/03/22 23:38:17",
+                                    "result": "{'PassengerId': {'count': '375', 'mean': '463.072', 'stddev': '259.79002759633147', 'min': '10', 'max': '99', 'mean_bias': 0.038278026905829605, 'stddev_bias': 0.009466287979323026, 'score': 97.61278425574237}, 'Survived': {'count': '375', 'mean': '0.42933333333333334', 'stddev': '0.4956423297833669', 'min': '0', 'max': '1', 'mean_bias': 0.11852631578947379, 'stddev_bias': 0.018598470730874592, 'score': 93.14376067398258}, 'Pclass': {'count': '375', 'mean': '2.3813333333333335', 'stddev': '0.8150806746812611', 'min': '1', 'max': '3', 'mean_bias': 0.03148663101604285, 'stddev_bias': 0.025106193428275334, 'score': 97.17035877778409}, 'Name': {'count': '375', 'mean': None, 'stddev': None, 'min': '\"Andersson, Mr. August Edvard (\"\"Wennerstrom\"\")\"', 'max': 'van Billiard, Mr. Austin Blyler', 'mean_bias': nan, 'stddev_bias': nan, 'score': nan}, 'Sex': {'count': '375', 'mean': None, 'stddev': None, 'min': 'female', 'max': 'male', 'mean_bias': nan, 'stddev_bias': nan, 'score': nan}, 'Age': {'count': '300', 'mean': '28.3678', 'stddev': '14.467668411237696', 'min': '0.42', 'max': '9', 'mean_bias': 0.04482684175604338, 'stddev_bias': 0.004049766419974729, 'score': 97.5561695911991}, 'SibSp': {'count': '375', 'mean': '0.52', 'stddev': '1.1672903858593995', 'min': '0', 'max': '8', 'mean_bias': 0.005751072961373263, 'stddev_bias': 0.05853306551255207, 'score': 96.78579307630373}, 'Parch': {'count': '375', 'mean': '0.3893333333333333', 'stddev': '0.75494330511595', 'min': '0', 'max': '5', 'mean_bias': 0.02028235294117645, 'stddev_bias': 0.06341226736030753, 'score': 95.81526898492581}, 'Ticket': {'count': '375', 'mean': '264134.8263888889', 'stddev': '502897.92346928484', 'min': '110152', 'max': 'WE/P 5735', 'mean_bias': 0.014660028004764548, 'stddev_bias': 0.0663444441368928, 'score': 95.94977639291713}, 'Fare': {'count': '375', 'mean': '30.589776266666647', 'stddev': '49.67628313726736', 'min': '0', 'max': '93.5', 'mean_bias': 0.05013107925161032, 'stddev_bias': 0.00034502469234939134, 'score': 97.47619480280201}, 'Cabin': {'count': '76', 'mean': None, 'stddev': None, 'min': 'A16', 'max': 'G6', 'mean_bias': nan, 'stddev_bias': nan, 'score': nan}, 'Embarked': {'count': '375', 'mean': None, 'stddev': None, 'min': 'C', 'max': 'S', 'mean_bias': nan, 'stddev_bias': nan, 'score': nan}}",
+                                    "request_data": "{'compare_job_id': 10000, 'type': 'csv'}"
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        "statistics_job_response": {
+            "type": "object",
+            "allOf": [
+                {
+                    "$ref": "#/definitions/response"
+                },
+                {
+                    "example": {
+                        "code": 0,
+                        "msg": "",
+                        "data": {
+                            "statistics_result": [
+                                {
+                                    "summary": "count",
+                                    "PassengerId": "375",
+                                    "Survived": "375",
+                                    "Pclass": "375",
+                                    "Name": "375",
+                                    "Sex": "375",
+                                    "Age": "300",
+                                    "SibSp": "375",
+                                    "Parch": "375",
+                                    "Ticket": "375",
+                                    "Fare": "375",
+                                    "Cabin": "76",
+                                    "Embarked": "375"
+                                },
+                                {
+                                    "summary": "mean",
+                                    "PassengerId": "463.072",
+                                    "Survived": "0.42933333333333334",
+                                    "Pclass": "2.3813333333333335",
+                                    "Name": null,
+                                    "Sex": null,
+                                    "Age": "28.3678",
+                                    "SibSp": "0.52",
+                                    "Parch": "0.3893333333333333",
+                                    "Ticket": "264134.8263888889",
+                                    "Fare": "30.589776266666647",
+                                    "Cabin": null,
+                                    "Embarked": null
+                                },
+                                {
+                                    "summary": "stddev",
+                                    "PassengerId": "259.79002759633147",
+                                    "Survived": "0.4956423297833669",
+                                    "Pclass": "0.8150806746812611",
+                                    "Name": null,
+                                    "Sex": null,
+                                    "Age": "14.467668411237696",
+                                    "SibSp": "1.1672903858593995",
+                                    "Parch": "0.75494330511595",
+                                    "Ticket": "502897.92346928484",
+                                    "Fare": "49.67628313726736",
+                                    "Cabin": null,
+                                    "Embarked": null
+                                },
+                                {
+                                    "summary": "min",
+                                    "PassengerId": "10",
+                                    "Survived": "0",
+                                    "Pclass": "1",
+                                    "Name": "\"Andersson, Mr. August Edvard (\"\"Wennerstrom\"\")\"",
+                                    "Sex": "female",
+                                    "Age": "0.42",
+                                    "SibSp": "0",
+                                    "Parch": "0",
+                                    "Ticket": "110152",
+                                    "Fare": "0",
+                                    "Cabin": "A16",
+                                    "Embarked": "C"
+                                },
+                                {
+                                    "summary": "max",
+                                    "PassengerId": "99",
+                                    "Survived": "1",
+                                    "Pclass": "3",
+                                    "Name": "van Billiard, Mr. Austin Blyler",
+                                    "Sex": "male",
+                                    "Age": "9",
+                                    "SibSp": "8",
+                                    "Parch": "5",
+                                    "Ticket": "WE/P 5735",
+                                    "Fare": "93.5",
+                                    "Cabin": "G6",
+                                    "Embarked": "S"
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}
+

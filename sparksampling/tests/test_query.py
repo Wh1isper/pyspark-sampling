@@ -8,7 +8,7 @@ class BaseTestQueryModule(BaseTestModule):
 
 
 class TestSamplingJob(BaseTestQueryModule):
-    test_url = '/v1/sampling/query/job/(.*)'
+    test_url = '/v1/query/sampling/job/(.*)'
 
     def test_query(self):
         response = self._post_data_from_file('query.json')
@@ -16,7 +16,7 @@ class TestSamplingJob(BaseTestQueryModule):
 
 
 class TestSamplingList(BaseTestQueryModule):
-    test_url = '/v1/sampling/query/list/(.*)'
+    test_url = '/v1/query/sampling/list/(.*)'
 
     def test_query(self):
         response = self._post_data_from_file('list.json')
@@ -24,7 +24,7 @@ class TestSamplingList(BaseTestQueryModule):
 
 
 class TestEvaluationJob(BaseTestQueryModule):
-    test_url = '/v1/evaluation/query/job/(.*)'
+    test_url = '/v1/query/evaluation/job/(.*)'
 
     def test_query(self):
         response = self._post_data_from_file('query.json')
@@ -32,7 +32,7 @@ class TestEvaluationJob(BaseTestQueryModule):
 
 
 class TestEvaluationList(BaseTestQueryModule):
-    test_url = '/v1/evaluation/query/list/(.*)'
+    test_url = '/v1/query/evaluation/list/(.*)'
 
     def test_query(self):
         response = self._post_data_from_file('list.json')

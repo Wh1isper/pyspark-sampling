@@ -47,13 +47,28 @@ Accept: application/json
 < requestbody/smote-sampling.json
 
 ###
-POST http://{{host}}:{{port}}/v1/sampling/query/job/
+POST http://{{host}}:{{port}}/v1/query/sampling/job/
 Accept: application/json
 
 < requestbody/query.json
 
 ###
-POST http://{{host}}:{{port}}/v1/sampling/query/list/
+POST http://{{host}}:{{port}}/v1/query/evaluation/job/
+Accept: application/json
+
+{
+    "job_id": 50001
+}
+
+
+###
+POST http://{{host}}:{{port}}/v1/query/sampling/list/
+Accept: application/json
+
+< requestbody/list.json
+
+###
+POST http://{{host}}:{{port}}/v1/query/evaluation/list/
 Accept: application/json
 
 < requestbody/list.json

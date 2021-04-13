@@ -177,9 +177,9 @@ job参考以下步骤对算法进行开发：
 
 #### 1：确定任务类型
 
-目前根据任务是否输出DataFrame到文件系统分为抽样任务(sampling_job)和统计评估(statistics_job & evaluation_job)任务两类
+目前根据任务是否输出DataFrame到文件系统分为采样任务(sampling_job)和统计评估(statistics_job & evaluation_job)任务两类
 
-根据任务同步执行或异步执行分为抽样评估任务(sampling_job && evaluation_job)和统计任务(statistics_job)两类
+根据任务同步执行或异步执行分为采样评估任务(sampling_job && evaluation_job)和统计任务(statistics_job)两类
 
 见下表：
 
@@ -264,8 +264,6 @@ class MLSamplingProcessModule(SamplingProcessModule):
         # 在这里对参数进行format
         return {}
 ```
-
-
 
 
 ## 架构介绍

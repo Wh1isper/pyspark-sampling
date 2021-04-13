@@ -23,10 +23,10 @@ sampling_handlers = [
     (r'/v1/sampling/mljob/(.*)', BaseProcessHandler, dict(processmodule=MLSamplingProcessModule)),
 ]
 query_handlers = [
-    (r'/v1/sampling/query/job/(.*)', SingletonHandler, dict(processmodule=QueryJobProcessModule)),
-    (r'/v1/sampling/query/list/(.*)', SingletonHandler, dict(processmodule=QueryListProcessModule)),
-    (r'/v1/evaluation/query/job/(.*)', SingletonHandler, dict(processmodule=QueryEvaluationJobProcessModule)),
-    (r'/v1/evaluation/query/list/(.*)', SingletonHandler, dict(processmodule=QueryEvaluationListProcessModule)),
+    (r'/v1/query/sampling/job/(.*)', SingletonHandler, dict(processmodule=QueryJobProcessModule)),
+    (r'/v1/query/sampling/list/(.*)', SingletonHandler, dict(processmodule=QueryListProcessModule)),
+    (r'/v1/query/evaluation/job/(.*)', SingletonHandler, dict(processmodule=QueryEvaluationJobProcessModule)),
+    (r'/v1/query/evaluation/list/(.*)', SingletonHandler, dict(processmodule=QueryEvaluationListProcessModule)),
 
 ]
 

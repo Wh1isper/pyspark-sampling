@@ -5,7 +5,7 @@ from typing import Dict, Any
 
 from sparksampling.handler.processmodule.base_process_module import BaseQueryProcessModule
 from sparksampling.utilities.custom_error import JobProcessError
-from sparksampling.var import JOB_STATUS_SUCCEED
+from sparksampling.var import JOB_STATUS_SUCCEED, STATISTICS_BASIC_METHOD, FILE_TYPE_TEXT
 
 
 class StatisticsProcessModule(BaseProcessModule):
@@ -25,13 +25,13 @@ class StatisticsProcessModule(BaseProcessModule):
         }
         request_data: Dict = self._request_data
         self.check_param(request_data)
-        conf = request_data
         format_conf = await self.format_conf(request_data)
-        if not conf:
+        if not format_conf:
             raise JobProcessError("Job status is not succeed or can not find file, can't run statistics")
+        conf = request_data
         conf.update(format_conf)
         engine = self.config_engine(conf)
-        response_data['data'] = engine.submit(df_output=False)
+        response_data['data'] = {"statistics_result": engine.submit(df_output=False)}
         return response_data
 
     def config_engine(self, conf) -> StatisticsEngine:
@@ -53,8 +53,8 @@ class StatisticsProcessModule(BaseProcessModule):
                 return False
         return {
             'path': path,
-            'method': request_data.get('method', 1),
-            'file_type': request_data.get('type', 2),
+            'method': request_data.get('method', STATISTICS_BASIC_METHOD),
+            'file_type': request_data.get('type', FILE_TYPE_TEXT),
             'with_header': request_data.get('with_header', True)
         }
 

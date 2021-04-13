@@ -79,7 +79,7 @@ class QueryListProcessModule(BaseQueryProcessModule):
                 'simpled_file_path': detail.simpled_path,
                 'request_data': detail.request_data,
             })
-        response_data['data'] = data
+        response_data['data'] = {'query_result': data}
 
         return response_data
 
@@ -121,7 +121,7 @@ class QueryEvaluationListProcessModule(BaseQueryProcessModule):
                 'result': detail.result,
                 'request_data': detail.request_data,
             })
-        response_data['data'] = data
+        response_data['data'] = {'query_result': data}
 
         return response_data
 
