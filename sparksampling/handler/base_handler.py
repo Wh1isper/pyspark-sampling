@@ -90,7 +90,7 @@ class BaseProcessHandler(RequestHandler):
             self.logger.error(error_msg)
             response = {
                 'code': PROCESS_ERROR,
-                'msg': "Process error...",
+                'msg': "Process error...Contact the developer if you think this shouldn't happen",
                 'data': {}
 
             }
