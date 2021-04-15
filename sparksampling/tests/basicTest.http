@@ -38,6 +38,12 @@ Accept: application/json
 POST http://{{host}}:{{port}}/v1/sampling/simplejob/
 Accept: application/json
 
+< requestbody/simple-random-sampling-txt.json
+
+###
+POST http://{{host}}:{{port}}/v1/sampling/simplejob/
+Accept: application/json
+
 < requestbody/stratified-sampling.json
 
 ###

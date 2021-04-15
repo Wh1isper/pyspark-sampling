@@ -7,6 +7,7 @@ from sparksampling.utilities.code import JSON_DECODE_ERROR
 import unittest
 import os
 import json
+import time
 from json import JSONDecodeError
 
 os.environ['ASYNC_TEST_TIMEOUT'] = '3600'
@@ -22,6 +23,11 @@ class BaseTestModule(AsyncHTTPTestCase):
 
     def get_app(self):
         return debug_app()
+
+    def tearDown(self) -> None:
+        # 间隔确保commit成功
+        time.sleep(1)
+        super(BaseTestModule, self).tearDown()
 
     def _post_data_from_file(self, filename):
         requset_data = self._get_request_data(filename)

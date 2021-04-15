@@ -106,15 +106,16 @@ class SamplingProcessModule(BaseProcessModule):
         self.logger.info("Store Spark job conf into DB...")
         async with self.sqlengine.acquire() as conn:
             convert_dict_value_to_string_value(conf)
-            await conn.execute(self.sql_table.insert().values(start_time=datetime.now(),
-                                                              path=conf.get('path'),
-                                                              method=conf.get('method'),
-                                                              request_data=str(self._request_data),
-                                                              status_code=JOB_STATUS_PADDING
-                                                              ))
-            result = await conn.execute("select @@IDENTITY")
-            job_id = (await result.fetchone())[0]
-            await conn._commit_impl()
+            async with conn.begin() as transaction:
+                await conn.execute(self.sql_table.insert().values(start_time=datetime.now(),
+                                                                  path=conf.get('path'),
+                                                                  method=conf.get('method'),
+                                                                  request_data=str(self._request_data),
+                                                                  status_code=JOB_STATUS_PADDING
+                                                                  ))
+                result = await conn.execute("select @@IDENTITY")
+                job_id = (await result.fetchone())[0]
+                await transaction.commit()
         return job_id
 
     async def finish_job(self, new_path):
@@ -122,20 +123,23 @@ class SamplingProcessModule(BaseProcessModule):
             return
         self.logger.info(f"Spark job {self.job_id} finished...Record job in DB...")
         async with self.sqlengine.acquire() as conn:
-            await conn.execute(self.sql_table.update().where(self.sql_table.c.job_id == self.job_id).values(
-                msg='succeed',
-                status_code=JOB_STATUS_SUCCEED,
-                end_time=datetime.now(),
-                simpled_path=new_path
-            ))
-            await conn._commit_impl()
+            async with conn.begin() as transaction:
+                await conn.execute(self.sql_table.update().where(self.sql_table.c.job_id == self.job_id).values(
+                    msg='succeed',
+                    status_code=JOB_STATUS_SUCCEED,
+                    end_time=datetime.now(),
+                    simpled_path=new_path
+                ))
+                await transaction.commit()
 
     async def error_job(self, e: CustomErrorWithCode):
         self.logger.info(f"Spark job {self.job_id} failed...Record job in DB...")
         async with self.sqlengine.acquire() as conn:
-            await conn.execute(self.sql_table.update().where(self.sql_table.c.job_id == self.job_id).values(
-                msg=e.errorinfo,
-                status_code=e.code,
-                end_time=datetime.now(),
-            ))
-            await conn._commit_impl()
+            async with conn.begin() as transaction:
+                await conn.execute(self.sql_table.update().where(self.sql_table.c.job_id == self.job_id).values(
+                    msg=e.errorinfo,
+                    status_code=e.code,
+                    end_time=datetime.now(),
+                ))
+                await transaction.commit()
+
