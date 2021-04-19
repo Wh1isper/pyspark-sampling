@@ -5,7 +5,7 @@
     "info": {
         "version": "0.1.0",
         "title": "Spark Sampling",
-        "description": "Spark数据采样及评估系统API文档，DEBUG模式下端口默认均为8000，非DEBUG模式下见配置文件",
+        "description": "Spark数据采样及评估系统API文档",
         "contact": {
             "email": "9573586@qq.com"
         },
@@ -20,15 +20,15 @@
     "tags": [
         {
             "name": "sampling",
-            "description": "采样任务提交接口 port：SAMPLING_SERVICE_SAMPLING_JOB_PORT"
+            "description": "采样任务提交接口"
         },
         {
             "name": "query",
-            "description": "查询接口 port：SAMPLING_SERVICE_QUERY_PORT"
+            "description": "查询接口"
         },
         {
             "name": "evaluation",
-            "description": "统计评估任务提交接口 port：SAMPLING_SERVICE_EVALUATION_JOB_PORT"
+            "description": "统计评估任务提交接口"
         }
     ],
     "paths": {

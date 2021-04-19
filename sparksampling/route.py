@@ -39,4 +39,5 @@ test_handlers = [
     (r'/', HelloHandler, dict(processmodule=DummyProcessModule)),
 ]
 
-debug_handlers = sampling_handlers + query_handlers + evaluation_handlers + test_handlers
+all_handlers = sampling_handlers + query_handlers + evaluation_handlers
+debug_handlers = all_handlers + test_handlers

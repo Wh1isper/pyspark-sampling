@@ -6,13 +6,17 @@ import logging
 
 from pymysql import OperationalError
 
+from sparksampling.config import PARALLEL
 from sparksampling.core import DatabaseConnector
 from sparksampling.utilities import CustomErrorWithCode, JsonDecodeError
 from sparksampling.utilities.custom_error import SQLError, DBConnectError
 from sparksampling.var import JOB_CREATED, JOB_CREATING
 
+from concurrent.futures.thread import ThreadPoolExecutor
+
 
 class BaseProcessModule(object):
+    executor = ThreadPoolExecutor(max_workers=PARALLEL if PARALLEL else None)
     logger = logging.getLogger('SAMPLING')
     required_keys = set()
 

@@ -1,3 +1,5 @@
+from tornado import ioloop
+
 from sparksampling.core.engine import EvaluationEngine
 from sparksampling.handler.processmodule import BaseProcessModule
 from typing import Dict, Any
@@ -82,7 +84,9 @@ class EvaluationProcessModule(BaseProcessModule):
 
     async def run_job(self):
         try:
-            result = self.evaluation_engine.submit(self.job_id, df_output=False)
+            result = await ioloop.IOLoop.current().run_in_executor(self.executor, self.evaluation_engine.submit,
+                                                                   self.job_id,
+                                                                   False)
             await self.finish_job(result)
         except CustomErrorWithCode as e:
             await self.error_job(e)

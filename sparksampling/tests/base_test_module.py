@@ -1,7 +1,12 @@
-from tornado.testing import AsyncHTTPTestCase
+import asyncio
+
+from tornado.platform.asyncio import AsyncIOMainLoop
+from tornado.process import Subprocess
+from tornado.testing import AsyncHTTPTestCase, get_async_test_timeout, _NON_OWNED_IOLOOPS
 from tornado.httpclient import HTTPResponse
-from sparksampling.app import make_app, debug_app
-import tornado
+from tornado.util import raise_exc_info
+
+from sparksampling.app import all_app, debug_app
 from sparksampling.utilities.code import JSON_DECODE_ERROR
 
 import unittest
@@ -19,15 +24,39 @@ class BaseTestModule(AsyncHTTPTestCase):
     test_url = r'/'
 
     def get_new_ioloop(self):
-        return tornado.platform.asyncio.AsyncIOMainLoop()
+        return AsyncIOMainLoop()
 
     def get_app(self):
-        return debug_app()
+        return all_app()
 
     def tearDown(self) -> None:
-        # 间隔确保commit成功
-        time.sleep(1)
-        super(BaseTestModule, self).tearDown()
+        # from super
+        # not cancel task because db hasn't submit
+        self.http_server.stop()
+        self.io_loop.run_sync(
+            self.http_server.close_all_connections, timeout=get_async_test_timeout()
+        )
+        self.http_client.close()
+        del self.http_server
+        del self._app
+        asyncio_loop = self.io_loop.asyncio_loop
+        if hasattr(asyncio, "all_tasks"):
+            tasks = asyncio.all_tasks(asyncio_loop)
+        else:
+            tasks = asyncio.Task.all_tasks(asyncio_loop)
+        tasks = [t for t in tasks if not t.done()]
+        if tasks:
+            done, pending = self.io_loop.run_sync(lambda: asyncio.wait(tasks))
+            assert not pending
+            for f in done:
+                try:
+                    f.result()
+                except asyncio.CancelledError:
+                    pass
+        Subprocess.uninitialize()
+        self.io_loop.clear_current()
+        if not isinstance(self.io_loop, _NON_OWNED_IOLOOPS):
+            self.io_loop.close(all_fds=True)
 
     def _post_data_from_file(self, filename):
         requset_data = self._get_request_data(filename)

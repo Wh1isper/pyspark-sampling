@@ -1,3 +1,5 @@
+import asyncio
+
 from sparksampling.handler.processmodule import BaseProcessModule
 from typing import Dict, Any
 import random
@@ -10,6 +12,7 @@ from sparksampling.utilities import CustomErrorWithCode
 from sparksampling.utilities.utilities import convert_dict_value_to_string_value
 from sparksampling.core.orm import SampleJobTable
 from datetime import datetime
+from tornado import ioloop
 
 
 class SamplingProcessModule(BaseProcessModule):
@@ -89,7 +92,8 @@ class SamplingProcessModule(BaseProcessModule):
 
     async def run_job(self):
         try:
-            new_path = self.sample_engine.submit(self.job_id)
+            new_path = await ioloop.IOLoop.current().run_in_executor(self.executor, self.sample_engine.submit,
+                                                                     self.job_id)
             await self.finish_job(new_path)
         except CustomErrorWithCode as e:
             await self.error_job(e)
@@ -142,4 +146,3 @@ class SamplingProcessModule(BaseProcessModule):
                     end_time=datetime.now(),
                 ))
                 await transaction.commit()
-
