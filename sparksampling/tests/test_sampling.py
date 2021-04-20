@@ -1,6 +1,6 @@
 from sparksampling.app import sampling_app
 from sparksampling.tests.base_test_module import BaseTestModule
-import asyncio
+
 
 class BaseTestSampleModule(BaseTestModule):
     def get_app(self):
@@ -17,7 +17,6 @@ class TestSimpleSampling(BaseTestSampleModule):
     def test_random_sampling_txt(self):
         response = self._post_data_from_file('simple-random-sampling-txt.json')
         self._check_code(response, 0, 'Sample Random Sampling Job Submit Test')
-
 
     def test_stratified_sampling(self):
         response = self._post_data_from_file('stratified-sampling.json')

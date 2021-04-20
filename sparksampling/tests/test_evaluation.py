@@ -5,8 +5,10 @@ from sparksampling.tests.base_test_module import BaseTestModule
 class BaseTestEvaluationModule(BaseTestModule):
     def get_app(self):
         return evaluation_app()
+
     def test_json_decode_error_code(self):
         super(BaseTestEvaluationModule, self).test_json_decode_error_code()
+
 
 class TestBasicStatistics(BaseTestEvaluationModule):
     test_url = '/v1/evaluation/statistics/'
