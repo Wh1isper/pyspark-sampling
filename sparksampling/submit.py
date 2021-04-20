@@ -4,6 +4,10 @@ from sparksampling.var import *
 import json
 import requests
 import pandas as pd
+import logging
+
+LOG_FORMAT = "%(asctime)s - %(levelname)s - %(message)s"
+logging.basicConfig(level=logging.INFO, format=LOG_FORMAT)
 
 import ast
 
@@ -39,8 +43,8 @@ class DSResponse(object):
             data = ast.literal_eval(self.data['result'])
             return pd.DataFrame.from_records(data)
         else:
-            print("No Data to Translate to pandas.")
-            print(self.to_dict())
+            logging.info("No Data to Translate to pandas.")
+            logging.info(self.to_dict())
 
     @property
     def job_id(self):
@@ -53,6 +57,10 @@ class DSResponse(object):
     @property
     def is_response_ok(self):
         return self.code == 0
+
+    @property
+    def is_job_ok(self):
+        return self.data.get('job_status') == CODE_TO_JOB_STATUS[JOB_STATUS_SUCCEED]
 
     def __str__(self):
         return self.to_dict()
@@ -118,14 +126,14 @@ class Submitter(object):
         return DSResponse(**self._post_dict_data(url, config_map))
 
     def get_sampling_job_details(self, job_id):
-        url = urljoin(self.sampling_prefix, '/v1/sampling/query/job/')
+        url = urljoin(self.sampling_prefix, '/v1/query/sampling/job/')
         config_map = {
             'job_id': job_id,
         }
         return DSResponse(**self._post_dict_data(url, config_map))
 
     def get_sampling_job_list(self, offset=None, limit=None):
-        url = urljoin(self.sampling_prefix, '/v1/sampling/query/list/')
+        url = urljoin(self.sampling_prefix, '/v1/query/sampling/list/')
         config_map = {
             'offset': offset,
             'limit': limit,
@@ -133,14 +141,14 @@ class Submitter(object):
         return DSResponse(**self._post_dict_data(url, config_map))
 
     def get_evaluation_job_details(self, job_id):
-        url = urljoin(self.sampling_prefix, '/v1/evaluation/query/job/')
+        url = urljoin(self.sampling_prefix, '/v1/query/evaluation/job/')
         config_map = {
             'job_id': job_id,
         }
         return DSResponse(**self._post_dict_data(url, config_map))
 
     def get_evaluation_job_list(self, offset=None, limit=None):
-        url = urljoin(self.sampling_prefix, '/v1/evaluation/query/list/')
+        url = urljoin(self.sampling_prefix, '/v1/query/evaluation/list/')
         config_map = {
             'offset': offset,
             'limit': limit,
@@ -169,7 +177,7 @@ class Submitter(object):
     def _post_dict_data(self, url, data: dict):
         extract_none_in_dict(data)
         request_body = json.dumps(data)
-        print(f"request: {url}")
+        logging.info(f"request: {url} with data {data}")
         request = requests.post(url, data=request_body)
         return request.json() if request.status_code is requests.codes.ok else {
             'code': request.status_code,

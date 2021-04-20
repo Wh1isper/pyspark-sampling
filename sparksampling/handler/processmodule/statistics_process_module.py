@@ -31,7 +31,7 @@ class StatisticsProcessModule(BaseProcessModule):
         conf = request_data
         conf.update(format_conf)
         engine = self.config_engine(conf)
-        response_data['data'] = {"statistics_result": engine.submit(df_output=False)}
+        response_data['data'] = {"result": str(engine.submit(df_output=False))}
         return response_data
 
     def config_engine(self, conf) -> StatisticsEngine:

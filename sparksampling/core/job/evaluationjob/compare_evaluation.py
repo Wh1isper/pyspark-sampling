@@ -36,13 +36,17 @@ class CompareEvaluationJob(BaseJob):
         for c in columns:
             if statistics[c]['mean'] is None:
                 continue
-            mean_bias = abs(float(statistics[c]['mean']) - float(source_statistics[c]['mean'])) / float(
-                source_statistics[c]['mean'])
-            stddev_bias = abs(float(statistics[c]['stddev']) - float(source_statistics[c]['stddev'])) / float(
-                source_statistics[c]['stddev'])
-            statistics[c]['mean_bias'] = mean_bias
-            statistics[c]['stddev_bias'] = stddev_bias
-            statistics[c]['score'] = 100 * (2 - mean_bias - stddev_bias) / 2
+            mean_bias = abs(
+                (float(statistics[c]['mean']) - float(source_statistics[c]['mean'])) /
+                float(source_statistics[c]['mean'])
+            ) if abs(float(statistics[c]['mean']) - float(source_statistics[c]['mean'])) > 1e-2 else 0
+            stddev_bias = abs(
+                (float(statistics[c]['stddev']) - float(source_statistics[c]['stddev'])) /
+                float(source_statistics[c]['stddev'])
+            ) if abs(float(statistics[c]['stddev']) - float(source_statistics[c]['stddev'])) > 1e-5 else 0
+            statistics[c]['mean_bias'] = mean_bias if mean_bias < 1 else 1
+            statistics[c]['stddev_bias'] = stddev_bias if stddev_bias < 1 else 1
+            statistics[c]['score'] = 100 * (2 - statistics[c]['mean_bias'] ** 1/2 - statistics[c]['stddev_bias'] ** 1/2) / 2
         print(statistics)
 
         return statistics.to_dict()

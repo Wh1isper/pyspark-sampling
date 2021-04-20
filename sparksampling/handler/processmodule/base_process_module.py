@@ -1,6 +1,7 @@
 """
 处理模型基类
 """
+import os
 from typing import Any, Dict
 import logging
 
@@ -16,7 +17,7 @@ from concurrent.futures.thread import ThreadPoolExecutor
 
 
 class BaseProcessModule(object):
-    executor = ThreadPoolExecutor(max_workers=PARALLEL if PARALLEL else None)
+    executor = ThreadPoolExecutor(max_workers=PARALLEL if PARALLEL else min(32, os.cpu_count() + 4))
     logger = logging.getLogger('SAMPLING')
     required_keys = set()
 

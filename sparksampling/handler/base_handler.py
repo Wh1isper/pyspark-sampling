@@ -5,8 +5,6 @@ import json
 import sys
 import logging
 import traceback
-from concurrent.futures.thread import ThreadPoolExecutor
-
 from tornado.web import RequestHandler
 
 from json import JSONDecodeError
@@ -23,7 +21,6 @@ class BaseProcessHandler(RequestHandler):
     每次执行都将初始化ProcessModule，如果任务足够简单，只需初始化一次，请使用SingletonHandler
     """
     logger = logging.getLogger('SAMPLING')
-    executor = ThreadPoolExecutor(20)
 
     def initialize(self, processmodule: type = BaseProcessModule):
         self.processmodule = processmodule()
