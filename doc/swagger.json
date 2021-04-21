@@ -543,25 +543,37 @@
             "properties": {
                 "k": {
                     "type": "integer",
-                    "description": "SMOTE K-NN",
+                    "description": "(SMOTE) K-NN",
                     "default": 3
                 },
                 "bucket_length": {
                     "type": "integer",
+                    "description": "(SMOTE) 分箱长度",
                     "default": 10
                 },
                 "multiplier": {
                     "type": "integer",
+                    "description": "(SMOTE) multiplier",
                     "default": 2
                 },
                 "seed": {
                     "type": "integer",
-                    "description": "随机种子"
+                    "description": "(SMOTE) 随机种子（maybe Deprecated in future）"
                 },
                 "restore": {
                     "type": "boolean",
-                    "description": "是否按照原格式返回",
+                    "description": "(SMOTE) 是否按照原格式返回",
                     "default": true
+                },
+                "n_neighbors": {
+                    "type": "integer",
+                    "description": "(ENN) n近邻",
+                    "default": 3
+                },
+                "drop_list": {
+                    "type": "array",
+                    "description": "(ENN) 与实验无关、需要移除的列",
+                    "default": []
                 },
                 "key": {
                     "type": "string",

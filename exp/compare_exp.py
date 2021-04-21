@@ -121,12 +121,12 @@ def get_avg_score_list(evaluation_job_details: List[DSResponse], drop_list: List
 
 
 def main():
-    dataset_uri = 'hdfs://localhost:9000/dataset/ten_million_top1k.csv'
-    # dataset_uri = 'hdfs://localhost:9000/dataset/titanic/train.csv'
-    num = 10
+    # dataset_uri = 'hdfs://localhost:9000/dataset/ten_million_top1k.csv'
+    dataset_uri = 'hdfs://hadoop001.wf:8020/dataset/titanic/train.csv'
+    num = 5
     NEW_EXP = True
-    drop_list = ['# id', 'y']
-    # drop_list = ['PassengerId', 'Survived']
+    # drop_list = ['# id', 'y']
+    drop_list = ['PassengerId', 'Survived']
     sampling_job_details, eva_job_details = new_exp(dataset_uri, num) if NEW_EXP else load_from_json()
     for job_detail in sampling_job_details:
         print(job_detail.to_dict())

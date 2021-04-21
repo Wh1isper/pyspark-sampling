@@ -7,6 +7,11 @@ import string
 import ast
 import importlib.util
 
+from pyspark.sql import SparkSession
+from pyspark.sql.types import *
+
+from sparksampling.config import SPARK_CONF
+
 
 def from_path_import(name, location, attr=None):
     spec = importlib.util.spec_from_file_location(name, location)
@@ -237,3 +242,39 @@ def get_value_by_require_dict(d: dict, request):
         job_conf[k] = request.get(k)
     extract_none_in_dict(job_conf)
     return job_conf
+
+
+# Auxiliar functions
+def equivalent_type(f):
+    if f == 'datetime64[ns]':
+        return TimestampType()
+    elif f == 'int64':
+        return LongType()
+    elif f == 'int32':
+        return IntegerType()
+    elif f == 'float64':
+        return FloatType()
+    else:
+        return StringType()
+
+
+def define_structure(string, format_type):
+    try:
+        typo = equivalent_type(format_type)
+    except:
+        typo = StringType()
+    return StructField(string, typo)
+
+
+# Given pandas dataframe, it will return a spark's dataframe.
+def pandas_to_spark(pandas_df):
+    columns = list(pandas_df.columns)
+    types = list(pandas_df.dtypes)
+    struct_list = []
+    for column, typo in zip(columns, types):
+        struct_list.append(define_structure(column, typo))
+    p_schema = StructType(struct_list)
+
+    conf = SPARK_CONF
+    spark = SparkSession.builder.config(conf=conf).getOrCreate()
+    return spark.createDataFrame(pandas_df, p_schema)

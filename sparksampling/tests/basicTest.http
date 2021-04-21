@@ -53,6 +53,12 @@ Accept: application/json
 < requestbody/smote-sampling.json
 
 ###
+POST http://{{host}}:{{port}}/v1/sampling/mljob/
+Accept: application/json
+
+< requestbody/imb-enn-sampling.json
+
+###
 POST http://{{host}}:{{port}}/v1/query/sampling/job/
 Accept: application/json
 

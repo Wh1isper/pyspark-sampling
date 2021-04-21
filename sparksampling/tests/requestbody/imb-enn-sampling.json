@@ -1,0 +1,12 @@
+{
+    "path": "hdfs://hadoop001.wf:8020/dataset/ten_million_top1k.csv",
+    "method": "imb_enn",
+    "type": "csv",
+    "conf": {
+        "drop_list": [
+            "# id",
+            "y"
+        ],
+        "key": "y"
+    }
+}

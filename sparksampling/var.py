@@ -7,6 +7,7 @@ STRATIFIED_SAMPLING_METHOD = 'stratified'
 
 # ml sampling
 SMOTE_SAMPLING_METHOD = 'smote'
+IMB_ENN_SAMPLING_METHOD = 'imb_enn'
 
 # statistics
 STATISTICS_BASIC_METHOD = 'basic'

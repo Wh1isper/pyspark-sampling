@@ -16,4 +16,4 @@ class CheckLogger(Logger):
         for attr, atype in self.type_map.items():
             if type(getattr(self, attr)) is not atype:
                 raise TypeError(
-                    f"Expected {attr} as {atype.__name__}, got {type(getattr(self, attr)).__name__} instead.")
+                    f"Expected {attr} as {atype.__name__}, got {type(getattr(self, attr)).__name__} instead.(Maybe format?)")
