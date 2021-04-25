@@ -24,8 +24,10 @@ class BaseEngine(Logger):
 
     def __init__(self):
         for k, v in self.data_io_map.items():
+            self.data_io_map[k.lower()] = v
             self.logger.info(f"Load data_io {k} : {v.__name__}")
         for k, v in self.job_map.items():
+            self.job_map[k.lower()] = v
             self.logger.info(f"Load job {k} : {v.__name__}")
 
     def submit(self, job_id=None, df_output=True):
