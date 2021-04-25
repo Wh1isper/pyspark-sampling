@@ -1,23 +1,23 @@
-from pyspark.sql import DataFrame, SparkSession
-from imblearn.under_sampling import EditedNearestNeighbours
+from pyspark.sql import DataFrame
+from imblearn.over_sampling import SMOTE
 import pandas as pd
 
 from sparksampling.core.job.base_job import BaseJob
 from sparksampling.utilities.utilities import pandas_to_spark
 
 
-class ImbENNSamplingJob(BaseJob):
+class ImbSmoteSamplingJob(BaseJob):
     type_map = {
-        'n_neighbors': int,
+        'k_neighbors': int,
         'drop_list': list,
         'col_key': str
     }
 
-    def __init__(self, n_neighbors=3, drop_list=None, col_key=None):
-        super(ImbENNSamplingJob, self).__init__()
+    def __init__(self, k_neighbors=3, drop_list=None, col_key=None):
+        super(ImbSmoteSamplingJob, self).__init__()
         if drop_list is None:
             drop_list = []
-        self.n_neighbors = n_neighbors
+        self.k_neighbors = k_neighbors
         self.drop_list = drop_list
         self.col_key = col_key
         self.check_type()
@@ -28,7 +28,7 @@ class ImbENNSamplingJob(BaseJob):
         if self.col_key not in self.drop_list:
             self.drop_list.append(self.col_key)
         x = df.drop(self.drop_list, axis=1)
-        enn = EditedNearestNeighbours(n_neighbors=self.n_neighbors)
-        x_fit, y_fit = enn.fit_resample(x.values, y.values)
+        smote = SMOTE(k_neighbors=self.k_neighbors)
+        x_fit, y_fit = smote.fit_resample(x.values, y.values)
         result_df = pd.concat([pd.DataFrame(x_fit, columns=x.columns), pd.DataFrame(y_fit, columns=y.columns)], axis=1)
         return pandas_to_spark(result_df)

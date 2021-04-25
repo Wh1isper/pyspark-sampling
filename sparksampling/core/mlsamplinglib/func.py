@@ -1,13 +1,22 @@
+from pyspark.ml import Pipeline
+from pyspark.ml.feature import VectorAssembler
 from pyspark.sql.types import ArrayType, DoubleType
 from pyspark.sql.functions import udf
 from pyspark.sql.functions import col
 from pyspark.sql import DataFrame
 
 
-def df_with_column_int(df:DataFrame):
+def df_with_column_int(df: DataFrame):
     for c in df.columns:
         df = df.withColumn(c, col(c).cast('int'))
     return df
+
+
+def df_with_column_double(df: DataFrame):
+    for c in df.columns:
+        df = df.withColumn(c, col(c).cast(DoubleType()))
+    return df
+
 
 def to_array(col):
     def to_array_(v):
@@ -51,3 +60,14 @@ def get_num_cat_feat(input_spark_df, exclude_list=None):
         print("The columns been hardcoded wrongly: {0}".format(mistake_list))
 
     return numeric_columns, string_columns
+
+
+def vectorized_feature(x: DataFrame) -> DataFrame:
+    x = df_with_column_double(x)
+    assembler = VectorAssembler(inputCols=x.columns, outputCol='features')
+    stages_ = []
+    stages_.append(assembler)
+    pipeline = Pipeline(stages=stages_)
+
+    vectorized = pipeline.fit(x).transform(x)
+    return vectorized
