@@ -46,12 +46,13 @@ class SparkEditedNearestNeighbours(object):
             distance_with_label.true_label != distance_with_label.pre_label)
         incorrect_count = Window.partitionBy("datasetA").orderBy("EuclideanDistance")
         count_matrix = incorrect_matrix.withColumn("incorrect_count", F.row_number().over(incorrect_count))
-        sample_index = count_matrix.filter(count_matrix.incorrect_count <= self.n_neighbors // 2).select(
+        index_to_remove = count_matrix.filter(count_matrix.incorrect_count > self.n_neighbors // 2).select(
             'index_a').distinct().withColumnRenamed('index_a', 'index')
 
         # reduce
-        output_x = vectorized.join(sample_index, vectorized.index == sample_index.index).drop('features').drop(
-            sample_index.index)
-        output_y = y.join(sample_index, y.index == sample_index.index).drop(sample_index.index)
+        output_x = vectorized.join(index_to_remove, vectorized.index == index_to_remove.index, 'anti').drop(
+            'features').drop(
+            index_to_remove.index)
+        output_y = y.join(index_to_remove, y.index == index_to_remove.index, 'anti').drop(index_to_remove.index)
         output = output_x.join(output_y, output_x.index == output_y.index).drop('index')
         return output
