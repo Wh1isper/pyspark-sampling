@@ -1,9 +1,8 @@
-from pyspark.ml import Pipeline
-from pyspark.ml.feature import BucketedRandomProjectionLSH, VectorAssembler
+from pyspark.ml.feature import BucketedRandomProjectionLSH
 import numpy as np
 from pyspark.sql import DataFrame, Window
 
-from sparksampling.core.mlsamplinglib.func import df_with_column_double, vectorized_feature
+from sparksampling.core.mlsamplinglib.func import vectorized_feature
 import pyspark.sql.functions as F
 
 

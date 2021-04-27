@@ -1,5 +1,5 @@
 {
-    "path": "hdfs://hadoop001.wf:8020/dataset/ten_million_top1k.csv",
+    "path": "hdfs://localhost:9000/dataset/10w_x_10.csv",
     "method": "imb_enn",
     "type": "csv",
     "conf": {

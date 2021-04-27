@@ -1,5 +1,5 @@
 {
-    "path": "hdfs://localhost:9000/dataset/titanic/train.csv",
+    "path": "hdfs://localhost:9000/dataset/10w_x_10.csv",
     "method": "random",
     "type": "txt",
     "conf": {

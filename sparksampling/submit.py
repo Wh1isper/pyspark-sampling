@@ -98,7 +98,7 @@ class Submitter(object):
         }
         return DSResponse(**self._post_dict_data(url, config_map))
 
-    def submit_sampling_mljob(self, path, method=SMOTE_SAMPLING_METHOD, file_type=FILE_TYPE_TEXT, with_header=None,
+    def submit_sampling_mljob(self, path, method=SPARK_SMOTE_SAMPLING_METHOD, file_type=FILE_TYPE_TEXT, with_header=None,
                               **kwargs):
         url = urljoin(self.sampling_prefix, '/v1/sampling/mljob')
         config_map = {

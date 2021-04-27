@@ -6,9 +6,13 @@ SIMPLE_RANDOM_SAMPLING_METHOD = 'random'
 STRATIFIED_SAMPLING_METHOD = 'stratified'
 
 # ml sampling
-SMOTE_SAMPLING_METHOD = 'smote'
-IMB_ENN_SAMPLING_METHOD = 'imb_enn'
+SPARK_SMOTE_SAMPLING_METHOD = 'spark_smote'
 SPARK_ENN_SAMPLING_METHOD = 'spark_enn'
+SPARK_SMOTE_ENN_SAMPLING_METHOD = 'spark_smote_enn'
+
+IMB_SMOTE_SAMPLING_METHOD = 'imb_smote'
+IMB_ENN_SAMPLING_METHOD = 'imb_enn'
+IMB_SMOTE_ENN_SAMPLING_METHOD = 'imb_smote_enn'
 
 # statistics
 STATISTICS_BASIC_METHOD = 'basic'
@@ -35,7 +39,12 @@ JOB_STATUS_PROCESS_ERROR = 599
 CODE_TO_SAMPLING_METHOD_NAME = {
     SIMPLE_RANDOM_SAMPLING_METHOD: 'Simple Random Sampling',
     STRATIFIED_SAMPLING_METHOD: 'Stratified Sampling',
-    SMOTE_SAMPLING_METHOD: 'Smote Oversampling'
+    SPARK_SMOTE_SAMPLING_METHOD: 'SMOTE Over Sampling Using Spark',
+    SPARK_ENN_SAMPLING_METHOD: 'ENN Under Sampling Using Spark',
+    SPARK_SMOTE_ENN_SAMPLING_METHOD: 'SMOTE+ENN Combine Sampling Using Spark',
+    IMB_SMOTE_SAMPLING_METHOD: 'SMOTE Over Sampling Using imblearn',
+    IMB_ENN_SAMPLING_METHOD: 'ENN Under Sampling Using imblearn',
+    IMB_SMOTE_ENN_SAMPLING_METHOD: 'SMOTE+ENN Combine Sampling Using imblearn',
 }
 CODE_TO_EVALUATION_METHOD_NAME = {
     EVALUATION_COMPARE_METHOD: 'Compare Evaluation',

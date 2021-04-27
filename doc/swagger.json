@@ -481,9 +481,12 @@
         "mljob_method": {
             "type": "string",
             "enum": [
-                "smote",
+                "spark_smote",
+                "spark_enn",
+                "spark_smote_enn",
+                "imb_smote",
                 "imb_enn",
-                "spark_enn"
+                "imb_smote_enn"
             ]
         },
         "statistics_method": {
@@ -549,29 +552,10 @@
         "ml_conf": {
             "type": "object",
             "properties": {
-                "k": {
+                "k_neighbors": {
                     "type": "integer",
-                    "description": "(SMOTE) K-NN",
+                    "description": "(SMOTE) k近邻",
                     "default": 3
-                },
-                "bucket_length": {
-                    "type": "integer",
-                    "description": "(SMOTE) 分箱长度",
-                    "default": 10
-                },
-                "multiplier": {
-                    "type": "integer",
-                    "description": "(SMOTE) multiplier",
-                    "default": 2
-                },
-                "seed": {
-                    "type": "integer",
-                    "description": "(SMOTE) 随机种子（maybe Deprecated in future）"
-                },
-                "restore": {
-                    "type": "boolean",
-                    "description": "(SMOTE) 是否按照原格式返回",
-                    "default": true
                 },
                 "n_neighbors": {
                     "type": "integer",
@@ -580,7 +564,7 @@
                 },
                 "drop_list": {
                     "type": "array",
-                    "description": "(ENN) 与实验无关、需要移除的列",
+                    "description": "与实验无关、需要移除的列",
                     "default": []
                 },
                 "key": {
