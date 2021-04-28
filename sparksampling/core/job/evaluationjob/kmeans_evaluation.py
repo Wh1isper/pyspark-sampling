@@ -11,22 +11,22 @@ from sparksampling.core.mlsamplinglib.func import vectorized_feature
 
 import random
 
-class KmeansEvaluationJob(BaseJob):
 
+class KmeansEvaluationJob(BaseJob):
     type_map = {
         'source_path': str,
         'selected_features_list': list,
         'K': Any
     }
 
-    def __init__(self, source_path=None, selected_features_list=None,K=None, *args, **kwargs):
+    def __init__(self, source_path=None, selected_features_list=None, K=None, *args, **kwargs):
         super(KmeansEvaluationJob, self).__init__(*args, **kwargs)
         self.source_path = source_path
         self.selected_features_list = selected_features_list
         self.K = K
         self.check_type()
 
-    def KM(dataset=None, K=6, predict=None):
+    def KM(self, dataset=None, K=6, predict=None):
         # Trains a k-means model.
         kmeans = KMeans().setK(K).setFeaturesCol('features').setPredictionCol('prediction')
         model = kmeans.fit(dataset)
@@ -42,14 +42,14 @@ class KmeansEvaluationJob(BaseJob):
             print(center)
         return centers, predictions
 
-    def evaluation_centers(centers, sample_centers):
+    def evaluation_centers(self, centers, sample_centers):
         result = []
         for i in range(len(centers)):
             mix = np.array([centers[i], sample_centers[i]])
             result.append(np.corrcoef(mix))
         return result
 
-    def evaluation_prediction(prediction, sample_prediction):
+    def evaluation_prediction(self, prediction, sample_prediction):
         prediction = prediction.withColumnRenamed('prediction', 'label')
         df = sample_prediction.join(prediction, ['features'])
         df = df.select(['prediction', 'label']).withColumn("label", df.label.cast(DoubleType())).withColumn(
@@ -58,10 +58,10 @@ class KmeansEvaluationJob(BaseJob):
                                                                labelCol='label')
         return evaluator_accuracy.evaluate(df)
 
-
     def _statistics(self, df: DataFrame, *args, **kwargs) -> dict:
 
-        source_df = self._get_df_from_source(self.source_path).select(*self.selected_features_list)
+        source_df = self._get_df_from_source(self.source_path, dataio=kwargs.get('data_io')).select(
+            *self.selected_features_list)
         df = df.select(*self.selected_features_list)
         source_df = vectorized_feature(source_df)
         df = vectorized_feature(df)
@@ -79,5 +79,4 @@ class KmeansEvaluationJob(BaseJob):
         # 计算抽样中的准确率召回率
         accuracy = self.evaluation_prediction(predictions, sample_predictions)
         print("accuracy: {}".format(accuracy))
-        return {"accuracy":accuracy}
-
+        return {"accuracy": accuracy}

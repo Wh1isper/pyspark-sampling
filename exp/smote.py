@@ -6,11 +6,7 @@ from sparksampling.core.mlsamplinglib.smote import SparkSMOTE
 
 conf = SPARK_CONF
 spark = SparkSession.builder.config(conf=conf).getOrCreate()
-indf = spark.read.csv("hdfs://localhost:9000/dataset/ten_million_top1k.csv", header=True)
-
-df = indf.filter(indf.y == 1).limit(100).union(indf.filter(indf.y == 0).limit(10))
-
-print(df.count())
+df = spark.read.csv("hdfs://hadoop001.wf:8020/dataset/unbalance_500v50_10.csv", header=True)
 
 y = df.select('y')
 drop_list = ['# id', 'y']

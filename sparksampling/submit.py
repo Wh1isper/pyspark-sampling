@@ -136,6 +136,7 @@ class Submitter(object):
             'with_header': with_header,
             'compare_job_id': compare_job_id
         }
+        config_map.update(kwargs)
         return DSResponse(**self._post_dict_data(self.evaluation_job_url, config_map))
 
     def get_sampling_job_details(self, job_id):

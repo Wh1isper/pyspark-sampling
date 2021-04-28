@@ -11,7 +11,7 @@ class BaseJob(CheckLogger):
         self.job_id = None
 
     def prepare(self, *args, **kwargs) -> dict:
-        return {}
+        return kwargs
 
     def _generate(self, df: DataFrame, *args, **kwargs) -> DataFrame:
         raise NotImplementedError
@@ -29,7 +29,6 @@ class BaseJob(CheckLogger):
         self.logger.info(f"{self.__class__.__name__}: Job {self.job_id}: Running Statistics...")
         return self._statistics(df, *args, **kwargs)
 
-    def _get_df_from_source(self, source_path, *args, **kwargs) -> DataFrame:
+    def _get_df_from_source(self, source_path, dataio) -> DataFrame:
         # 对比评估时可通过此函数获得source_path的dataframe
-        dataio: BaseDataIO = kwargs.get('data_io')
         return dataio.read(self.job_id, source_path)
