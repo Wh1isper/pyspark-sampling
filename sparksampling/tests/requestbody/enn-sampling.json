@@ -1,0 +1,12 @@
+{
+    "path": "hdfs://hadoop001.wf:8020/dataset/unbalance_500v50_10.csv",
+    "method": "spark_enn",
+    "type": "csv",
+    "conf": {
+        "drop_list": [
+            "# id",
+            "y"
+        ],
+        "key": "y"
+    }
+}

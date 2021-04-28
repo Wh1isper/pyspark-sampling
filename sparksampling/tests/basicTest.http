@@ -56,7 +56,13 @@ Accept: application/json
 POST http://{{host}}:{{port}}/v1/sampling/mljob/
 Accept: application/json
 
-< requestbody/imb-enn-sampling.json
+< requestbody/enn-sampling.json
+
+###
+POST http://{{host}}:{{port}}/v1/sampling/mljob/
+Accept: application/json
+
+< requestbody/smote-enn-sampling.json
 
 ###
 POST http://{{host}}:{{port}}/v1/query/sampling/job/
