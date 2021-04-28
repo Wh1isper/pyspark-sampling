@@ -6,23 +6,20 @@ class CsvDataIO(BaseDataIO):
     def __init__(self, spark, path, *args, **kwargs):
         super(CsvDataIO, self).__init__(spark, path, args, kwargs)
         self.header = kwargs.get('with_header', True)
-        self.__df: DataFrame = None
+        self.original_num_partitions = None
 
-    def _read(self, *args, **kwargs):
-        df = self.spark.read.csv(self.path, header=self.header).cache()
-        self.__df = df
+    def _read(self, path=None, *args, **kwargs):
+        path = path or self.path
+        df = self.spark.read.csv(path, header=self.header).cache()
+        if not self.original_num_partitions:
+            self.original_num_partitions = df.rdd.getNumPartitions()
         return df
 
     def _write(self, df: DataFrame):
-        if self.__df:
-            self.__df.unpersist()
-        df.repartition(self.__df.rdd.getNumPartitions())
+        if self.original_num_partitions:
+            df.repartition(self.original_num_partitions)
         df.write.csv(self.write_path, mode='overwrite', header=self.header)
         return self.write_path
-
-    def __del__(self):
-        if self.__df:
-            self.__df.unpersist()
 
     def copy(self):
         return

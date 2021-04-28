@@ -31,6 +31,5 @@ class BaseJob(CheckLogger):
 
     def _get_df_from_source(self, source_path, *args, **kwargs) -> DataFrame:
         # 对比评估时可通过此函数获得source_path的dataframe
-        dataio: BaseDataIO = copy.deepcopy(kwargs.get('data_io'))
-        dataio.path = source_path
-        return dataio.read(job_id=self.job_id)
+        dataio: BaseDataIO = kwargs.get('data_io')
+        return dataio.read(self.job_id, source_path)

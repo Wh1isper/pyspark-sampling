@@ -15,10 +15,10 @@ class BaseDataIO(Logger):
     def __convert_path(self):
         return f"{self.path}-sampled-{time.time()}"
 
-    def read(self, job_id, *args, **kwargs) -> DataFrame:
+    def read(self, job_id, path=None, *args, **kwargs) -> DataFrame:
         self.job_id = job_id
         self.logger.info(f"{self.__class__.__name__}: Job {self.job_id} : Read from {self.path}")
-        return self._read(*args, **kwargs)
+        return self._read(path, *args, **kwargs)
 
     def _read(self, *args, **kwargs) -> DataFrame:
         raise NotImplementedError

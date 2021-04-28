@@ -200,7 +200,7 @@
                 }
             }
         },
-        "/query/sampling/list": {
+        "/query/sampling/list/": {
             "post": {
                 "tags": [
                     "query"
@@ -278,7 +278,7 @@
                 }
             }
         },
-        "/query/evaluation/list": {
+        "/query/evaluation/list/": {
             "post": {
                 "tags": [
                     "query"
