@@ -31,7 +31,7 @@ class CompareEvaluationJob(BaseJob):
         statistics.loc['mean_bias'] = -1
         statistics.loc['stddev_bias'] = -1
         statistics.loc['score'] = -1
-        columns = source_statistics.columns.values.tolist()
+        columns = statistics.columns.values.tolist()
 
         for c in columns:
             if statistics[c]['mean'] is None:
