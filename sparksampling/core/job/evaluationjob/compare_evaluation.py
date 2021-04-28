@@ -46,7 +46,8 @@ class CompareEvaluationJob(BaseJob):
             ) if abs(float(statistics[c]['stddev']) - float(source_statistics[c]['stddev'])) > 1e-5 else 0
             statistics[c]['mean_bias'] = mean_bias if mean_bias < 1 else 1
             statistics[c]['stddev_bias'] = stddev_bias if stddev_bias < 1 else 1
-            statistics[c]['score'] = 100 * (2 - statistics[c]['mean_bias'] ** 1/2 - statistics[c]['stddev_bias'] ** 1/2) / 2
+            statistics[c]['score'] = 100 * (
+                2 - statistics[c]['mean_bias'] ** 1 / 2 - statistics[c]['stddev_bias'] ** 1 / 2) / 2
         print(statistics)
 
         return statistics.to_dict()
@@ -57,7 +58,6 @@ class CompareEvaluationJob(BaseJob):
         for file_type_code, data_io in kwargs.get('data_io_map').items():
             if type(kwargs.get('data_io')) is data_io:
                 file_type = file_type_code
-
         statistics_conf = {
             'path': self.source_path,
             'method': compare_evaluation_code,

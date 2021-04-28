@@ -19,3 +19,10 @@ class CsvDataIO(BaseDataIO):
         df.repartition(self.__df.rdd.getNumPartitions())
         df.write.csv(self.write_path, mode='overwrite', header=self.header)
         return self.write_path
+
+    def __del__(self):
+        if self.__df:
+            self.__df.unpersist()
+
+    def copy(self):
+        return
