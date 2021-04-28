@@ -70,20 +70,24 @@ class DSResponse(object):
 
 
 class Submitter(object):
-    def __init__(self, ip='localhost', query_port=8000, sampling_port=8000, evaluation_port=8000, protocol='http'):
+    def __init__(self, ip='localhost', port=8000, protocol='http'):
         self.ip = ip
-        self.query_port = query_port
-        self.sampling_port = sampling_port
-        self.evaluation_port = evaluation_port
-        self.query_prefix = f'{protocol}://{self.ip}:{self.query_port}/'
-        self.sampling_prefix = f'{protocol}://{self.ip}:{self.sampling_port}/'
-        self.evaluation_prefix = f'{protocol}://{self.ip}:{self.evaluation_port}/'
+        self.port = port
+        self.prefix = f'{protocol}://{self.ip}:{self.port}/'
+
+        self.simple_job_url = urljoin(self.prefix, '/v1/sampling/simplejob/')
+        self.ml_job_url = urljoin(self.prefix, '/v1/sampling/mljob/')
+        self.evaluation_job_url = urljoin(self.prefix, '/v1/evaluation/job/')
+        self.statistics_job_url = urljoin(self.prefix, '/v1/evaluation/statistics/')
+        self.query_simple_job_detail_url = urljoin(self.prefix, '/v1/query/sampling/job/')
+        self.query_simple_job_list_url = urljoin(self.prefix, '/v1/query/sampling/list/')
+        self.query_evaluation_job_detail_url = urljoin(self.prefix, '/v1/query/evaluation/job/')
+        self.query_evaluation_job_list_url = urljoin(self.prefix, '/v1/query/evaluation/list/')
 
     def submit_sampling_simplejob(self, path, method=SIMPLE_RANDOM_SAMPLING_METHOD, file_type=FILE_TYPE_TEXT,
                                   with_header=None, seed=None,
                                   fraction: str or dict = None,
                                   with_replacement: bool = None, key=None):
-        url = urljoin(self.sampling_prefix, '/v1/sampling/simplejob/')
         config_map = {
             'path': path,
             'method': method,
@@ -96,25 +100,34 @@ class Submitter(object):
                 'key': key
             }
         }
-        return DSResponse(**self._post_dict_data(url, config_map))
+        return DSResponse(**self._post_dict_data(self.simple_job_url, config_map))
 
-    def submit_sampling_mljob(self, path, method=SPARK_SMOTE_SAMPLING_METHOD, file_type=FILE_TYPE_TEXT, with_header=None,
-                              **kwargs):
-        url = urljoin(self.sampling_prefix, '/v1/sampling/mljob')
+    def submit_sampling_mljob(self, path, method=SPARK_SMOTE_SAMPLING_METHOD, file_type=FILE_TYPE_TEXT,
+                              with_header=None, key=None, drop_list=None, k_neighbors=None, n_neighbors=None,
+                              conf=None):
+        if conf is None:
+            conf = {}
+        if drop_list is None:
+            drop_list = []
+        algo_conf = {
+            "n_neighbors": n_neighbors,
+            "k_neighbors": k_neighbors,
+            "key": key,
+            "drop_list": drop_list,
+        }.update(conf)
         config_map = {
             'path': path,
             'method': method,
             'type': file_type,
             'with_header': with_header,
-            'conf': kwargs
+            'conf': algo_conf,
         }
-        return DSResponse(**self._post_dict_data(url, config_map))
+        return DSResponse(**self._post_dict_data(self.ml_job_url, config_map))
 
     def submit_evaluation_job(self, path=None, source_path=None, compare_job_id=None, method=EVALUATION_COMPARE_METHOD,
                               file_type=FILE_TYPE_TEXT,
                               with_header=None,
                               **kwargs):
-        url = urljoin(self.sampling_prefix, '/v1/evaluation/job/')
         config_map = {
             'path': path,
             'source_path': source_path,
@@ -123,37 +136,33 @@ class Submitter(object):
             'with_header': with_header,
             'compare_job_id': compare_job_id
         }
-        return DSResponse(**self._post_dict_data(url, config_map))
+        return DSResponse(**self._post_dict_data(self.evaluation_job_url, config_map))
 
     def get_sampling_job_details(self, job_id):
-        url = urljoin(self.sampling_prefix, '/v1/query/sampling/job/')
         config_map = {
             'job_id': job_id,
         }
-        return DSResponse(**self._post_dict_data(url, config_map))
+        return DSResponse(**self._post_dict_data(self.query_simple_job_detail_url, config_map))
 
     def get_sampling_job_list(self, offset=None, limit=None):
-        url = urljoin(self.sampling_prefix, '/v1/query/sampling/list/')
         config_map = {
             'offset': offset,
             'limit': limit,
         }
-        return DSResponse(**self._post_dict_data(url, config_map))
+        return DSResponse(**self._post_dict_data(self.query_simple_job_list_url, config_map))
 
     def get_evaluation_job_details(self, job_id):
-        url = urljoin(self.sampling_prefix, '/v1/query/evaluation/job/')
         config_map = {
             'job_id': job_id,
         }
-        return DSResponse(**self._post_dict_data(url, config_map))
+        return DSResponse(**self._post_dict_data(self.query_evaluation_job_detail_url, config_map))
 
     def get_evaluation_job_list(self, offset=None, limit=None):
-        url = urljoin(self.sampling_prefix, '/v1/query/evaluation/list/')
         config_map = {
             'offset': offset,
             'limit': limit,
         }
-        return DSResponse(**self._post_dict_data(url, config_map))
+        return DSResponse(**self._post_dict_data(self.query_evaluation_job_list_url, config_map))
 
     def get_statistics(self, path=None,
                        job_id=None,
@@ -163,7 +172,6 @@ class Submitter(object):
                        from_sampling=False):
         if from_sampling and not job_id:
             return "Error: From sampling should set a job_id"
-        url = urljoin(self.sampling_prefix, '/v1/evaluation/statistics/')
         config_map = {
             'path': path,
             'job_id': job_id,
@@ -172,7 +180,7 @@ class Submitter(object):
             'with_header': with_header,
             'from_sampling': from_sampling
         }
-        return DSResponse(**self._post_dict_data(url, config_map))
+        return DSResponse(**self._post_dict_data(self.statistics_job_url, config_map))
 
     def _post_dict_data(self, url, data: dict):
         extract_none_in_dict(data)

@@ -1,4 +1,5 @@
 import logging
+from typing import Any
 
 
 class Logger(object):
@@ -14,6 +15,8 @@ class CheckLogger(Logger):
                 raise AttributeError(f"AttributeError: {attr}")
 
         for attr, atype in self.type_map.items():
-            if type(getattr(self, attr)) is not atype:
+            if atype is Any:
+                continue
+            if isinstance(attr, atype):
                 raise TypeError(
                     f"Expected {attr} as {atype.__name__}, got {type(getattr(self, attr)).__name__} instead.(Maybe format?)")
