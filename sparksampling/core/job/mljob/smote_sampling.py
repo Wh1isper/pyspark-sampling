@@ -24,5 +24,5 @@ class SmoteSamplingJob(BaseJob):
         if self.col_key not in self.drop_list:
             self.drop_list.append(self.col_key)
         x = df.drop(*self.drop_list)
-        enn = SparkSMOTE(k_neighbors=self.k_neighbors)
-        return enn.fit_resample(x, y)
+        smote = SparkSMOTE(k_neighbors=self.k_neighbors)
+        return smote.fit_resample(x, y)
