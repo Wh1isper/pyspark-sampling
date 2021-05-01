@@ -18,6 +18,7 @@ from concurrent.futures.thread import ThreadPoolExecutor
 
 class BaseProcessModule(object):
     executor = ThreadPoolExecutor(max_workers=PARALLEL if PARALLEL else min(32, os.cpu_count() + 4))
+    job_list = []
     logger = logging.getLogger('SAMPLING')
     required_keys = set()
 
@@ -99,6 +100,7 @@ class BaseProcessModule(object):
 
 class BaseQueryProcessModule(BaseProcessModule):
     sql_table = None
+    MSG_JOB_NOT_FOUND = 'Job not found'
 
     def __init__(self):
         super(BaseQueryProcessModule, self).__init__()
@@ -134,7 +136,13 @@ class BaseQueryProcessModule(BaseProcessModule):
             details = await self.query(query_param)
         except Exception as e:
             raise SQLError(str(e))
+        if not details:
+            return self.response_job_not_found(response_data)
         response_data = self.format_response(response_data, details)
+        return response_data
+
+    def response_job_not_found(self, response_data):
+        response_data['msg'] = self.MSG_JOB_NOT_FOUND
         return response_data
 
 
@@ -145,13 +153,12 @@ class DummyProcessModule(BaseProcessModule):
     async def process(self) -> Dict[str, Any]:
         response_data = {
             'code': 0,
-            'msg': '',
+            'msg': 'Hello World!',
             'data': {},
         }
         try:
-            async with self.sqlengine.acquire() as conn:
-                ret = await conn.execute("SELECT * FROM test_table")
-                print(await ret.fetchone())
+            async with self.sqlengine.acquire() as _:
+                ...
         except CustomErrorWithCode as e:
             # catch or rise
             response_data = e.error_response()

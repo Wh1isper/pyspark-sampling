@@ -24,14 +24,11 @@ class QueryJobProcessModule(BaseQueryProcessModule):
             return await self.query_job_id(conn, job_id, self.sql_table)
 
     def format_response(self, response_data, details) -> dict:
-        if not details:
-            response_data['msg'] = 'job not found'
-            return response_data
         data = {
             'job_id': details.job_id,
-            'job_status': CODE_TO_JOB_STATUS[details.status_code],
+            'job_status': CODE_TO_JOB_STATUS.get(details.status_code, details.status_code),
             'msg': details.msg,
-            'method': CODE_TO_SAMPLING_METHOD_NAME[details.method],
+            'method': CODE_TO_SAMPLING_METHOD_NAME.get(details.method, details.method),
             'start_time': details.start_time.strftime("%Y/%m/%d/ %H:%M:%S") if details.start_time else None,
             'end_time': details.end_time.strftime("%Y/%m/%d %H:%M:%S") if details.end_time else None,
             'simpled_file_path': details.simpled_path,
@@ -64,20 +61,15 @@ class QueryListProcessModule(BaseQueryProcessModule):
         return details
 
     def format_response(self, response_data, details) -> dict:
-        if not details:
-            response_data['msg'] = 'job not found'
-            return response_data
         data = []
         for detail in details:
             data.append({
                 'job_id': detail.job_id,
-                'job_status': CODE_TO_JOB_STATUS[detail.status_code],
+                'job_status': CODE_TO_JOB_STATUS.get(detail.status_code, detail.status_code),
                 'msg': detail.msg,
-                'method': CODE_TO_SAMPLING_METHOD_NAME[detail.method],
+                'method': CODE_TO_SAMPLING_METHOD_NAME.get(detail.method, detail.method),
                 'start_time': detail.start_time.strftime("%Y/%m/%d/ %H:%M:%S") if detail.start_time else None,
                 'end_time': detail.end_time.strftime("%Y/%m/%d %H:%M:%S") if detail.end_time else None,
-                'simpled_file_path': detail.simpled_path,
-                'request_data': detail.request_data,
             })
         response_data['data'] = {'query_result': data}
 
@@ -106,20 +98,15 @@ class QueryEvaluationListProcessModule(BaseQueryProcessModule):
         return details
 
     def format_response(self, response_data, details) -> dict:
-        if not details:
-            response_data['msg'] = 'job not found'
-            return response_data
         data = []
         for detail in details:
             data.append({
                 'job_id': detail.job_id,
-                'job_status': CODE_TO_JOB_STATUS[detail.status_code],
+                'job_status': CODE_TO_JOB_STATUS.get(detail.status_code, detail.status_code),
                 'msg': detail.msg,
-                'method': CODE_TO_EVALUATION_METHOD_NAME[detail.method],
+                'method': CODE_TO_EVALUATION_METHOD_NAME.get(detail.method, detail.method),
                 'start_time': detail.start_time.strftime("%Y/%m/%d/ %H:%M:%S") if detail.start_time else None,
                 'end_time': detail.end_time.strftime("%Y/%m/%d %H:%M:%S") if detail.end_time else None,
-                'result': detail.result,
-                'request_data': detail.request_data,
             })
         response_data['data'] = {'query_result': data}
 
@@ -146,14 +133,11 @@ class QueryEvaluationJobProcessModule(BaseQueryProcessModule):
             return await self.query_job_id(conn, job_id, self.sql_table)
 
     def format_response(self, response_data, details) -> dict:
-        if not details:
-            response_data['msg'] = 'job not found'
-            return response_data
         data = {
             'job_id': details.job_id,
-            'job_status': CODE_TO_JOB_STATUS[details.status_code],
+            'job_status': CODE_TO_JOB_STATUS.get(details.status_code, details.status_code),
             'msg': details.msg,
-            'method': CODE_TO_EVALUATION_METHOD_NAME[details.method],
+            'method': CODE_TO_EVALUATION_METHOD_NAME.get(details.method, details.method),
             'start_time': details.start_time.strftime("%Y/%m/%d/ %H:%M:%S") if details.start_time else None,
             'end_time': details.end_time.strftime("%Y/%m/%d %H:%M:%S") if details.end_time else None,
             'result': details.result,

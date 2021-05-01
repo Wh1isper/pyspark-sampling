@@ -22,7 +22,7 @@ class EvaluationProcessModule(BaseProcessModule):
 
     required_keys = {
         'path',
-        # 'source_path',
+        'source_path',
         'method',
     }
 
@@ -84,9 +84,14 @@ class EvaluationProcessModule(BaseProcessModule):
 
     async def run_job(self):
         try:
-            result = await ioloop.IOLoop.current().run_in_executor(self.executor, self.evaluation_engine.submit,
-                                                                   self.job_id,
-                                                                   False)
+            future = ioloop.IOLoop.current().run_in_executor(self.executor, self.evaluation_engine.submit,
+                                                             self.job_id,
+                                                             False)
+            BaseProcessModule.job_list.append((self.job_id, future))
+            self.logger.info(f"Evaluation Job Enqueued: {self.job_id}")
+            result = await future
+            if (self.job_id, future) in BaseProcessModule.job_list:
+                BaseProcessModule.job_list.remove((self.job_id, future))
             await self.finish_job(result)
         except CustomErrorWithCode as e:
             await self.error_job(e)

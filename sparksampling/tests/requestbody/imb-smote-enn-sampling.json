@@ -1,0 +1,12 @@
+{
+    "path": "hdfs://localhost:9000/dataset/unbalance_500v50_10.csv",
+    "method": "imb_smote_enn",
+    "type": "csv",
+    "conf": {
+        "drop_list": [
+            "# id",
+            "y"
+        ],
+        "key": "y"
+    }
+}

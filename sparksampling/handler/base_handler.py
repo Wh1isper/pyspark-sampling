@@ -100,7 +100,7 @@ class BaseProcessHandler(RequestHandler):
         try:
             result = await self.fetch(self.request.body, kw)
             self.write(result)
-            self.finish()
+            await self.finish()
             await self.processmodule.run_job()
         except Exception:
             self.send_error(500, exc_info=sys.exc_info())

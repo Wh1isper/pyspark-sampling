@@ -7,4 +7,4 @@ omit =
 	*/utilities/*
 	app.py
 	submit.py
-	core/mlsamplinglib/ref.py
+	*/core/mlsamplinglib/*
