@@ -26,7 +26,26 @@ class TestSimpleSampling(BaseTestSampleModule):
 class TestMLSampling(BaseTestSampleModule):
     test_url = '/v1/sampling/mljob/'
 
-    def test_2_class_upper_smote(self):
+    def test_spark_smote(self):
         response = self._post_data_from_file('smote-sampling.json')
+        self._check_code(response, 0, 'Spark SMOTE Job Submit Test')
 
-        self._check_code(response, 0, 'SMOTE Job Submit Test')
+    def test_imb_smote(self):
+        response = self._post_data_from_file('imb-smote-sampling.json')
+        self._check_code(response, 0, 'Imb SMOTE Job Submit Test')
+
+    def test_spark_enn(self):
+        response = self._post_data_from_file('enn-sampling.json')
+        self._check_code(response, 0, 'Spark ENN Job Submit Test')
+
+    def test_imb_enn(self):
+        response = self._post_data_from_file('imb-enn-sampling.json')
+        self._check_code(response, 0, 'Imb ENN Job Submit Test')
+
+    def test_spark_smote_enn(self):
+        response = self._post_data_from_file('smote-enn-sampling.json')
+        self._check_code(response, 0, 'Spark SMOTE-ENN Job Submit Test')
+
+    def test_imb_smote_enn(self):
+        response = self._post_data_from_file('imb-smote-enn-sampling.json')
+        self._check_code(response, 0, 'Imb SMOTE-ENN Job Submit Test')

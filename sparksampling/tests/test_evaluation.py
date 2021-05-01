@@ -28,3 +28,8 @@ class TestEvaluation(BaseTestEvaluationModule):
     def test_compare_evaluation(self):
         response = self._post_data_from_file('evaluation-compare.json')
         self._check_code(response, 0, 'Compare Evaluation Test')
+
+    def test_kmeans_evaluation(self):
+        response = self._post_data_from_file('evaluation-kmeans.json')
+        self._check_code(response, 0, 'Kmeans Evaluation Test')
+

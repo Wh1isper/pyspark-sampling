@@ -72,6 +72,9 @@ class BaseTestModule(AsyncHTTPTestCase):
             json_data = None
         return json_data
 
+    def dict_to_json(self, dict_data):
+        return json.dumps(dict_data)
+
     def _get_request_data(self, file_name):
         # default: /path_to_project/tests/requestbody/{file_name}
         # modify self.pre_fix to change 'requestbody' to any path
@@ -88,11 +91,23 @@ class BaseTestModule(AsyncHTTPTestCase):
         #     'data': {},
         # }
         # if code is not expected,test failed and show msg
+        print("processing code check")
         self.assertEqual(data['code'], code, msg=data['msg'])
         print(
             f"--------- {'@' if annotation else ''} " + annotation + ' ---------\n',
-            f"{self.__class__.__name__} Test Succeed: msg: {data['msg'] if data['code'] != 0 else 'Pass...'} \n"
-            f"status code: {data['code']} with data:{data['data']} "
+            f"{self.__class__.__name__} Test Succeed: \n"
+            f"msg: {data['msg'] if data['code'] != 0 else 'Pass...'}\n"
+            f"status code: {data['code']} with data: {data['data']} "
+        )
+
+    def _check_msg(self, data, msg, annotation=''):
+        print("processing msg check")
+        self.assertEqual(data['msg'], msg, msg=data['msg'])
+        print(
+            f"--------- {'@' if annotation else ''} " + annotation + ' ---------\n',
+            f"{self.__class__.__name__} Test Succeed: \n"
+            f"msg: {data['msg'] if data['code'] != 0 else 'Pass...'}\n"
+            f"status code: {data['code']} with msg: {data['msg']} "
         )
 
     def test_json_decode_error_code(self):
