@@ -28,7 +28,7 @@ Accept: application/json
     });
 %}
 
-###
+### simple sampling job
 POST http://{{host}}:{{port}}/v1/sampling/simplejob/
 Accept: application/json
 
@@ -46,7 +46,7 @@ Accept: application/json
 
 < requestbody/stratified-sampling.json
 
-###
+### ml sampling job
 POST http://{{host}}:{{port}}/v1/sampling/mljob/
 Accept: application/json
 
@@ -64,6 +64,18 @@ Accept: application/json
 
 < requestbody/smote-enn-sampling.json
 
+### evaluation job
+POST http://{{host}}:{{port}}/v1/evaluation/job/
+Accept: application/json
+
+< requestbody/evaluation-compare.json
+
+###
+POST http://{{host}}:{{port}}/v1/evaluation/job/
+Accept: application/json
+
+< requestbody/evaluation-kmeans.json
+
 ###
 POST http://{{host}}:{{port}}/v1/query/sampling/job/
 Accept: application/json
@@ -77,7 +89,6 @@ Accept: application/json
 {
     "job_id": 50001
 }
-
 
 ###
 POST http://{{host}}:{{port}}/v1/query/sampling/list/
@@ -97,8 +108,19 @@ Accept: application/json
 
 < requestbody/statistics.json
 
+
+### cancel test
 ###
-POST http://{{host}}:{{port}}/v1/evaluation/job/
+POST http://{{host}}:{{port}}/v1/sampling/cancel/
 Accept: application/json
 
-< requestbody/evaluation-compare.json
+{
+    "job_id": 10039
+}
+###
+POST http://{{host}}:{{port}}/v1/evaluation/cancel/
+Accept: application/json
+
+{
+    "job_id": 50001
+}

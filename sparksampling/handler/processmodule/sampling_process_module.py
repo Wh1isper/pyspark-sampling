@@ -1,8 +1,7 @@
-import asyncio
-
-from sparksampling.handler.processmodule import BaseProcessModule
 from typing import Dict, Any
 import random
+from datetime import datetime
+from tornado import ioloop
 from sparksampling.utilities import TypeCheckError
 from sparksampling.core.engine import SamplingEngine
 from sparksampling.var import JOB_STATUS_SUCCEED, JOB_STATUS_PADDING
@@ -11,8 +10,7 @@ from sparksampling.var import JOB_CANCELED, JOB_CREATED, JOB_CREATING
 from sparksampling.utilities import CustomErrorWithCode
 from sparksampling.utilities.utilities import convert_dict_value_to_string_value
 from sparksampling.core.orm import SampleJobTable
-from datetime import datetime
-from tornado import ioloop
+from sparksampling.handler.processmodule import BaseProcessModule
 
 
 class SamplingProcessModule(BaseProcessModule):
@@ -92,8 +90,13 @@ class SamplingProcessModule(BaseProcessModule):
 
     async def run_job(self):
         try:
-            new_path = await ioloop.IOLoop.current().run_in_executor(self.executor, self.sample_engine.submit,
-                                                                     self.job_id)
+            future = ioloop.IOLoop.current().run_in_executor(self.executor, self.sample_engine.submit,
+                                                             self.job_id)
+            BaseProcessModule.job_list.append((self.job_id, future))
+            self.logger.info(f"Sampling Job Enqueued: {self.job_id}")
+            new_path = await future
+            if (self.job_id, future) in BaseProcessModule.job_list:
+                BaseProcessModule.job_list.remove((self.job_id, future))
             await self.finish_job(new_path)
         except CustomErrorWithCode as e:
             await self.error_job(e)

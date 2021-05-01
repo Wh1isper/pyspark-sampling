@@ -5,22 +5,21 @@
 from sparksampling.handler import BaseProcessHandler, SingletonHandler
 from sparksampling.handler.processmodule import DummyProcessModule, SamplingProcessModule, MLSamplingProcessModule, \
     QueryJobProcessModule, StatisticsProcessModule, QueryListProcessModule, EvaluationProcessModule, \
-    QueryEvaluationListProcessModule, QueryEvaluationJobProcessModule
+    QueryEvaluationListProcessModule, QueryEvaluationJobProcessModule, CancelSamplingJobProcessModule, \
+    CancelEvaluationJobProcessModule
 
 
 class HelloHandler(SingletonHandler):
     async def get(self):
         self.logger.info('Debug Mod is Running...')
-        self.write({
-            'code': 0,
-            'msg': 'Hello World!',
-            'data': {}
-        })
+        self.write(await self.fetch(self.request.body))
 
 
 sampling_handlers = [
     (r'/v1/sampling/simplejob/(.*)', BaseProcessHandler, dict(processmodule=SamplingProcessModule)),
     (r'/v1/sampling/mljob/(.*)', BaseProcessHandler, dict(processmodule=MLSamplingProcessModule)),
+    (r'/v1/sampling/cancel/(.*)', SingletonHandler, dict(processmodule=CancelSamplingJobProcessModule)),
+
 ]
 query_handlers = [
     (r'/v1/query/sampling/job/(.*)', SingletonHandler, dict(processmodule=QueryJobProcessModule)),
@@ -33,6 +32,8 @@ query_handlers = [
 evaluation_handlers = [
     (r'/v1/evaluation/statistics/(.*)', SingletonHandler, dict(processmodule=StatisticsProcessModule)),
     (r'/v1/evaluation/job/(.*)', BaseProcessHandler, dict(processmodule=EvaluationProcessModule)),
+    (r'/v1/evaluation/cancel/(.*)', SingletonHandler, dict(processmodule=CancelEvaluationJobProcessModule)),
+
 ]
 
 test_handlers = [

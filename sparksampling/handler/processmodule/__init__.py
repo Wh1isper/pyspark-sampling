@@ -5,6 +5,8 @@ from sparksampling.handler.processmodule.query_process_module import QueryJobPro
     QueryEvaluationJobProcessModule, QueryEvaluationListProcessModule
 from sparksampling.handler.processmodule.statistics_process_module import StatisticsProcessModule
 from sparksampling.handler.processmodule.evaluation_process_module import EvaluationProcessModule
+from sparksampling.handler.processmodule.cancel_process_module import CancelEvaluationJobProcessModule, \
+    CancelSamplingJobProcessModule
 
 __all__ = [
     "BaseProcessModule",
@@ -17,4 +19,6 @@ __all__ = [
     "EvaluationProcessModule",
     "QueryEvaluationJobProcessModule",
     "QueryEvaluationListProcessModule",
+    "CancelSamplingJobProcessModule",
+    "CancelEvaluationJobProcessModule",
 ]
