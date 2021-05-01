@@ -1,6 +1,6 @@
 from sparksampling.app import query_app
 from sparksampling.tests.base_test_module import BaseTestModule
-from sparksampling.handler.processmodule.base_process_module import BaseQueryProcessModule
+from sparksampling.handler.processmodule import BaseQueryProcessModule
 
 
 class BaseTestQueryModule(BaseTestModule):
