@@ -92,11 +92,11 @@ class SamplingProcessModule(BaseProcessModule):
         try:
             future = ioloop.IOLoop.current().run_in_executor(self.executor, self.sample_engine.submit,
                                                              self.job_id)
-            BaseProcessModule.job_list.append((self.job_id, future))
+            SamplingProcessModule.job_list.append((self.job_id, future))
             self.logger.info(f"Sampling Job Enqueued: {self.job_id}")
             new_path = await future
-            if (self.job_id, future) in BaseProcessModule.job_list:
-                BaseProcessModule.job_list.remove((self.job_id, future))
+            if (self.job_id, future) in SamplingProcessModule.job_list:
+                SamplingProcessModule.job_list.remove((self.job_id, future))
             await self.finish_job(new_path)
         except CustomErrorWithCode as e:
             await self.error_job(e)

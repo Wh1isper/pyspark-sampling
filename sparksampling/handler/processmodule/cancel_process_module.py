@@ -3,12 +3,13 @@ from tornado.locks import Event
 from datetime import datetime
 
 from sparksampling.core.orm import EvaluationJobTable, SampleJobTable
-from sparksampling.handler.processmodule import BaseProcessModule
+from sparksampling.handler.processmodule import BaseProcessModule, SamplingProcessModule, EvaluationProcessModule
 from sparksampling.var import JOB_STATUS_CANCELED
 
 
 class CancelBaseProcessModule(BaseProcessModule):
     sql_table = None
+    job_refer_process_module: BaseProcessModule = None
 
     required_keys = {
         "job_id"
@@ -28,7 +29,7 @@ class CancelBaseProcessModule(BaseProcessModule):
 
         event = Event()
         status = future.cancel()
-        BaseProcessModule.job_list.remove((job_id, future))
+        self.job_refer_process_module.job_list.remove((job_id, future))
         event.set()
         if not status:
             return self.cancel_job_failed(job_id)
@@ -36,7 +37,7 @@ class CancelBaseProcessModule(BaseProcessModule):
         return self.cancel_job_succeed(job_id)
 
     def find_job_future(self, job_id):
-        job_list = BaseProcessModule.job_list
+        job_list = self.job_refer_process_module.job_list
         for t_job_id, future in job_list:
             if t_job_id == job_id:
                 return future
@@ -68,7 +69,7 @@ class CancelBaseProcessModule(BaseProcessModule):
             'msg': 'Succeed',
             'data': {
                 "job_id": job_id,
-                "is_succeed": False,
+                "is_succeed": True,
             },
         }
 
@@ -86,7 +87,9 @@ class CancelBaseProcessModule(BaseProcessModule):
 
 class CancelSamplingJobProcessModule(CancelBaseProcessModule):
     sql_table = SampleJobTable
+    job_refer_process_module = SamplingProcessModule
 
 
 class CancelEvaluationJobProcessModule(CancelBaseProcessModule):
     sql_table = EvaluationJobTable
+    job_refer_process_module = EvaluationProcessModule

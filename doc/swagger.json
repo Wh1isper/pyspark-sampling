@@ -20,7 +20,7 @@
     "tags": [
         {
             "name": "sampling",
-            "description": "采样任务提交接口"
+            "description": "采样任务接口"
         },
         {
             "name": "query",
@@ -28,7 +28,7 @@
         },
         {
             "name": "evaluation",
-            "description": "统计评估任务提交接口"
+            "description": "统计评估任务接口"
         }
     ],
     "paths": {
@@ -161,6 +161,40 @@
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/sampling_job_create_response"
+                        }
+                    }
+                }
+            }
+        },
+        "/sampling/cancel/": {
+            "post": {
+                "tags": [
+                    "sampling"
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "description": "取消采样任务(只能取消未运行的采样任务)",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "job_id",
+                        "description": "任务id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": "10000"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/job_cancel_response"
                         }
                     }
                 }
@@ -464,6 +498,40 @@
                     }
                 }
             }
+        },
+        "/evaluation/cancel/": {
+            "post": {
+                "tags": [
+                    "evaluation"
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "description": "取消评估任务(只能取消未运行的评估任务)",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "job_id",
+                        "description": "任务id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": "50000"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/job_cancel_response"
+                        }
+                    }
+                }
+            }
         }
     },
     "externalDocs": {
@@ -572,6 +640,24 @@
                     "description": "分类标签"
                 }
             }
+        },
+        "job_cancel_response": {
+            "type": "object",
+            "allOf": [
+                {
+                    "$ref": "#/definitions/response"
+                },
+                {
+                    "example": {
+                        "code": 0,
+                        "msg": "Succeed",
+                        "data": {
+                            "job_id": 10000,
+                            "is_succeed": true
+                        }
+                    }
+                }
+            ]
         },
         "sampling_job_create_response": {
             "type": "object",

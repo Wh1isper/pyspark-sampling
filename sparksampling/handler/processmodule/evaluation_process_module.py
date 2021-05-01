@@ -87,11 +87,11 @@ class EvaluationProcessModule(BaseProcessModule):
             future = ioloop.IOLoop.current().run_in_executor(self.executor, self.evaluation_engine.submit,
                                                              self.job_id,
                                                              False)
-            BaseProcessModule.job_list.append((self.job_id, future))
+            EvaluationProcessModule.job_list.append((self.job_id, future))
             self.logger.info(f"Evaluation Job Enqueued: {self.job_id}")
             result = await future
-            if (self.job_id, future) in BaseProcessModule.job_list:
-                BaseProcessModule.job_list.remove((self.job_id, future))
+            if (self.job_id, future) in EvaluationProcessModule.job_list:
+                EvaluationProcessModule.job_list.remove((self.job_id, future))
             await self.finish_job(result)
         except CustomErrorWithCode as e:
             await self.error_job(e)
