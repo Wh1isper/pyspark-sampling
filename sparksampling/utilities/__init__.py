@@ -1,4 +1,5 @@
-from sparksampling.utilities.custom_error import CustomErrorWithCode, JsonDecodeError, TypeCheckError
+from sparksampling.utilities.custom_error import SQLError, DBConnectError, TypeCheckError, JobTypeError, JobKeyError, \
+    JobProcessError, JsonDecodeError, BadParamError, CustomErrorWithCode
 from sparksampling.utilities.utilities import from_path_import
 import logging.config
 import os
@@ -14,8 +15,14 @@ logging.getLogger("py4j").setLevel(logging.ERROR)
 logging.getLogger("matplotlib").setLevel(logging.ERROR)
 __all__ = [
     'CustomErrorWithCode',
-    'JsonDecodeError',
     'logger',
-    'TypeCheckError',
     'from_path_import',
+    'SQLError',
+    'JsonDecodeError',
+    'BadParamError',
+    'DBConnectError',
+    'JobKeyError',
+    'JobProcessError',
+    'JobTypeError',
+    'TypeCheckError',
 ]

@@ -4,7 +4,7 @@ from sparksampling.core.engine import EvaluationEngine
 from sparksampling.handler.processmodule import BaseProcessModule
 from typing import Dict, Any
 
-from sparksampling.handler.processmodule.base_process_module import BaseQueryProcessModule
+from sparksampling.handler.processmodule import BaseQueryProcessModule
 from sparksampling.utilities import TypeCheckError
 from sparksampling.var import JOB_STATUS_SUCCEED, JOB_STATUS_PADDING
 from sparksampling.var import EVALUATION_COMPARE_METHOD, FILE_TYPE_TEXT

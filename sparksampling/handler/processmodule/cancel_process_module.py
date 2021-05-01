@@ -7,7 +7,7 @@ from sparksampling.handler.processmodule import BaseProcessModule, SamplingProce
 from sparksampling.var import JOB_STATUS_CANCELED
 
 
-class CancelBaseProcessModule(BaseProcessModule):
+class BaseCancelProcessModule(BaseProcessModule):
     sql_table = None
     job_refer_process_module: BaseProcessModule = None
 
@@ -16,7 +16,7 @@ class CancelBaseProcessModule(BaseProcessModule):
     }
 
     def __init__(self):
-        super(CancelBaseProcessModule, self).__init__()
+        super(BaseCancelProcessModule, self).__init__()
 
     async def process(self) -> Dict[str, Any]:
         request_data: Dict = self._request_data
@@ -85,11 +85,11 @@ class CancelBaseProcessModule(BaseProcessModule):
                 await transaction.commit()
 
 
-class CancelSamplingJobProcessModule(CancelBaseProcessModule):
+class SamplingJobCancelProcessModule(BaseCancelProcessModule):
     sql_table = SampleJobTable
     job_refer_process_module = SamplingProcessModule
 
 
-class CancelEvaluationJobProcessModule(CancelBaseProcessModule):
+class EvaluationJobCancelProcessModule(BaseCancelProcessModule):
     sql_table = EvaluationJobTable
     job_refer_process_module = EvaluationProcessModule

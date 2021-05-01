@@ -3,7 +3,7 @@ from sparksampling.core.engine import StatisticsEngine
 from sparksampling.handler.processmodule import BaseProcessModule
 from typing import Dict, Any
 
-from sparksampling.handler.processmodule.base_process_module import BaseQueryProcessModule
+from sparksampling.handler.processmodule import BaseQueryProcessModule
 from sparksampling.utilities.custom_error import JobProcessError
 from sparksampling.var import JOB_STATUS_SUCCEED, STATISTICS_BASIC_METHOD, FILE_TYPE_TEXT
 

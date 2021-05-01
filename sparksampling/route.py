@@ -4,9 +4,9 @@
 
 from sparksampling.handler import BaseProcessHandler, SingletonHandler
 from sparksampling.handler.processmodule import DummyProcessModule, SamplingProcessModule, MLSamplingProcessModule, \
-    QueryJobProcessModule, StatisticsProcessModule, QueryListProcessModule, EvaluationProcessModule, \
-    QueryEvaluationListProcessModule, QueryEvaluationJobProcessModule, CancelSamplingJobProcessModule, \
-    CancelEvaluationJobProcessModule
+    QuerySamplingJobProcessModule, StatisticsProcessModule, QuerySamplingListProcessModule, EvaluationProcessModule, \
+    QueryEvaluationListProcessModule, QueryEvaluationJobProcessModule, SamplingJobCancelProcessModule, \
+    EvaluationJobCancelProcessModule
 
 
 class HelloHandler(SingletonHandler):
@@ -18,12 +18,12 @@ class HelloHandler(SingletonHandler):
 sampling_handlers = [
     (r'/v1/sampling/simplejob/(.*)', BaseProcessHandler, dict(processmodule=SamplingProcessModule)),
     (r'/v1/sampling/mljob/(.*)', BaseProcessHandler, dict(processmodule=MLSamplingProcessModule)),
-    (r'/v1/sampling/cancel/(.*)', SingletonHandler, dict(processmodule=CancelSamplingJobProcessModule)),
+    (r'/v1/sampling/cancel/(.*)', SingletonHandler, dict(processmodule=SamplingJobCancelProcessModule)),
 
 ]
 query_handlers = [
-    (r'/v1/query/sampling/job/(.*)', SingletonHandler, dict(processmodule=QueryJobProcessModule)),
-    (r'/v1/query/sampling/list/(.*)', SingletonHandler, dict(processmodule=QueryListProcessModule)),
+    (r'/v1/query/sampling/job/(.*)', SingletonHandler, dict(processmodule=QuerySamplingJobProcessModule)),
+    (r'/v1/query/sampling/list/(.*)', SingletonHandler, dict(processmodule=QuerySamplingListProcessModule)),
     (r'/v1/query/evaluation/job/(.*)', SingletonHandler, dict(processmodule=QueryEvaluationJobProcessModule)),
     (r'/v1/query/evaluation/list/(.*)', SingletonHandler, dict(processmodule=QueryEvaluationListProcessModule)),
 
@@ -32,7 +32,7 @@ query_handlers = [
 evaluation_handlers = [
     (r'/v1/evaluation/statistics/(.*)', SingletonHandler, dict(processmodule=StatisticsProcessModule)),
     (r'/v1/evaluation/job/(.*)', BaseProcessHandler, dict(processmodule=EvaluationProcessModule)),
-    (r'/v1/evaluation/cancel/(.*)', SingletonHandler, dict(processmodule=CancelEvaluationJobProcessModule)),
+    (r'/v1/evaluation/cancel/(.*)', SingletonHandler, dict(processmodule=EvaluationJobCancelProcessModule)),
 
 ]
 

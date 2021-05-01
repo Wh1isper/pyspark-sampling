@@ -98,54 +98,6 @@ class BaseProcessModule(object):
         return self.job_stats == JOB_CREATED
 
 
-class BaseQueryProcessModule(BaseProcessModule):
-    sql_table = None
-    MSG_JOB_NOT_FOUND = 'Job not found'
-
-    def __init__(self):
-        super(BaseQueryProcessModule, self).__init__()
-
-    def get_query_param_from_request_data(self, request_data):
-        raise NotImplementedError
-
-    @staticmethod
-    async def query_job_id(conn, job_id, table):
-        result = await conn.execute(table.select().where(table.c.job_id == job_id))
-        details = await result.fetchone()
-        return details
-
-    async def query(self, query_param) -> dict or None:
-        raise NotImplementedError
-
-    def format_response(self, response_data, details) -> dict:
-        raise NotImplementedError
-
-    async def process(self) -> Dict[str, Any]:
-        response_data = {
-            'code': 0,
-            'msg': "",
-            'data': {}
-        }
-        request_data: Dict = self._request_data
-
-        if type(request_data) is not dict:
-            raise JsonDecodeError
-        self.check_param(request_data)
-        query_param = self.get_query_param_from_request_data(request_data)
-        try:
-            details = await self.query(query_param)
-        except Exception as e:
-            raise SQLError(str(e))
-        if not details:
-            return self.response_job_not_found(response_data)
-        response_data = self.format_response(response_data, details)
-        return response_data
-
-    def response_job_not_found(self, response_data):
-        response_data['msg'] = self.MSG_JOB_NOT_FOUND
-        return response_data
-
-
 class DummyProcessModule(BaseProcessModule):
     def __init__(self):
         super(DummyProcessModule, self).__init__()
