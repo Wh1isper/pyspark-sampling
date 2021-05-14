@@ -23,6 +23,8 @@ class SparkSMOTE(object):
         vectorized_sdf = vectorized.join(y, vectorized.index == y.index).drop("index")
         df_min = vectorized_sdf.filter(f"{label_index} == {min_label}")
 
+        subtract_vector_udf = F.udf(lambda arr: random.uniform(0, 1) * (arr[0] - arr[1]), VectorUDT())
+        add_vector_udf = F.udf(lambda arr: arr[0] + arr[1], VectorUDT())
         brp = BucketedRandomProjectionLSH(inputCol="features", outputCol="hashes", seed=np.random.randint(1, 65535),
                                           bucketLength=3)
         # smote only applies on existing minority instances
@@ -41,14 +43,12 @@ class SparkSMOTE(object):
 
         over_original_rows_no_order = Window.partitionBy('datasetA')
         original_cols = df_min.columns
-        subtract_vector_udf = F.udf(lambda arr: random.uniform(0, 1) * (arr[0] - arr[1]), VectorUDT())
-        add_vector_udf = F.udf(lambda arr: arr[0] + arr[1], VectorUDT())
         res = []
         for _ in range(t_round):
-            df_random_sel = self_similarity_df_selected.withColumn("rand", F.rand()).withColumn('max_rand',
-                                                                                                F.max('rand').over(
-                                                                                                    over_original_rows_no_order)) \
-                .where(F.col('rand') == F.col('max_rand')).drop(*['max_rand', 'rand', 'r_num'])
+            df_random_sel = self_similarity_df_selected.withColumn("rand", F.rand()).withColumn(
+                'max_rand',
+                F.max('rand').over(over_original_rows_no_order)
+            ).where(F.col('rand') == F.col('max_rand')).drop(*['max_rand', 'rand', 'r_num'])
             df_vec_diff = df_random_sel.select('*',
                                                subtract_vector_udf(
                                                    F.array('datasetA.features', 'datasetB.features')).alias(

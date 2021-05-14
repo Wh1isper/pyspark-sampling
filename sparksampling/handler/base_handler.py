@@ -96,7 +96,6 @@ class BaseProcessHandler(RequestHandler):
 
     async def post(self, kw=None):
         # 请求入口，由于pyspark的限制，一般来说在生成job之后就将run_job
-        self.logger.debug("type:" + str(kw))
         try:
             result = await self.fetch(self.request.body, kw)
             self.write(result)

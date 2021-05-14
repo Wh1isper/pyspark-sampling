@@ -32,7 +32,8 @@ class ImbSMOTEENNSamplingJob(BaseJob):
         if self.col_key not in self.drop_list:
             self.drop_list.append(self.col_key)
         x = df.drop(self.drop_list, axis=1)
-        smoteenn = SMOTEENN(smote=SMOTE(k_neighbors=self.k_neighbors), enn=ENN(n_neighbors=self.n_neighbors))
+        smoteenn = SMOTEENN(smote=SMOTE(k_neighbors=self.k_neighbors),
+                            enn=ENN(n_neighbors=self.n_neighbors, sampling_strategy="all"))
         x_fit, y_fit = smoteenn.fit_resample(x.values, y.values)
         result_df = pd.concat([pd.DataFrame(x_fit, columns=x.columns), pd.DataFrame(y_fit, columns=y.columns)], axis=1)
         return pandas_to_spark(result_df)

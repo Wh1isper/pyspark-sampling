@@ -43,7 +43,7 @@ def get_path(job_type: str):
     if job_type not in JOB_TYPE:
         return ''
     else:
-        return "{}_job_list.json".format(job_type)
+        return "compare_{}_job_list.json".format(job_type)
 
 
 def get_job_id_list(job_list: List[DSResponse]):
@@ -78,14 +78,6 @@ def query_job_info(job_list: List[int], job_type: str) -> List[DSResponse]:
     return job_info_list
 
 
-def load_job_info(job_type: str, file_path=None) -> List[int]:
-    path = get_path(job_type) if not file_path else file_path
-    if path:
-        with open(path, 'r') as f:
-            job_id_list = json.load(f)
-    return job_id_list
-
-
 def new_exp(dataset_uri, num):
     response_list = generate_sampling_job(dataset_uri, num=num)
     job_list = get_job_id_list(response_list)
@@ -99,6 +91,13 @@ def new_exp(dataset_uri, num):
 
 
 def load_from_json():
+    def load_job_info(job_type: str, file_path=None) -> List[int]:
+        path = get_path(job_type) if not file_path else file_path
+        if path:
+            with open(path, 'r') as f:
+                job_id_list = json.load(f)
+            return job_id_list
+
     job_list = load_job_info(SAMPLING_JOB_TYPE)
     eva_job_list = load_job_info(EVALUATION_JOB_TYPE)
     sampling_job_details = query_job_info(job_list, SAMPLING_JOB_TYPE)

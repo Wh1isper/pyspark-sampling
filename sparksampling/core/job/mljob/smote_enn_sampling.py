@@ -29,6 +29,6 @@ class SmoteENNSamplingJob(BaseJob):
         x = df.drop(*self.drop_list)
 
         smote = SparkSMOTE(k_neighbors=self.k_neighbors)
-        enn = SparkENN(n_neighbors=self.n_neighbors)
+        enn = SparkENN(n_neighbors=self.n_neighbors, only_undersample_majority=False)
         smoteenn = SparkSMOTEENN(smote=smote, enn=enn)
         return smoteenn.fit_resample(x, y)

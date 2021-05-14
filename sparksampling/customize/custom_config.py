@@ -8,7 +8,6 @@ compare_evaluation_code = STATISTICS_BASIC_METHOD
 # api对应字段：method
 # 示例：
 # "basic"：BasicStatisticsJob
-# PORT: EVALUATION_JOB_PORT
 extra_statistics_job = {
 
 }
@@ -16,7 +15,6 @@ extra_statistics_job = {
 # api对应字段：method
 # 示例：
 # "compare"：CompareEvaluationJob
-# PORT: EVALUATION_JOB_PORT
 extra_evaluation_job = {
 
 }
@@ -24,7 +22,6 @@ extra_evaluation_job = {
 # api对应字段：method
 # 示例：
 # "random"：SimpleRandomSamplingJob
-# PORT: SAMPLING_JOB_PORT
 extra_sampling_job = {
 
 }

@@ -75,14 +75,14 @@ class Submitter(object):
         self.port = port
         self.prefix = f'{protocol}://{self.ip}:{self.port}/'
 
-        self.simple_job_url = urljoin(self.prefix, '/v1/sampling/simplejob/')
-        self.ml_job_url = urljoin(self.prefix, '/v1/sampling/mljob/')
-        self.evaluation_job_url = urljoin(self.prefix, '/v1/evaluation/job/')
-        self.statistics_job_url = urljoin(self.prefix, '/v1/evaluation/statistics/')
-        self.query_simple_job_detail_url = urljoin(self.prefix, '/v1/query/sampling/job/')
-        self.query_simple_job_list_url = urljoin(self.prefix, '/v1/query/sampling/list/')
-        self.query_evaluation_job_detail_url = urljoin(self.prefix, '/v1/query/evaluation/job/')
-        self.query_evaluation_job_list_url = urljoin(self.prefix, '/v1/query/evaluation/list/')
+        self.__simple_job_url = urljoin(self.prefix, '/v1/sampling/simplejob/')
+        self.__ml_job_url = urljoin(self.prefix, '/v1/sampling/mljob/')
+        self.__evaluation_job_url = urljoin(self.prefix, '/v1/evaluation/job/')
+        self.__statistics_job_url = urljoin(self.prefix, '/v1/evaluation/statistics/')
+        self.__query_simple_job_detail_url = urljoin(self.prefix, '/v1/query/sampling/job/')
+        self.__query_simple_job_list_url = urljoin(self.prefix, '/v1/query/sampling/list/')
+        self.__query_evaluation_job_detail_url = urljoin(self.prefix, '/v1/query/evaluation/job/')
+        self.__query_evaluation_job_list_url = urljoin(self.prefix, '/v1/query/evaluation/list/')
 
     def submit_sampling_simplejob(self, path, method=SIMPLE_RANDOM_SAMPLING_METHOD, file_type=FILE_TYPE_TEXT,
                                   with_header=None, seed=None,
@@ -100,7 +100,7 @@ class Submitter(object):
                 'key': key
             }
         }
-        return DSResponse(**self._post_dict_data(self.simple_job_url, config_map))
+        return DSResponse(**self._post_dict_data(self.__simple_job_url, config_map))
 
     def submit_sampling_mljob(self, path, method=SPARK_SMOTE_SAMPLING_METHOD, file_type=FILE_TYPE_TEXT,
                               with_header=None, key=None, drop_list=None, k_neighbors=None, n_neighbors=None,
@@ -122,7 +122,7 @@ class Submitter(object):
             'with_header': with_header,
             'conf': algo_conf,
         }
-        return DSResponse(**self._post_dict_data(self.ml_job_url, config_map))
+        return DSResponse(**self._post_dict_data(self.__ml_job_url, config_map))
 
     def submit_evaluation_job(self, path=None, source_path=None, compare_job_id=None, method=EVALUATION_COMPARE_METHOD,
                               file_type=FILE_TYPE_TEXT,
@@ -137,33 +137,33 @@ class Submitter(object):
             'compare_job_id': compare_job_id
         }
         config_map.update(kwargs)
-        return DSResponse(**self._post_dict_data(self.evaluation_job_url, config_map))
+        return DSResponse(**self._post_dict_data(self.__evaluation_job_url, config_map))
 
     def get_sampling_job_details(self, job_id):
         config_map = {
             'job_id': job_id,
         }
-        return DSResponse(**self._post_dict_data(self.query_simple_job_detail_url, config_map))
+        return DSResponse(**self._post_dict_data(self.__query_simple_job_detail_url, config_map))
 
     def get_sampling_job_list(self, offset=None, limit=None):
         config_map = {
             'offset': offset,
             'limit': limit,
         }
-        return DSResponse(**self._post_dict_data(self.query_simple_job_list_url, config_map))
+        return DSResponse(**self._post_dict_data(self.__query_simple_job_list_url, config_map))
 
     def get_evaluation_job_details(self, job_id):
         config_map = {
             'job_id': job_id,
         }
-        return DSResponse(**self._post_dict_data(self.query_evaluation_job_detail_url, config_map))
+        return DSResponse(**self._post_dict_data(self.__query_evaluation_job_detail_url, config_map))
 
     def get_evaluation_job_list(self, offset=None, limit=None):
         config_map = {
             'offset': offset,
             'limit': limit,
         }
-        return DSResponse(**self._post_dict_data(self.query_evaluation_job_list_url, config_map))
+        return DSResponse(**self._post_dict_data(self.__query_evaluation_job_list_url, config_map))
 
     def get_statistics(self, path=None,
                        job_id=None,
@@ -181,7 +181,7 @@ class Submitter(object):
             'with_header': with_header,
             'from_sampling': from_sampling
         }
-        return DSResponse(**self._post_dict_data(self.statistics_job_url, config_map))
+        return DSResponse(**self._post_dict_data(self.__statistics_job_url, config_map))
 
     def _post_dict_data(self, url, data: dict):
         extract_none_in_dict(data)

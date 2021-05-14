@@ -7,20 +7,28 @@ import pyspark.sql.functions as F
 
 
 class SparkEditedNearestNeighbours(object):
-    def __init__(self, n_neighbors):
+    def __init__(self, n_neighbors, only_undersample_majority=True):
         self.n_neighbors = n_neighbors
+        self.only_undersample_majority = only_undersample_majority
+
+    def get_majority_label(self, y: DataFrame) -> str:
+        print("ENN: Get majority class label...")
+        labels = y.distinct().toPandas().to_numpy().reshape(-1)
+        label_index = y.columns[0]
+        count_map = {}
+        for label in labels:
+            count_map[label] = y.filter(f"{label_index} == {label}").count()
+
+        return max(count_map, key=count_map.get)
 
     def fit_resample(self, x: DataFrame, y: DataFrame) -> DataFrame:
         vectorized = vectorized_feature(x)
         vectorized = vectorized.withColumn("index", F.monotonically_increasing_id())
         y = y.withColumn("index", F.monotonically_increasing_id())
-
         brp = BucketedRandomProjectionLSH(inputCol="features", outputCol="hashes", seed=np.random.randint(1, 65535),
                                           bucketLength=3)
-        # smote only applies on existing minority instances
         model = brp.fit(vectorized)
         model.transform(vectorized)
-
         # here distance is calculated from brp's param inputCol
         self_join_w_distance = model.approxSimilarityJoin(vectorized, vectorized, float("inf"),
                                                           distCol="EuclideanDistance")
@@ -47,7 +55,8 @@ class SparkEditedNearestNeighbours(object):
         count_matrix = incorrect_matrix.withColumn("incorrect_count", F.row_number().over(incorrect_count))
         index_to_remove = count_matrix.filter(count_matrix.incorrect_count > self.n_neighbors // 2).select(
             'index_a').distinct().withColumnRenamed('index_a', 'index')
-
+        if self.only_undersample_majority:
+            index_to_remove = index_to_remove.filter(index_to_remove.index == self.get_majority_label(y))
         # reduce
         output_x = vectorized.join(index_to_remove, vectorized.index == index_to_remove.index, 'anti').drop(
             'features').drop(
