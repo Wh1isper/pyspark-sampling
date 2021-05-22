@@ -1,6 +1,6 @@
 from pyspark.ml import Pipeline
 from pyspark.ml.feature import VectorAssembler
-from pyspark.sql.types import ArrayType, DoubleType
+from pyspark.sql.types import ArrayType, DoubleType, FloatType
 from pyspark.sql.functions import udf
 from pyspark.sql.functions import col
 from pyspark.sql import DataFrame
@@ -12,9 +12,9 @@ def df_with_column_int(df: DataFrame):
     return df
 
 
-def df_with_column_double(df: DataFrame):
+def df_with_column_float(df: DataFrame):
     for c in df.columns:
-        df = df.withColumn(c, col(c).cast(DoubleType()))
+        df = df.withColumn(c, col(c).cast(FloatType()))
     return df
 
 
@@ -63,7 +63,7 @@ def get_num_cat_feat(input_spark_df, exclude_list=None):
 
 
 def vectorized_feature(x: DataFrame) -> DataFrame:
-    x = df_with_column_double(x)
+    x = df_with_column_float(x)
     assembler = VectorAssembler(inputCols=x.columns, outputCol='features')
     stages_ = []
     stages_.append(assembler)

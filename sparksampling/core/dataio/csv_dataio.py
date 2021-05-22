@@ -12,9 +12,6 @@ class CsvDataIO(BaseDataIO):
     def _read(self, path=None, *args, **kwargs):
         path = path or self.path
         df = self.spark.read.csv(path, header=self.header)
-        if not df.is_cached:
-            df.cache()
-            self.__df = df
         if not self.original_num_partitions:
             self.original_num_partitions = df.rdd.getNumPartitions()
         return df

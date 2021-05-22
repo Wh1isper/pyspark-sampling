@@ -20,6 +20,7 @@ class SparkENNSamplingJob(BaseJob):
         self.check_type()
 
     def _generate(self, df: DataFrame, *args, **kwargs) -> DataFrame:
+
         y = df.select(self.col_key)
         if self.col_key not in self.drop_list:
             self.drop_list.append(self.col_key)

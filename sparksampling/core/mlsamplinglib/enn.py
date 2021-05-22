@@ -14,6 +14,7 @@ class SparkEditedNearestNeighbours(object):
     def get_majority_label(self, y: DataFrame) -> str:
         print("ENN: Get majority class label...")
         labels = y.distinct().toPandas().to_numpy().reshape(-1)
+        print(f"labels :{labels}")
         label_index = y.columns[0]
         count_map = {}
         for label in labels:
@@ -24,6 +25,7 @@ class SparkEditedNearestNeighbours(object):
     def fit_resample(self, x: DataFrame, y: DataFrame) -> DataFrame:
         vectorized = vectorized_feature(x)
         vectorized = vectorized.withColumn("index", F.monotonically_increasing_id())
+        orin_y = y
         y = y.withColumn("index", F.monotonically_increasing_id())
         brp = BucketedRandomProjectionLSH(inputCol="features", outputCol="hashes", seed=np.random.randint(1, 65535),
                                           bucketLength=3)
@@ -56,7 +58,7 @@ class SparkEditedNearestNeighbours(object):
         index_to_remove = count_matrix.filter(count_matrix.incorrect_count > self.n_neighbors // 2).select(
             'index_a').distinct().withColumnRenamed('index_a', 'index')
         if self.only_undersample_majority:
-            index_to_remove = index_to_remove.filter(index_to_remove.index == self.get_majority_label(y))
+            index_to_remove = index_to_remove.filter(index_to_remove.index == self.get_majority_label(orin_y))
         # reduce
         output_x = vectorized.join(index_to_remove, vectorized.index == index_to_remove.index, 'anti').drop(
             'features').drop(

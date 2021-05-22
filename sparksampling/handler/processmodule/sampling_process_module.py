@@ -1,6 +1,8 @@
 from typing import Dict, Any
 import random
 from datetime import datetime
+
+import tornado.gen
 from tornado import ioloop
 from sparksampling.utilities import TypeCheckError
 from sparksampling.core.engine import SamplingEngine
