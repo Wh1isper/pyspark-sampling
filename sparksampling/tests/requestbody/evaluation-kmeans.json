@@ -1,11 +1,10 @@
 {
-    "compare_job_id": 10001,
+    "compare_job_id": 10080,
     "type": "csv",
     "method": "kmeans",
+    "key": "y",
     "selected_features_list": [
         "X_0",
-        "X_1",
-        "X_2",
-        "X_3"
+        "X_1"
     ]
 }

@@ -1,7 +1,1 @@
-{
-    "job_id": 10000,
-    "type": "csv",
-    "method": "basic",
-    "from_sampling": true,
-    "with_header": true
-}
+{"job_id": 10000, "type": "csv", "method": "basic", "from_sampling": true, "with_header": true}

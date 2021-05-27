@@ -1,4 +1,5 @@
 {
-    "compare_job_id": 10178,
-    "type": "csv"
+    "compare_job_id": 10077,
+    "type": "csv",
+    "method": "compare"
 }

@@ -115,7 +115,7 @@ POST http://{{host}}:{{port}}/v1/sampling/cancel/
 Accept: application/json
 
 {
-    "job_id": 10039
+    "job_id": 10069
 }
 ###
 POST http://{{host}}:{{port}}/v1/evaluation/cancel/

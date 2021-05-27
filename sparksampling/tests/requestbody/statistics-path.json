@@ -1,7 +1,1 @@
-{
-    "path": "hdfs://localhost:9000/dataset/10w_x_10.csv",
-    "type": "csv",
-    "method": "basic",
-    "from_sampling": true,
-    "with_header": true
-}
+{"path": "hdfs://localhost:9000/dataset/10w_x_10.csv", "type": "csv", "method": "basic", "from_sampling": true, "with_header": true}

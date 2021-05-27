@@ -1,5 +1,5 @@
 {
-    "path": "hdfs://hadoop001.wf:8020/dataset/unbalance_500v50_10.csv",
+    "path": "hdfs://localhost:9000/dataset/unb_50vs5.csv",
     "method": "spark_smote_enn",
     "type": "csv",
     "conf": {
