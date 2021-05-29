@@ -47,6 +47,18 @@ class DSResponse(object):
             logging.info(self.to_dict())
 
     @property
+    def result(self):
+        result_str = self.data.get('result')
+        if not result_str:
+            return None
+        try:
+            return ast.literal_eval(result_str)
+        except:
+            logging.warning("Can't get result...")
+            return None
+
+
+    @property
     def job_id(self):
         return self.data.get('job_id')
 
