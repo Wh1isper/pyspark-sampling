@@ -3,10 +3,15 @@
 """The setup script."""
 
 from setuptools import setup, find_packages
+import os
 
 requirements = []
 
-setup_requirements = []
+if os.path.exists("./requirements.txt"):
+    with open('requirements.txt') as f:
+        setup_requirements = f.read().splitlines()
+else:
+    setup_requirements = []
 
 test_requirements = []
 
