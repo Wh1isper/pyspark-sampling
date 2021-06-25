@@ -9,7 +9,6 @@ compare_evaluation_code = STATISTICS_BASIC_METHOD
 # 示例：
 # "basic"：BasicStatisticsJob
 extra_statistics_job = {
-
 }
 
 # api对应字段：method

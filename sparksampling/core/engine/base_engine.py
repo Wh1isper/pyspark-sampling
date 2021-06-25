@@ -2,10 +2,10 @@ from pyspark.sql import SparkSession
 
 from sparksampling.config import SPARK_CONF
 from sparksampling.core import Logger
-from sparksampling.core.dataio import CsvDataIO, TextDataIO
+from sparksampling.core.dataio import CsvDataIO, TextDataIO, ConfigurableDataIO
 from sparksampling.utilities.custom_error import JobTypeError, JobProcessError, JobKeyError, BadParamError
-from sparksampling.utilities.utilities import extract_none_in_dict, get_value_by_require_dict, from_path_import
-from sparksampling.var import FILE_TYPE_TEXT, FILE_TYPE_CSV
+from sparksampling.utilities.utilities import get_value_by_require_dict, from_path_import
+from sparksampling.var import FILE_TYPE_TEXT, FILE_TYPE_CSV, CONFIGURABLE_FILE_TYPE
 from sparksampling.config import CUSTOM_CONFIG_FILE
 
 extra_dataio = from_path_import("extra_dataio", CUSTOM_CONFIG_FILE, "extra_dataio")
@@ -14,7 +14,9 @@ extra_dataio = from_path_import("extra_dataio", CUSTOM_CONFIG_FILE, "extra_datai
 class BaseEngine(Logger):
     data_io_map = {
         FILE_TYPE_TEXT: TextDataIO,
-        FILE_TYPE_CSV: CsvDataIO
+        FILE_TYPE_CSV: CsvDataIO,
+        CONFIGURABLE_FILE_TYPE: ConfigurableDataIO,
+
     }
     data_io_map.update(extra_dataio)
 
@@ -47,16 +49,12 @@ class SparkJobEngine(BaseEngine):
         self.job_id = None
         self.path = path
         self.method = method.lower()
-        self.data_io_conf = {
-            'with_header': kwargs.get('with_header')
-        }
-        extract_none_in_dict(self.data_io_conf)
-
-        sample_job_class = self.job_map[method]
+        data_io_class = self.data_io_map[file_type.lower()]
+        sample_job_class = self.job_map[method.lower()]
         self.job_conf = get_value_by_require_dict(sample_job_class.type_map, kwargs)
-
-        self.data_io = self.data_io_map[file_type.lower()](spark=self.spark, path=self.path, **self.data_io_conf)
-        self.job = self.job_map[method](**self.job_conf)
+        self.data_io_conf = get_value_by_require_dict(data_io_class.type_map, kwargs)
+        self.data_io = data_io_class(spark=self.spark, path=self.path, **self.data_io_conf)
+        self.job = sample_job_class(**self.job_conf)
 
     def prepare(self, *args, **kwargs) -> dict:
         return {}
@@ -81,4 +79,5 @@ class SparkJobEngine(BaseEngine):
         except KeyError as e:
             raise JobKeyError(str(e))
         except Exception as e:
+            self.logger.warning("Spark processing error...Spark cluster may be dead...")
             raise JobProcessError(str(e))

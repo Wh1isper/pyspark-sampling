@@ -1,7 +1,7 @@
 import tornado.ioloop
 import tornado.web
 
-from sparksampling.config import PORT, DEBUG
+from sparksampling.config import PORT, DEBUG, SPARK_UI_PORT
 from sparksampling.route import debug_handlers, sampling_handlers, query_handlers, evaluation_handlers, all_handlers
 from sparksampling.utilities import logger
 
@@ -39,6 +39,8 @@ def main():
         logger.info(f"DEBUG MOD:LISTENING {PORT}")
     else:
         app = all_app()
+    logger.info(f"Spark UI Running at {SPARK_UI_PORT}")
+    logger.info(f"Spark Sampling:LISTENING {PORT}")
     app.listen(PORT)
     tornado.ioloop.IOLoop.instance().start()
 

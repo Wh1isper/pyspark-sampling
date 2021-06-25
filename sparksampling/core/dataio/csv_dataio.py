@@ -3,11 +3,14 @@ from pyspark.sql import DataFrame
 
 
 class CsvDataIO(BaseDataIO):
+    type_map = {
+        'with_header': bool
+    }
+
     def __init__(self, spark, path, *args, **kwargs):
         super(CsvDataIO, self).__init__(spark, path, args, kwargs)
         self.header = kwargs.get('with_header', True)
         self.original_num_partitions = None
-        self.__df = None
 
     def _read(self, path=None, *args, **kwargs):
         path = path or self.path
@@ -23,7 +26,3 @@ class CsvDataIO(BaseDataIO):
         if df.is_cached:
             df.unpersist()
         return self.write_path
-
-    def __del__(self):
-        if self.__df and self.__df.is_cached:
-            self.__df.unpersist()

@@ -4,6 +4,7 @@ from sparksampling.core import Logger
 
 
 class BaseDataIO(Logger):
+    type_map = dict()
 
     def __init__(self, spark: SparkSession, path, *args, **kwargs):
         self.job_id = None

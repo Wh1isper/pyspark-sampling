@@ -22,6 +22,7 @@ EVALUATION_KMEANS_METHOD = 'kmeans'
 
 FILE_TYPE_TEXT = 'txt'
 FILE_TYPE_CSV = 'csv'
+CONFIGURABLE_FILE_TYPE = 'configurable'
 
 # job status in code
 JOB_CANCELED = 0
