@@ -1,9 +1,12 @@
+import os
+import sys
+
 import tornado.ioloop
 import tornado.web
 
-from sparksampling.config import PORT, DEBUG, SPARK_UI_PORT
 from sparksampling.route import debug_handlers, sampling_handlers, query_handlers, evaluation_handlers, all_handlers
 from sparksampling.utilities import logger
+from sparksampling.config import PORT, DEBUG, SPARK_UI_PORT
 
 
 def make_app(handlers, debug, autoreload):

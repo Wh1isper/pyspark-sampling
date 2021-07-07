@@ -6,7 +6,7 @@ from sparksampling.core.dataio import CsvDataIO, TextDataIO, ConfigurableDataIO
 from sparksampling.utilities.custom_error import JobTypeError, JobProcessError, JobKeyError, BadParamError
 from sparksampling.utilities.utilities import get_value_by_require_dict, from_path_import
 from sparksampling.var import FILE_TYPE_TEXT, FILE_TYPE_CSV, CONFIGURABLE_FILE_TYPE
-from sparksampling.config import CUSTOM_CONFIG_FILE
+from sparksampling.config import CUSTOM_CONFIG_FILE, SPARK_UI_PORT
 
 extra_dataio = from_path_import("extra_dataio", CUSTOM_CONFIG_FILE, "extra_dataio")
 
@@ -23,6 +23,7 @@ class BaseEngine(Logger):
     job_map = {}
     conf = SPARK_CONF
     spark = SparkSession.builder.config(conf=conf).getOrCreate()
+    SPARK_UI_PORT = spark.conf.get('spark.ui.port')
 
     def __init__(self):
         for k, v in self.data_io_map.items():
@@ -53,7 +54,7 @@ class SparkJobEngine(BaseEngine):
         sample_job_class = self.job_map[method.lower()]
         self.job_conf = get_value_by_require_dict(sample_job_class.type_map, kwargs)
         self.data_io_conf = get_value_by_require_dict(data_io_class.type_map, kwargs)
-        self.data_io = data_io_class(spark=self.spark, path=self.path, **self.data_io_conf)
+        self.data_io = data_io_class(spark=BaseEngine.spark, path=self.path, **self.data_io_conf)
         self.job = sample_job_class(**self.job_conf)
 
     def prepare(self, *args, **kwargs) -> dict:
