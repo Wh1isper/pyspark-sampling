@@ -24,8 +24,7 @@ class SparkWatcher:
             return True
         except:
             self.logger.info("spark session closed")
-            self.stop_server()
-            return False
+            return self.stop_server()
 
     def stop_server(self):
         request_body = {
@@ -35,9 +34,10 @@ class SparkWatcher:
         self.logger.info("try to stop server")
         try:
             self.client.fetch(request)
+            return True
         except:
-            self.logger.info("stop failed, restart server")
-        return True
+            self.logger.info("stop request failed, restart server")
+            return False
 
     def run(self):
         return self.process()
@@ -51,12 +51,15 @@ def start_app():
 
 def run_watchdog():
     watcher = SparkWatcher()
-    if os.fork() != 0:
+    pid = os.fork()
+    if pid != 0:
         while True:
             time.sleep(20)
             if not watcher.run():
                 time.sleep(5)
-                if os.fork() == 0:
+                os.kill(pid, 9)
+                pid = os.fork()
+                if pid == 0:
                     sys.exit(start_app())
                 time.sleep(20)
     else:
@@ -69,4 +72,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

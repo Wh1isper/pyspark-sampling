@@ -1,8 +1,8 @@
-import os
-import sys
-
 import tornado.ioloop
 import tornado.web
+import findspark
+
+findspark.init()
 
 from sparksampling.route import debug_handlers, sampling_handlers, query_handlers, evaluation_handlers, all_handlers
 from sparksampling.utilities import logger

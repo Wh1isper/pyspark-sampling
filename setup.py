@@ -36,7 +36,8 @@ setup(
     name='sparksampling',
     entry_points={
         'console_scripts': [
-            'sparksampling = sparksampling.app:main'
+            'sparksampling = sparksampling.app:main',
+            'sparksamplinghost=sparksampling.watchdog:main'
         ],
     },
     packages=find_packages(include=['sparksampling', 'sparksampling.*']),
