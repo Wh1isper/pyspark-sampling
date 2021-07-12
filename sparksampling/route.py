@@ -15,7 +15,7 @@ class HelloHandler(SingletonHandler):
         self.write(await self.fetch(self.request.body))
 
 
-spark_handlers = [
+system_handlers = [
     (r'/stop/(.*)', SingletonHandler, dict(processmodule=StopProcessModule)),
 ]
 
@@ -43,5 +43,5 @@ test_handlers = [
     (r'/', HelloHandler, dict(processmodule=DummyProcessModule)),
 ]
 
-all_handlers = spark_handlers + sampling_handlers + query_handlers + evaluation_handlers
+all_handlers = system_handlers + sampling_handlers + query_handlers + evaluation_handlers
 debug_handlers = all_handlers + test_handlers
