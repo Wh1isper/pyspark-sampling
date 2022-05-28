@@ -1,3 +1,9 @@
+# 注意！ Attention！
+
+This branch is no longer maintained, see [#3](https://github.com/Wh1isper/pyspark-sampling/issues/3)
+
+这个分支不再维护，见  [#3](https://github.com/Wh1isper/pyspark-sampling/issues/3)
+
 # pyspark-sampling
 
 基于PySpark的数据采样与评估系统
@@ -15,12 +21,11 @@
 
 - Python 3.7
 - Spark 3.0.1（with PySpark 3.0.0）
-- MySQL  Ver 8.0.22 for Linux on x86_64 (MySQL Community Server - GPL)
+- MySQL Ver 8.0.22 for Linux on x86_64 (MySQL Community Server - GPL)
 - Hadoop 3.2.1
 - OpenJDK Version "1.8.0_275"
   OpenJDK Runtime Environment (build 1.8.0_275-8u275-b01-0ubuntu1~18.04-b01)
   OpenJDK 64-Bit Server VM (build 25.275-b01, mixed mode)
-
 
 ## 如何使用
 
@@ -183,11 +188,10 @@ job参考以下步骤对算法进行开发：
 
 见下表：
 
-|      job       | 异步执行 | 输出 | 需要实现的函数                                               |
-| :------------: | :------: | :--: | ------------------------------------------------------------ |
-|  sampling_job  |    是    |  是  | def _generate(self, df: DataFrame, *args, **kwargs) -> DataFrame: |
-| evaluation_job |    是    |  否  | def _statistics(self, df: DataFrame, *args, **kwargs) -> dict: |
-| statistics_job |    否    |  否  | def _statistics(self, df: DataFrame, *args, **kwargs) -> dict: |
+| job | 异步执行 | 输出 | 需要实现的函数 | | :------------: | :------: | :--: |
+------------------------------------------------------------ | | sampling_job | 是 | 是 | def _generate(self, df:
+DataFrame, *args, **kwargs) -> DataFrame: | | evaluation_job | 是 | 否 | def _statistics(self, df: DataFrame, *args, **
+kwargs) -> dict: | | statistics_job | 否 | 否 | def _statistics(self, df: DataFrame, *args, **kwargs) -> dict: |
 
 #### 2：根据任务类型在对应Engine注册
 
@@ -205,7 +209,7 @@ job参考以下步骤对算法进行开发：
 ```python
 class SamplingEngine(SparkJobEngine):
     job_map = {
-    	# 在这里进行注册，如 "sampling job method name": JobClass
+        # 在这里进行注册，如 "sampling job method name": JobClass
         SIMPLE_RANDOM_SAMPLING_METHOD: SimpleRandomSamplingJob,
         STRATIFIED_SAMPLING_METHOD: StratifiedSamplingJob,
         SMOTE_SAMPLING_METHOD: SmoteSamplingJob
@@ -264,7 +268,6 @@ class MLSamplingProcessModule(SamplingProcessModule):
         # 在这里对参数进行format
         return {}
 ```
-
 
 ## 架构介绍
 
