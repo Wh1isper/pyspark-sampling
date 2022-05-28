@@ -3,17 +3,20 @@
 """The setup script."""
 
 from setuptools import setup, find_packages
-import os
 
-requirements = []
+requirements = [
+    'grpcio>=1.35.0',
+    'protobuf',
+    'pyspark',
+    'findspark',
+    'traitlets',
+    'pandas >= 1.2',
+    'requests',
+    'kubernetes',
+    'boto3'
+]
 
-if os.path.exists("./requirements.txt"):
-    with open('requirements.txt') as f:
-        setup_requirements = f.read().splitlines()
-else:
-    setup_requirements = []
-
-test_requirements = []
+test_requirements = ['pytest>=3', 'pytest-grpc', ]
 
 setup(
     author="wh1isper",
@@ -37,11 +40,9 @@ setup(
     entry_points={
         'console_scripts': [
             'sparksampling = sparksampling.app:main',
-            'sparksamplinghost=sparksampling.watchdog:main'
         ],
     },
     packages=find_packages(include=['sparksampling', 'sparksampling.*']),
-    setup_requires=setup_requirements,
     test_suite='tests',
     tests_require=test_requirements,
     url='',

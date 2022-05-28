@@ -1,9 +1,0 @@
-{
-    "path": "hdfs://localhost:9000/dataset/ten_w-partition.csv",
-    "method": "random",
-    "type": "csv",
-    "conf": {
-        "with_replacement": true,
-        "fraction": 0.001
-    }
-}

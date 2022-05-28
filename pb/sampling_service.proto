@@ -1,0 +1,102 @@
+syntax = "proto3";
+
+service SparkSamplingService {
+    rpc SamplingJob(SamplingRequest) returns (SamplingResponse) {}
+    rpc CancelJob(CancelRequest) returns (CancelResponse) {}
+}
+
+enum SamplingMethodType{
+    UNKNOWN_METHOD = 0;
+    RANDOM_SAMPLING_METHOD = 1;
+    STRATIFIED_SAMPLING_METHOD = 2;
+    SIMPLE_SAMPLING_METHOD = 3;
+}
+
+enum FileFormatType{
+    UNKNOWN_FORMAT = 0;
+    FILE_FORMAT_CSV = 1;
+}
+
+message SamplingRequest {
+    // 抽样方法
+    SamplingMethodType sampling_method = 1;
+    // 文件格式
+    FileFormatType file_format = 2;
+    // 抽样任务配置
+    SamplingConf sampling_conf = 3;
+    // 文件格式配置
+    FileFormatConf format_conf = 4;
+    // 抽样文件路径
+    string input_path = 5;
+    // 抽样文件输出路径
+    string output_path = 6;
+    // 任务ID
+    string job_id = 7;
+}
+
+message CancelRequest{
+    // 根据任务id终止正在运行的任务
+    // 根据spark的配置不同，不管是否成功终止、任务id是否存在，都会返回正确
+    // 需要通过想要终止的任务是否返回错误来判断任务是否终止
+    string job_id = 7;
+}
+
+
+/**
+ * 终止任务返回信息，状态码应当只会返回0
+ * 需要根据任务是否报错来判断终止是否成功
+ */
+message CancelResponse {
+    // 状态码
+    int32 code = 1;
+    // 提示信息
+    string message = 2;
+}
+
+/**
+ * 抽样任务返回信息，正确完成后状态码为0
+ * 任务被终止或出现执行错误时，返回code:5000
+ * 其他错误码见概要设计文档
+ */
+message SamplingResponse {
+    // 状态码
+    int32 code = 1;
+    // 提示信息
+    string message = 2;
+    // 返回数据
+    ResponseData data = 3;
+    message ResponseData{
+        // 请求原文，用于溯源
+        SamplingRequest parent_request = 1;
+        // 抽样输出文件路径
+        string sampled_path = 2;
+    }
+    // 任务被终止时等同执行错误，返回code: 5000
+}
+
+message dict {
+    string name = 1;
+    string value = 2;
+}
+
+message SamplingConf {
+    // 抽样率，随机抽样为Float str，分层抽样为Json str:格式为{str:float}，例如'{"label_A":0.3, "label_B":0.7}'表示以3:7比例抽取label_A和label_B，若分层抽样时传Float str，则将自动扩展为{"label_A":fraction, "label_B":fraction}
+    string fraction = 1;
+    // 是否为有放回抽样，默认为False
+    bool with_replacement = 2;
+    // 随机抽样种子，不传将随机生成
+    uint32 seed = 3;
+    // 分层抽样的key，分层抽样必需参数
+    string stratified_key = 4;
+    // 取前count的数据，0为全部，简单抽样要求不为0
+    uint32 count = 5;
+    // 需要保留的列名，不填或为空指全部列都保留
+    repeated string sampling_col = 6;
+}
+
+message FileFormatConf {
+    // csv是否带头，默认为True
+    bool with_header = 1;
+    // 文件分隔符，默认为'\001'，使用逗号分隔符csv自测时需要传入','
+    string sep = 2;
+}

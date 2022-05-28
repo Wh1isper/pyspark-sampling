@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: spark-sampling-headless-service
+  namespace: spark-sampling
+spec:
+  clusterIP: None
+  selector:
+    app: spark-sampling

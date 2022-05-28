@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spark-sampling-deployment
+  namespace: spark-sampling
+  labels:
+    app: spark-sampling
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: spark-sampling
+  template:
+    metadata:
+      labels:
+        app: spark-sampling
+    spec:
+      containers:
+        - name: spark-sampling
+          image: wh1isper/pysparksampling:latest
+          ports:
+            - containerPort: 8530
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: SPARK_DRIVER_BINDADDRESS
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: SPARK_DRIVER_POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: DEPLOY_ON_K8S
+              value: 'true'
+            - name: S3_ACCESS_KEY
+              value: NK5FICD4P4FZC83Z29RV
+            - name: S3_SECRET_KEY
+              value: oxm9ZNJJxDEKoMNcsJEjxcvBocdW0rmYCPuWrRZ4
+            - name: S3_ENTRY_POINT
+              value: https://obs.cn-south-222.ai.pcl.cn
