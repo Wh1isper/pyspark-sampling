@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spark-sampling-deployment
+  namespace: spark-sampling
+  labels:
+    app: spark-sampling
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: spark-sampling
+  template:
+    metadata:
+      labels:
+        app: spark-sampling
+    spec:
+      containers:
+        - name: spark-sampling
+          image: wh1isper/pysparksampling:latest
+          ports:
+            - containerPort: 8530
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: SPARK_DRIVER_BINDADDRESS
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: SPARK_DRIVER_POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: DEPLOY_ON_K8S
+              value: 'true'

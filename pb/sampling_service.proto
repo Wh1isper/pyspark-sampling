@@ -1,0 +1,102 @@
+syntax = "proto3";
+
+service SparkSamplingService {
+    rpc SamplingJob(SamplingRequest) returns (SamplingResponse) {}
+    rpc CancelJob(CancelRequest) returns (CancelResponse) {}
+}
+
+enum SamplingMethodType{
+    UNKNOWN_METHOD = 0;
+    RANDOM_SAMPLING_METHOD = 1;
+    STRATIFIED_SAMPLING_METHOD = 2;
+    SIMPLE_SAMPLING_METHOD = 3;
+}
+
+enum FileFormatType{
+    UNKNOWN_FORMAT = 0;
+    FILE_FORMAT_CSV = 1;
+}
+
+/**
+ * Response message for SMS tasks
+ */
+message SamplingRequest {
+    SamplingMethodType sampling_method = 1;
+    FileFormatType file_format = 2;
+    SamplingConf sampling_conf = 3;
+    FileFormatConf format_conf = 4;
+    string input_path = 5;
+    string output_path = 6;
+    string job_id = 7;
+}
+
+message CancelRequest{
+    string job_id = 7;
+}
+
+
+/**
+ * Response message for canceled tasks
+ * Need to determine if cancellation is successful based on whether the task reports an error or not
+ */
+message CancelResponse {
+    // Status code, return 0 for success
+    int32 code = 1;
+    // message
+    string message = 2;
+}
+
+/**
+ * Response message for SMS tasks
+ * When a task is cancelled it returns code:5000
+ * Other error codes: error.py
+ */
+message SamplingResponse {
+    // Status code, return 0 for success
+    int32 code = 1;
+    string message = 2;
+    ResponseData data = 3;
+    message ResponseData{
+        // Original SMS request
+        SamplingRequest parent_request = 1;
+        // Sample output file path
+        string sampled_path = 2;
+    }
+}
+
+message dict {
+    string name = 1;
+    string value = 2;
+}
+
+/**
+ * config sampling for SMS tasks
+ */
+message SamplingConf {
+    // Sampling rate
+    // 'Float str' for random sampling
+    // 'Json str' for stratified sampling like {str:float}
+    // eg. '{"label_A":0.3, "label_B":0.7}' means to draw label_A and label_B in the ratio of 3:7
+    // if 'Float str' is passed for stratified sampling, it is considered to be the same for each stratum
+    // same as {"label_A":fraction, "label_B":fraction}
+    string fraction = 1;
+    // sampling with replacement(Bootstrap Sample), default is False
+    bool with_replacement = 2;
+    uint32 seed = 3;
+    // Key for stratified sampling, necessary parameters for stratified sampling
+    string stratified_key = 4;
+    // Maximum number of samples drawn
+    // SIMPLE_SAMPLING_METHOD requires not to be 0
+    uint32 count = 5;
+    // Columns to be retained
+    repeated string sampling_col = 6;
+}
+
+message FileFormatConf {
+    // csv have a header, default is True
+    bool with_header = 1;
+    // File separator, default is '\001', using a comma as the default separator requires passing ','
+    string sep = 2;
+}
+
+

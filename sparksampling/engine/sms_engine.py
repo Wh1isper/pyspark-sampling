@@ -1,0 +1,113 @@
+from os.path import abspath, join, exists, dirname, split
+from pprint import pformat
+from typing import Dict
+from uuid import uuid4
+
+from sparksampling.engine.base_engine import SparkBaseEngine, record_job_id
+from sparksampling.engine_factory import EngineFactory
+from sparksampling.error import CustomErrorWithCode, BadParamError, ProcessError
+from sparksampling.file_format.file_factory import FileFormatFactory
+from sparksampling.mixin import acquire_worker
+from sparksampling.proto.sampling_service_pb2 import SamplingRequest
+from sparksampling.sample import SamplingFactory
+from sparksampling.utilities import check_spark_session
+
+
+class SMSEngine(SparkBaseEngine):
+    # Single Mapping Sampling
+
+    def __init__(self,
+                 parent,
+                 input_path: str,
+                 output_path: str,
+                 sampling_method: int,
+                 file_format: int,
+                 job_id: str,
+                 sampling_conf: Dict,
+                 format_conf: Dict):
+        super(SMSEngine, self).__init__()
+        self.parent = parent
+        self.input_path = input_path
+        self.output_path = output_path
+        self.sampling_method = sampling_method
+        self.file_format = file_format
+        self.job_id = job_id
+        self.sampling_conf = sampling_conf
+        self.format_conf = format_conf
+
+    @acquire_worker
+    @check_spark_session
+    def submit(self, *args, **kwargs):
+        sampling_imp, file_imp = self.get_spark_imp()
+        return self.submit_spark_job(sampling_imp, file_imp)
+
+    def get_spark_imp(self):
+        try:
+            sampling_imp = SamplingFactory.get_sampling_imp(self.sampling_method, self.sampling_conf)
+            file_imp = FileFormatFactory.get_file_imp(self.spark, self.file_format, self.format_conf)
+        except CustomErrorWithCode as e:
+            raise e
+        except KeyError as e:
+            self.log.info(f"Task initialization failed {e}")
+            raise BadParamError(f"Check task configuration parameters {str(e)}")
+        except ValueError as e:
+            self.log.info(f"Task initialization failed {e}")
+            raise BadParamError(f"Check task configuration parameters {str(e)}")
+        except Exception as e:
+            self.log.exception(e)
+            raise ProcessError(str(e))
+        return sampling_imp, file_imp
+
+    @record_job_id
+    def submit_spark_job(self, sampling_imp, file_imp):
+        # 进入spark处理，以下内容抛出错误5000
+        df = file_imp.read(self.input_path)
+        output_df = sampling_imp.run(df)
+        output_path = file_imp.write(output_df, self.output_path)
+        self.log.info(f"The task is completed and the output file or directory is: {output_path}")
+        return output_path
+
+    @classmethod
+    def config(cls, kw):
+        def _set_default_output_path(kw):
+            if exists(kw.get('input_path')):
+                # when input_path = /{path_to_data}/{input_file_name}
+                # set default_output_path = /{path_to_data}/sampled/{input_file_name}-{uuid}
+                input_path = kw.get('input_path')
+                default_output_path = abspath(
+                    join(dirname(abspath(input_path)), "./sampled/", split(input_path)[-1] + '-' + str(uuid4())))
+                kw.setdefault('output_path', default_output_path)
+            else:
+                input_path = kw.get('input_path')
+                default_output_path = input_path.rstrip('/') + '-' + str(uuid4())
+                kw.setdefault('output_path', default_output_path)
+            return kw
+
+        try:
+            kw = _set_default_output_path(kw)
+            required_conf = {
+                'input_path': kw.pop('input_path'),
+                'output_path': kw.pop('output_path'),
+                'sampling_method': kw.pop('sampling_method'),
+                'file_format': kw.pop('file_format'),
+                'job_id': kw.pop('job_id')
+            }
+        except KeyError as e:
+            cls.log.info("Missing required parameters", e)
+            raise BadParamError(f"Missing required parameters {str(e)}")
+
+        # Detailed configuration depends on the specific implementation
+        conf = {
+            'sampling_conf': kw.get('sampling_conf', {}),
+            'format_conf': kw.get('format_conf', {}),
+        }
+        conf.update(required_conf)
+        cls.log.info(f"Initializing job conf... \n {pformat(conf)}")
+        return conf
+
+    @classmethod
+    def is_matching(cls, request_type):
+        return request_type == SamplingRequest
+
+
+EngineFactory.register(SMSEngine)

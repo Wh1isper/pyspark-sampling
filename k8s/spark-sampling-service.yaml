@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: spark-sampling-service
+  namespace: spark-sampling
+spec:
+  ports:
+    - name: spark-sampling-grpc-port
+      protocol: TCP
+      port: 8530
+      nodePort: 30530
+      targetPort: 8530
+  selector:
+    app: spark-sampling
+  type: NodePort

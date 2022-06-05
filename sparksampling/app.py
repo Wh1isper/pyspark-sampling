@@ -1,52 +1,121 @@
-import tornado.ioloop
-import tornado.web
 import findspark
 
 findspark.init()
 
-from sparksampling.route import debug_handlers, sampling_handlers, query_handlers, evaluation_handlers, all_handlers
-from sparksampling.utilities import logger
-from sparksampling.config import PORT, DEBUG, SPARK_UI_PORT
+from concurrent import futures
+from pyspark import SparkConf
+from pyspark.sql import SparkSession
+import logging
+import grpc
+from sparksampling.config import SPARK_CONF
+from sparksampling.service import GRPCService
+from traitlets.config import Application
+from traitlets import (
+    Integer,
+    Unicode,
+    Dict,
+    default,
+    Instance
+)
+
+_ONE_DAY_IN_SECONDS = 60 * 60 * 24
+
+aliases = {
+    'log-level': 'Application.log_level',
+    'ip': 'SparkSamplingAPP.ip',
+    'port': 'SparkSamplingAPP.port',
+    'workers': 'SparkSamplingAPP.workers',
+}
+
+flags = {
+    'debug': (
+        {'Application': {'log_level': logging.DEBUG}},
+        "set log level to logging.DEBUG (maximize logging output)",
+    ),
+}
 
 
-def make_app(handlers, debug, autoreload):
-    for url, handler, conf in handlers:
-        logger.info(
-            f'{handler.__name__}: Add Route:{url}, Processor:{conf.get("processmodule").__name__}')
-    return tornado.web.Application(handlers, debug=debug, autoreload=autoreload)
+class SparkSamplingAPP(Application):
+    name = 'sparksampling'
+    version = "0.1.0"
+    description = """An application for starting a spark sampling server"""
+    # the grpc server handle
+    server = None
+
+    # application config
+    aliases = Dict(aliases)
+    flags = Dict(flags)
+
+    ip = Unicode(
+        '0.0.0.0', help="Host IP address for listening (default 0.0.0.0)."
+    ).tag(config=True)
+
+    port = Integer(
+        8530, help="Port (default 8530)."
+    ).tag(config=True)
+
+    spark_config = Instance(SparkConf)
+    spark = Instance(SparkSession)
+
+    @default('spark_config')
+    def _spark_config_default(self):
+        return SPARK_CONF
+
+    @default('spark')
+    def _spark_default(self):
+        return SparkSession.builder.config(conf=self.spark_config).getOrCreate()
+
+    @default('log_level')
+    def _log_level_default(self):
+        return logging.DEBUG
+
+    @default('log_datefmt')
+    def _log_datefmt_default(self):
+        """Exclude date from default date format"""
+        return "%Y-%m-%d %H:%M:%S"
+
+    @default('log_format')
+    def _log_format_default(self):
+        """override default log format to include time"""
+        return "[%(levelname)1.1s %(asctime)s %(module)s:%(lineno)d] %(message)s"
+
+    def initialize(self, *args, **kwargs):
+        super().initialize(*args, **kwargs)
+        self.init_logger()
+        self.init_spark()
+
+    def init_logger(self):
+        logger = logging.getLogger('sparksampling')
+        logger.propagate = True
+        logger.parent = self.log
+        logger.setLevel(self.log.level)
+
+    def init_spark(self):
+        self.log.info(f"Started SparkSession, Spark version: {self.spark.version}")
+
+    def start(self, argv=None):
+        self.initialize(argv)
+        self._add_server()
+        self.server.add_insecure_port('%s:%d' % (self.ip, self.port))
+        self.server.start()
+        self.log.info("Spark Sampling Server Listening On %s:%s..." %
+                      (self.ip, self.port))
+        self.server.wait_for_termination()
+
+    def _add_server(self):
+        cancel_job_worker_reserve = 1
+        max_workers = GRPCService.get_worker_num() + cancel_job_worker_reserve
+        self.log.info(f'Service allocate {max_workers} for engine, {cancel_job_worker_reserve} reserve for cancel')
+        self.server = grpc.server(futures.ThreadPoolExecutor(max_workers=max_workers))
+        GRPCService.add_to_server(self, self.server)
+
+    @classmethod
+    def launch(cls, argv=None):
+        self = cls.instance()
+        self.start(argv)
 
 
-def debug_app():
-    return make_app(debug_handlers, debug=True, autoreload=True)
-
-
-def all_app():
-    return make_app(all_handlers, debug=False, autoreload=False)
-
-
-def query_app():
-    return make_app(query_handlers, debug=False, autoreload=False)
-
-
-def sampling_app():
-    return make_app(sampling_handlers, debug=False, autoreload=False)
-
-
-def evaluation_app():
-    return make_app(evaluation_handlers, debug=False, autoreload=False)
-
-
-def main():
-    if DEBUG:
-        app = debug_app()
-        logger.info(f"DEBUG MOD:LISTENING {PORT}")
-    else:
-        app = all_app()
-    logger.info(f"Spark UI Running at {SPARK_UI_PORT}")
-    logger.info(f"Spark Sampling:LISTENING {PORT}")
-    app.listen(PORT)
-    tornado.ioloop.IOLoop.instance().start()
-
+main = SparkSamplingAPP.launch
 
 if __name__ == '__main__':
     main()

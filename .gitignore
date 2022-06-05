@@ -542,3 +542,8 @@ fabric.properties
 /.idea/kf-dsl-service.iml
 sparksampling/tests/requestbody/tmp.json
 .idea/
+
+
+dev
+tests/output/
+data/sampled
