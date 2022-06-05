@@ -547,3 +547,4 @@ sparksampling/tests/requestbody/tmp.json
 dev
 tests/output/
 data/sampled
+k8s/spark-sampling-deployment-dev.yaml
