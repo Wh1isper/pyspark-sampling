@@ -4,7 +4,6 @@ from pyspark.sql import SparkSession
 
 from sparksampling.config import SPARK_CONF
 from sparksampling.mixin import WorkerManagerMixin, LogMixin
-from sparksampling.utilities import check_spark_session
 
 
 def record_job_id(method):
@@ -40,7 +39,7 @@ class BaseEngine(WorkerManagerMixin):
         raise NotImplementedError
 
     @classmethod
-    def config(cls, config_dict):
+    def config(cls, kwargs):
         raise NotImplementedError
 
     @classmethod
@@ -62,7 +61,6 @@ class SparkMixin(LogMixin):
 
 class SparkBaseEngine(BaseEngine, SparkMixin):
     @classmethod
-    @check_spark_session
     def stop(cls, parent, job_id=None):
-        cls.log.info(f"Send Stop Job to Spark: {job_id}")
-        parent.spark.sparkContext.cancelJobGroup(job_id)
+        # SparkStopEngine will cancel spark job
+        return

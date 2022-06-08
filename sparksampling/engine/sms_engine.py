@@ -23,8 +23,9 @@ class SMSEngine(SparkBaseEngine):
                  sampling_method: int,
                  file_format: int,
                  job_id: str,
-                 sampling_conf: Dict,
-                 format_conf: Dict):
+                 sampling_conf: Dict or None = None,
+                 format_conf: Dict or None = None
+                 ):
         super(SMSEngine, self).__init__()
         self.parent = parent
         self.input_path = input_path
@@ -47,10 +48,7 @@ class SMSEngine(SparkBaseEngine):
             file_imp = FileFormatFactory.get_file_imp(self.spark, self.file_format, self.format_conf)
         except CustomErrorWithCode as e:
             raise e
-        except KeyError as e:
-            self.log.info(f"Task initialization failed {e}")
-            raise BadParamError(f"Check task configuration parameters {str(e)}")
-        except ValueError as e:
+        except (KeyError, ValueError) as e:
             self.log.info(f"Task initialization failed {e}")
             raise BadParamError(f"Check task configuration parameters {str(e)}")
         except Exception as e:
@@ -68,29 +66,29 @@ class SMSEngine(SparkBaseEngine):
         return output_path
 
     @classmethod
-    def config(cls, kw):
-        def _set_default_output_path(kw):
-            if exists(kw.get('input_path')):
+    def config(cls, kwargs):
+        def _set_default_output_path(conf):
+            if exists(conf.get('input_path')):
                 # when input_path = /{path_to_data}/{input_file_name}
                 # set default_output_path = /{path_to_data}/sampled/{input_file_name}-{uuid}
-                input_path = kw.get('input_path')
+                input_path = conf.get('input_path')
                 default_output_path = abspath(
                     join(dirname(abspath(input_path)), "./sampled/", split(input_path)[-1] + '-' + str(uuid4())))
-                kw.setdefault('output_path', default_output_path)
+                conf.setdefault('output_path', default_output_path)
             else:
-                input_path = kw.get('input_path')
+                input_path = conf.get('input_path')
                 default_output_path = input_path.rstrip('/') + '-' + str(uuid4())
-                kw.setdefault('output_path', default_output_path)
-            return kw
+                conf.setdefault('output_path', default_output_path)
+            return conf
 
         try:
-            kw = _set_default_output_path(kw)
+            kwargs = _set_default_output_path(kwargs)
             required_conf = {
-                'input_path': kw.pop('input_path'),
-                'output_path': kw.pop('output_path'),
-                'sampling_method': kw.pop('sampling_method'),
-                'file_format': kw.pop('file_format'),
-                'job_id': kw.pop('job_id')
+                'input_path': kwargs.pop('input_path'),
+                'output_path': kwargs.pop('output_path'),
+                'sampling_method': kwargs.pop('sampling_method'),
+                'file_format': kwargs.pop('file_format'),
+                'job_id': kwargs.pop('job_id')
             }
         except KeyError as e:
             cls.log.info("Missing required parameters", e)
@@ -98,8 +96,8 @@ class SMSEngine(SparkBaseEngine):
 
         # Detailed configuration depends on the specific implementation
         conf = {
-            'sampling_conf': kw.get('sampling_conf', {}),
-            'format_conf': kw.get('format_conf', {}),
+            'sampling_conf': kwargs.get('sampling_conf', {}),
+            'format_conf': kwargs.get('format_conf', {}),
         }
         conf.update(required_conf)
         cls.log.info(f"Initializing job conf... \n {pformat(conf)}")

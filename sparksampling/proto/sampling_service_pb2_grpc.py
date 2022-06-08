@@ -19,6 +19,11 @@ class SparkSamplingServiceStub(object):
                 request_serializer=sampling__service__pb2.SamplingRequest.SerializeToString,
                 response_deserializer=sampling__service__pb2.SamplingResponse.FromString,
                 )
+        self.RelationSamplingJob = channel.unary_unary(
+                '/SparkSamplingService/RelationSamplingJob',
+                request_serializer=sampling__service__pb2.RelationSamplingRequest.SerializeToString,
+                response_deserializer=sampling__service__pb2.RelationSamplingResponse.FromString,
+                )
         self.CancelJob = channel.unary_unary(
                 '/SparkSamplingService/CancelJob',
                 request_serializer=sampling__service__pb2.CancelRequest.SerializeToString,
@@ -30,6 +35,12 @@ class SparkSamplingServiceServicer(object):
     """Missing associated documentation comment in .proto file."""
 
     def SamplingJob(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def RelationSamplingJob(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -48,6 +59,11 @@ def add_SparkSamplingServiceServicer_to_server(servicer, server):
                     servicer.SamplingJob,
                     request_deserializer=sampling__service__pb2.SamplingRequest.FromString,
                     response_serializer=sampling__service__pb2.SamplingResponse.SerializeToString,
+            ),
+            'RelationSamplingJob': grpc.unary_unary_rpc_method_handler(
+                    servicer.RelationSamplingJob,
+                    request_deserializer=sampling__service__pb2.RelationSamplingRequest.FromString,
+                    response_serializer=sampling__service__pb2.RelationSamplingResponse.SerializeToString,
             ),
             'CancelJob': grpc.unary_unary_rpc_method_handler(
                     servicer.CancelJob,
@@ -78,6 +94,23 @@ class SparkSamplingService(object):
         return grpc.experimental.unary_unary(request, target, '/SparkSamplingService/SamplingJob',
             sampling__service__pb2.SamplingRequest.SerializeToString,
             sampling__service__pb2.SamplingResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def RelationSamplingJob(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/SparkSamplingService/RelationSamplingJob',
+            sampling__service__pb2.RelationSamplingRequest.SerializeToString,
+            sampling__service__pb2.RelationSamplingResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 

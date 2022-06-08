@@ -68,12 +68,12 @@ class WorkerManagerMixin(LockMixin, LogMixin):
     @with_lock
     def _allocate_worker(cls):
         if not cls.guarantee_worker:
-            raise ExhaustedError("提交任务过多，无可用work提供抽样服务")
+            raise ExhaustedError(f"No enough worker for {cls.__name__}...")
         cls.guarantee_worker = cls.guarantee_worker - 1
-        cls.logger.debug(f"acquire worker:{cls.guarantee_worker} left")
+        cls.logger.debug(f"{cls.__name__} acquire worker:{cls.guarantee_worker} left")
 
     @classmethod
     @with_lock
     def _release_worker(cls):
         cls.guarantee_worker = cls.guarantee_worker + 1
-        cls.logger.debug(f"release worker, have {cls.guarantee_worker} now")
+        cls.logger.debug(f"{cls.__name__} release worker, have {cls.guarantee_worker} now")

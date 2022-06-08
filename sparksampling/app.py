@@ -1,3 +1,5 @@
+import os
+
 import findspark
 
 findspark.init()
@@ -47,15 +49,19 @@ class SparkSamplingAPP(Application):
     flags = Dict(flags)
 
     ip = Unicode(
-        '0.0.0.0', help="Host IP address for listening (default 0.0.0.0)."
+        os.getenv('SERVICE_HOST', '0.0.0.0'), help="Host IP address for listening (default 0.0.0.0)."
     ).tag(config=True)
 
     port = Integer(
-        8530, help="Port (default 8530)."
+        int(os.getenv('SERVICE_PORT', 8530)), help="Port (default 8530)."
     ).tag(config=True)
 
     spark_config = Instance(SparkConf)
     spark = Instance(SparkSession)
+    customer_engine_package = Unicode(
+        os.getenv('SERVICE_CUSTOMER_ENGINE_PACKAGES', ''),
+        help="Third part engine packages, like 'package_a.engine,package_b.engine'"
+    ).tag(config=True)
 
     @default('spark_config')
     def _spark_config_default(self):
@@ -103,9 +109,11 @@ class SparkSamplingAPP(Application):
         self.server.wait_for_termination()
 
     def _add_server(self):
-        cancel_job_worker_reserve = 1
-        max_workers = GRPCService.get_worker_num() + cancel_job_worker_reserve
-        self.log.info(f'Service allocate {max_workers} for engine, {cancel_job_worker_reserve} reserve for cancel')
+        GRPCService.register_engine(self)
+        engine_worker = GRPCService.get_worker_num()
+        # need one reserve worker to reject request asap
+        max_workers = engine_worker + 1
+        self.log.info(f'Service allocate {engine_worker} workers for engine and 1 reserve for response')
         self.server = grpc.server(futures.ThreadPoolExecutor(max_workers=max_workers))
         GRPCService.add_to_server(self, self.server)
 

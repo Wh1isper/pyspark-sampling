@@ -1,9 +1,10 @@
+import os
+from functools import reduce
+
 import pandas
 import pytest
 
-from functools import reduce
-import os
-from sparksampling.error import BAD_PARAM_ERROR, EXHAUSTED_ERROR, PROCESS_ERROR
+from sparksampling.error import BAD_PARAM_ERROR, PROCESS_ERROR
 from sparksampling.proto.sampling_service_pb2 import (
     SamplingRequest,
     RANDOM_SAMPLING_METHOD,

@@ -2,6 +2,7 @@ syntax = "proto3";
 
 service SparkSamplingService {
     rpc SamplingJob(SamplingRequest) returns (SamplingResponse) {}
+    rpc RelationSamplingJob(RelationSamplingRequest) returns (RelationSamplingResponse) {}
     rpc CancelJob(CancelRequest) returns (CancelResponse) {}
 }
 
@@ -31,7 +32,7 @@ message SamplingRequest {
 }
 
 message CancelRequest{
-    string job_id = 7;
+    string job_id = 1;
 }
 
 
@@ -100,3 +101,78 @@ message FileFormatConf {
 }
 
 
+message RelationSamplingRequest{
+    message SamplingStage{
+        // input_path or input_name determines the dataframe involved in the association relationship
+        // One of input_name or input_path must be passed in
+        // name has higher priority than path, if no name, using path to construct dataframe
+        string input_path = 1;
+        string input_name = 2;
+        string output_path = 3;
+        string name = 4;
+        SamplingMethodType sampling_method = 5;
+        SamplingConf sampling_conf = 6;
+        FileFormatType file_format = 7;
+        FileFormatConf format_conf = 8;
+    }
+
+    message Relation{
+        // similar with input_path and input_name, determines the dataframe
+        // One of relation_path or relation_name must be passed in
+        // name has higher priority than path, if no name, using path to construct dataframe
+        string relation_path = 1;
+        string relation_name = 2;
+
+        // One of relation_path or relation_name or both must be passed in
+        string relation_col = 3;
+        string input_col = 4;
+        // when using path to construct dataframe, allow read as custom file format
+        FileFormatType file_format = 5;
+        FileFormatConf format_conf = 6;
+    }
+
+    message RelationStage{
+        // input_path or input_name determines the dataframe involved in the association relationship
+        // One of input_name or input_path must be passed in
+        // name has higher priority than path, if no name, using path to construct dataframe
+        string input_path = 1;
+        string input_name = 2;
+        // If output_path exists, this dataframe will be exported
+        string output_path = 3;
+        // Name of the dataframe, using in response and other stage
+        string name = 4;
+        // input dataframe semi-join relation dataframe by input_col == relation_col
+        repeated Relation relations = 5;
+        FileFormatType file_format = 6;
+        FileFormatConf format_conf = 7;
+    }
+    repeated SamplingStage sampling_stages = 1;
+    repeated RelationStage relation_stages = 2;
+    string job_id = 3;
+
+    // Global default configuration, used when the stage is not specifically configured
+    // If a relation or sample using name not path, FileFormat* only applied when output
+    SamplingMethodType default_sampling_method = 4;
+    SamplingConf default_sampling_conf = 5;
+    FileFormatType default_file_format = 6;
+    FileFormatConf default_format_conf = 7;
+}
+
+
+message RelationSamplingResponse{
+    message SampleResult{
+        string name = 1;
+        string sampled_path = 2;
+    }
+
+    // Status code, return 0 for success
+    int32 code = 1;
+    string message = 2;
+    ResponseData data = 3;
+    message ResponseData{
+        // Original request
+        RelationSamplingRequest parent_request = 1;
+        // Sample output file path
+        repeated SampleResult result = 2;
+    }
+}

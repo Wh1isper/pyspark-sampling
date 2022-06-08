@@ -1,4 +1,4 @@
-FROM pysparksampling-base:latest
+FROM wh1isper/pysparksampling-base:latest
 LABEL maintainer="wh1isper <9573586@qq.com>"
 
 WORKDIR /home/application

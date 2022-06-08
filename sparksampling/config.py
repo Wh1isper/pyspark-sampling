@@ -105,9 +105,7 @@ def get_s3_config():
     SK = os.environ.get('S3_SECRET_KEY', '')
     END_POINT = os.environ.get('S3_ENTRY_POINT', '')
     if not (AK and SK and END_POINT):
-        return {
-            'spark.hadoop.fs.s3a.bucket.all.committer.magic.enabled': 'true',
-        }
+        return dict()
     return {
         'spark.hadoop.fs.s3a.access.key': AK,
         'spark.hadoop.fs.s3a.secret.key': SK,

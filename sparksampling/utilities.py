@@ -9,7 +9,7 @@ import requests
 from google.protobuf.json_format import MessageToDict
 from pyspark.sql import SparkSession
 
-from sparksampling.error import CustomErrorWithCode
+from sparksampling.error import CustomErrorWithCode, SERVER_ERROR
 
 logger = logging.getLogger("sparksampling")
 
@@ -58,7 +58,7 @@ def throw_exception(func=None, *, request_type=None, response_type=None):
                                  data=response_type.ResponseData(parent_request=parent_request))
         except Exception as e:
             logger.exception(e)
-            return response_type(code=5000, message=str(e),
+            return response_type(code=SERVER_ERROR, message=str(e),
                                  data=response_type.ResponseData(parent_request=parent_request))
         finally:
             end_time = time.time()
@@ -91,7 +91,7 @@ def async_throw_exception(func=None, *, request_type=None, response_type=None):
                                  data=response_type.ResponseData(parent_request=parent_request))
         except Exception as e:
             logger.exception(e)
-            return response_type(code=5000, message=str(e),
+            return response_type(code=SERVER_ERROR, message=str(e),
                                  data=response_type.ResponseData(parent_request=parent_request))
         finally:
             end_time = time.time()

@@ -4,6 +4,8 @@ from sparksampling.proto import sampling_service_pb2_grpc
 from sparksampling.proto.sampling_service_pb2 import (
     SamplingResponse,
     SamplingRequest,
+    RelationSamplingRequest,
+    RelationSamplingResponse,
     CancelRequest,
     CancelResponse
 )
@@ -16,8 +18,12 @@ class GRPCService(sampling_service_pb2_grpc.SparkSamplingServiceServicer, LogMix
         self.parent = parent
 
     @staticmethod
-    def get_worker_num():
+    def register_engine(parent):
         EngineFactory.register_all_engine()
+        EngineFactory.register_customer_engine(parent.customer_engine_package)
+
+    @staticmethod
+    def get_worker_num():
         return EngineFactory.get_engine_total_worker()
 
     @staticmethod
@@ -40,6 +46,17 @@ class GRPCService(sampling_service_pb2_grpc.SparkSamplingServiceServicer, LogMix
         return SamplingResponse(code=0, message='',
                                 data=SamplingResponse.ResponseData(parent_request=parent_request,
                                                                    sampled_path=output_path))
+
+    @throw_exception
+    def RelationSamplingJob(self, request: RelationSamplingRequest, context) -> RelationSamplingResponse:
+        data = EngineFactory.message_to_dict(request)
+        parent_request = RelationSamplingRequest(**data)
+        engine = EngineFactory.get_engine(self.parent, RelationSamplingRequest, **data)
+        result = engine.submit()
+
+        return RelationSamplingResponse(code=0, message='',
+                                        data=RelationSamplingResponse.ResponseData(parent_request=parent_request,
+                                                                                   result=result))
 
     def CancelJob(self, request: CancelRequest, context) -> CancelResponse:
         try:

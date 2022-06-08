@@ -1,13 +1,14 @@
 from pprint import pformat
+import importlib
 
 from google.protobuf.json_format import MessageToDict
 
-from sparksampling.error import BadParamError
+from sparksampling.error import BadParamError, ProcessError
 from sparksampling.mixin import LogMixin
 
 
 class EngineFactory(LogMixin):
-    engine_cls = []
+    engine_cls = set()
 
     @classmethod
     def choose_engine(cls, request_type):
@@ -15,7 +16,7 @@ class EngineFactory(LogMixin):
         for engine in cls.engine_cls:
             if engine.is_matching(request_type):
                 if engine_cls:
-                    raise BadParamError(f"Duplicated Engine Found: {engine.__name__} and {engine_cls.__name__}")
+                    raise ProcessError(f"Duplicated Engine Found: {engine.__name__} and {engine_cls.__name__}")
                 engine_cls = engine
         return engine_cls
 
@@ -44,12 +45,18 @@ class EngineFactory(LogMixin):
         if engine_class in cls.engine_cls:
             return
         cls.log.info(f'Register engine: {engine_class.__name__}, allocate {engine_class.guarantee_worker} workers')
-        cls.engine_cls.append(engine_class)
+        cls.engine_cls.add(engine_class)
 
     @staticmethod
     def register_all_engine():
-        import importlib
         importlib.import_module('sparksampling.engine')
+
+    @staticmethod
+    def register_customer_engine(packages):
+        if not packages:
+            return
+        for package in packages.split(','):
+            importlib.import_module(package)
 
     @classmethod
     def get_engine_total_worker(cls):

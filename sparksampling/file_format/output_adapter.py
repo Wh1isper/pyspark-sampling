@@ -28,7 +28,7 @@ class LocalAdapterMixin(LogMixin):
         return merge_file_name
 
     @classmethod
-    def __merge_local_csv_parallel(cls, abs_output_path, merge_file_names, sep):
+    def _merge_local_csv_parallel(cls, abs_output_path, merge_file_names, sep):
         if len(merge_file_names) == 1:
             return os.path.join(abs_output_path, merge_file_names[0])
         pool = []
@@ -41,7 +41,7 @@ class LocalAdapterMixin(LogMixin):
 
         merge_file_names = [p.result() for p in pool]
 
-        return cls.__merge_local_csv_parallel(abs_output_path, merge_file_names, sep)
+        return cls._merge_local_csv_parallel(abs_output_path, merge_file_names, sep)
 
     @classmethod
     def _merge_local_file(cls, abs_output_path, csv_files, sep):
@@ -50,7 +50,7 @@ class LocalAdapterMixin(LogMixin):
             return os.path.join(abs_output_path,
                                 cls._merge_local_csv(dir_prefix=abs_output_path, csv_files=csv_files, sep=sep))
         else:
-            return cls.__merge_local_csv_parallel(abs_output_path, csv_files, sep)
+            return cls._merge_local_csv_parallel(abs_output_path, csv_files, sep)
 
     @classmethod
     def _get_local_sampled_file(cls, output_path, sep):
@@ -59,11 +59,14 @@ class LocalAdapterMixin(LogMixin):
         if not csv_files:
             raise ProcessError('csv file not found')
         if len(csv_files) > 1:
+            if os.getenv('NO_REPARTITION'):
+                cls.log.info(f"No repartition and no merge for files:  {csv_files[:10]}...(only show top 10)")
+                return abs_dir
             cls.log.info(f"Start merging sampling files {len(csv_files)}: {csv_files[:10]}...(only show top 10)", )
             csv_file = cls._merge_local_file(abs_dir, csv_files, sep)
         else:
             csv_file = csv_files[0]
-        cls.log.info(f"Output one file: {csv_file}")
+        cls.log.debug(f"Output one file: {csv_file}")
         return os.path.join(abs_dir, csv_file)
 
 
@@ -99,12 +102,11 @@ class S3OutputAdapterMixin(LogMixin):
             return output_path
         else:
             csv_file = csv_files[0]
-        cls.log.info(f"Output one file: {csv_file}")
+        cls.log.debug(f"Output one file: {csv_file}")
         return cls.s3_theme + '/'.join([bucket_name, csv_file])
 
 
 class OutputAdapterMixin(LocalAdapterMixin, S3OutputAdapterMixin):
-    # 不采用多步合并，本地磁盘多步合并性能不佳
     MERGE_CHUNK_SIZE = 0
     executor = PoolExecutor(os.cpu_count() or 1)
 
