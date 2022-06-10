@@ -106,7 +106,7 @@ def check_spark_session(func):
     # Server will be redeployed under K8S deployment
     def _check_spark_ui(logger, spark: SparkSession):
         try:
-            if not spark.conf.get('spark.master').startswith('local'):
+            if not spark.conf.get('spark.submit.deployMode') == 'client':
                 return True
         except Exception as e:
             logger.exception(e)

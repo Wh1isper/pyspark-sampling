@@ -47,7 +47,7 @@ setup(
     packages=find_packages(include=['sparksampling', 'sparksampling.*']),
     test_suite='tests',
     tests_require=test_requirements,
-    url='',
-    version='0.1.0',
+    url='https://github.com/Wh1isper/pyspark-sampling',
+    version='0.1.1',
     zip_safe=False,
 )

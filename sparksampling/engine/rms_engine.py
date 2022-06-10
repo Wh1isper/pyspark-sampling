@@ -148,6 +148,10 @@ class JobStage(LogMixin):
         return self.stage_config.get('output_path')
 
     @property
+    def output_col(self):
+        return self.stage_config.get('output_col')
+
+    @property
     def input_name(self):
         return self.stage_config.get('input_name')
 
@@ -158,6 +162,10 @@ class JobStage(LogMixin):
     def export_dataframe(self):
         if self.output_path:
             self.log.debug(f'Exporting stage {self.name} to {self.output_path}')
+            # for relation stage, choose  Columns to be retained
+            if self.output_col:
+                self.log.debug(f'Exporting stage {self.name} as col: {self.output_col}')
+                self._df = self._df[self.output_col]
             self.sampled_path = self.file_format_imp.write(self._df, self.output_path)
         else:
             self.log.debug(f'Nothing to export for {self.name}')

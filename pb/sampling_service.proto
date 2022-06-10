@@ -89,7 +89,9 @@ message SamplingConf {
     // Maximum number of samples drawn
     // SIMPLE_SAMPLING_METHOD requires not to be 0
     uint32 count = 5;
-    // Columns to be retained
+    // Columns to be retained, empty or null means to retain all
+    // Sampled dataframe only has columns with sampling_col
+    // In relationSampling, 'output_col' is a better choice if you don't know which columns need to be used in the association
     repeated string sampling_col = 6;
 }
 
@@ -100,7 +102,6 @@ message FileFormatConf {
     string sep = 2;
 }
 
-
 message RelationSamplingRequest{
     message SamplingStage{
         // input_path or input_name determines the dataframe involved in the association relationship
@@ -109,11 +110,13 @@ message RelationSamplingRequest{
         string input_path = 1;
         string input_name = 2;
         string output_path = 3;
-        string name = 4;
-        SamplingMethodType sampling_method = 5;
-        SamplingConf sampling_conf = 6;
-        FileFormatType file_format = 7;
-        FileFormatConf format_conf = 8;
+        // Columns to be retained when output, only work when export dataframe, empty or null means to retain all
+        repeated string output_col = 4;
+        string name = 5;
+        SamplingMethodType sampling_method = 6;
+        SamplingConf sampling_conf = 7;
+        FileFormatType file_format = 8;
+        FileFormatConf format_conf = 9;
     }
 
     message Relation{
@@ -139,12 +142,14 @@ message RelationSamplingRequest{
         string input_name = 2;
         // If output_path exists, this dataframe will be exported
         string output_path = 3;
+        // Columns to be retained when output, only work when export dataframe, empty or null means to retain all
+        repeated string output_col = 4;
         // Name of the dataframe, using in response and other stage
-        string name = 4;
+        string name = 5;
         // input dataframe semi-join relation dataframe by input_col == relation_col
-        repeated Relation relations = 5;
-        FileFormatType file_format = 6;
-        FileFormatConf format_conf = 7;
+        repeated Relation relations = 6;
+        FileFormatType file_format = 7;
+        FileFormatConf format_conf = 8;
     }
     repeated SamplingStage sampling_stages = 1;
     repeated RelationStage relation_stages = 2;
