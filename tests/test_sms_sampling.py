@@ -22,13 +22,6 @@ dir_prefix = os.path.abspath(os.path.dirname(__file__))
 input_path = os.path.join(dir_prefix, '../data/10w_x_10.csv')
 
 
-def setup_module():
-    import shutil
-
-    shutil.rmtree(os.path.join(dir_prefix, './output/'), ignore_errors=True)
-    shutil.rmtree(os.path.join(dir_prefix, '../data/sampled'), ignore_errors=True)
-
-
 def test_random_sampling(grpc_stub):
     sampling_col = ['# id', 'X_0', 'X_1', 'X_2', 'y']
     sampling_conf = SamplingConf(

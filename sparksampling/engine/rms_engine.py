@@ -162,11 +162,7 @@ class JobStage(LogMixin):
     def export_dataframe(self):
         if self.output_path:
             self.log.debug(f'Exporting stage {self.name} to {self.output_path}')
-            # for relation stage, choose  Columns to be retained
-            if self.output_col:
-                self.log.debug(f'Exporting stage {self.name} as col: {self.output_col}')
-                self._df = self._df[self.output_col]
-            self.sampled_path = self.file_format_imp.write(self._df, self.output_path)
+            self.sampled_path = self.file_format_imp.write(self._df, self.output_path, self.output_col)
         else:
             self.log.debug(f'Nothing to export for {self.name}')
 

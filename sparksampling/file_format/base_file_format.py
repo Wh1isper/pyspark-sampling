@@ -23,5 +23,5 @@ class SparkBaseFileFormat(LogMixin):
     def read(self, input_path):
         raise NotImplementedError
 
-    def write(self, df: DataFrame, output_path):
+    def write(self, df: DataFrame, output_path, output_col=None):
         raise NotImplementedError

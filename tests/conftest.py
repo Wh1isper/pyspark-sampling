@@ -37,3 +37,15 @@ def register():
     from sparksampling.engine_factory import EngineFactory
 
     EngineFactory.register_all_engine()
+
+
+@pytest.fixture(scope='session', autouse=True)
+def cleanup():
+    import shutil
+    import os
+    dir_prefix = os.path.abspath(os.path.dirname(__file__))
+
+    shutil.rmtree(os.path.join(dir_prefix, './output/'), ignore_errors=True)
+    shutil.rmtree(os.path.join(dir_prefix, '../data/sampled'), ignore_errors=True)
+
+    yield

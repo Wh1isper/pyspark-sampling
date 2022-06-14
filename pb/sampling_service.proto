@@ -96,7 +96,7 @@ message SamplingConf {
 }
 
 message FileFormatConf {
-    // csv have a header, default is True
+    // csv have a header, default is False
     bool with_header = 1;
     // File separator, default is '\001', using a comma as the default separator requires passing ','
     string sep = 2;
