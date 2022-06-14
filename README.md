@@ -1,12 +1,11 @@
 # pyspark-sampling
 
-...
+``sparksampling`` is a PySpark-based sampling and data quality assessment GRPC service that supports containerized
+deployments and Spark On K8S
 
-```bash
-rm -rf build dist && python setup.py sdist bdist_wheel
+## Feature
 
-# pypi
-twine upload dist/*
-# local repo
-twine upload -r local dist/*
-```
+- Common sampling methods: Random, Stratified, Simple
+- Relationship Sampling based on DAG and Topological sorting
+- Cloud Native and Spark on K8S support
+

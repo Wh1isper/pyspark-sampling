@@ -4,6 +4,9 @@
 
 from setuptools import setup, find_packages
 
+with open('README.rst') as readme_file:
+    readme = readme_file.read()
+
 requirements = [
     'grpcio>=1.35.0',
     'protobuf<4',
@@ -36,6 +39,7 @@ setup(
     ],
     description="pyspark-sampling",
     install_requires=requirements,
+    long_description=readme,
     include_package_data=True,
     keywords='sparksampling',
     name='sparksampling',
@@ -48,6 +52,6 @@ setup(
     test_suite='tests',
     tests_require=test_requirements,
     url='https://github.com/Wh1isper/pyspark-sampling',
-    version='0.1.1',
+    version='0.1.2',
     zip_safe=False,
 )
