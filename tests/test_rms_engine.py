@@ -10,6 +10,7 @@ input_path = os.path.join(dir_prefix, '../data/10w_x_10.csv')
 input_a = os.path.join(dir_prefix, '../data/relation-a.csv')
 input_b = os.path.join(dir_prefix, '../data/relation-b.csv')
 input_c = os.path.join(dir_prefix, '../data/relation-c.csv')
+SEED = 4
 
 
 def test_only_sampling(grpc_stub):
@@ -22,6 +23,7 @@ def test_only_sampling(grpc_stub):
         sampling_conf=SamplingConf(
             fraction='0.5',
             with_replacement=True,
+            seed=SEED,
         ),
         format_conf=FileFormatConf(
             with_header=True,
@@ -73,6 +75,7 @@ def test_only_relation(grpc_stub):
         default_sampling_conf=SamplingConf(
             fraction='0.5',
             with_replacement=True,
+            seed=SEED,
         ),
         default_format_conf=FileFormatConf(
             with_header=True,
@@ -123,6 +126,7 @@ def test_part_relation(grpc_stub):
         default_sampling_conf=SamplingConf(
             fraction='0.5',
             with_replacement=True,
+            seed=SEED,
         ),
         default_format_conf=FileFormatConf(
             with_header=True,
@@ -175,6 +179,7 @@ def test_chain_relation(grpc_stub):
         default_sampling_conf=SamplingConf(
             fraction='0.5',
             with_replacement=True,
+            seed=SEED,
         ),
         default_format_conf=FileFormatConf(
             with_header=True,
@@ -203,6 +208,7 @@ def test_dry_run(grpc_stub):
         default_sampling_conf=SamplingConf(
             fraction='0.5',
             with_replacement=True,
+            seed=SEED,
         ),
         default_format_conf=FileFormatConf(
             with_header=True,
