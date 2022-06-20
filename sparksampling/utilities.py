@@ -115,12 +115,12 @@ def check_spark_session(func):
 
         ui_port = spark.conf.get('spark.ui.port')
         url = f"http://localhost:{ui_port}"
-        logger.debug(f"Check spark is alive: {url}")
+        logger.debug(f"Check Spark is alive: {url}")
         try:
             response = requests.get(url)
         except Exception as e:
             logger.exception(e)
-            logger.warning(f"Can't access spark ui: {url}")
+            logger.warning(f"Can't access Spark ui: {url}")
             return False
         return response.status_code == 200
 

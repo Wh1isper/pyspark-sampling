@@ -1,3 +1,4 @@
+from concurrent.futures import ThreadPoolExecutor
 from pprint import pformat
 from typing import List, Dict
 
@@ -89,6 +90,24 @@ class JobStage(LogMixin):
             return
         self.sample_imp = SamplingFactory.get_sampling_imp(self.sampling_method, self.sampling_conf)
 
+    def _build_relation_dataframe(self, input_df, relation):
+        relation_name = relation.get('relation_name')
+        if relation_name:
+            relation_df = self.name_df_map[relation_name]
+        else:
+            # using relation_path to construct dataframe
+            relation_file_format = FileFormatFactory.get_file_imp(
+                self.spark,
+                relation['file_format'],
+                relation['format_conf']
+            )
+            # no need to worry if spark read the same csv twice, spark only read once
+            relation_df = relation_file_format.read(relation['relation_path'])
+
+        # python's way for self._df.join(relation_df, self._df.input_col == relation_df.relation_col, 'semi')
+        cond = [getattr(input_df, relation['input_col']) == getattr(relation_df, relation['relation_col'])]
+        return input_df.join(relation_df, cond, how='semi')
+
     def build_dataframe(self):
         self.log.debug(f'Starting building stage {self.name}')
         if self.input_name:
@@ -100,22 +119,7 @@ class JobStage(LogMixin):
             self._df = self.sample_imp.run(self._df)
 
         for relation in self.relations:
-            relation_name = relation.get('relation_name')
-            if relation_name:
-                relation_df = self.name_df_map[relation_name]
-            else:
-                # using relation_path to construct dataframe
-                relation_file_format = FileFormatFactory.get_file_imp(
-                    self.spark,
-                    relation['file_format'],
-                    relation['format_conf']
-                )
-                # no need to worry if spark read the same csv twice, spark only read once
-                relation_df = relation_file_format.read(relation['relation_path'])
-
-            # python's way for self._df.join(relation_df, self._df.input_col == relation_df.relation_col, 'semi')
-            cond = [getattr(self._df, relation['input_col']) == getattr(relation_df, relation['relation_col'])]
-            self._df = self._df.join(relation_df, cond, how='semi')
+            self._df = self._build_relation_dataframe(self._df, relation)
 
         self.name_df_map[self.name] = self._df
 
@@ -202,7 +206,6 @@ class RMSEngine(SparkBaseEngine):
             build_order = self._get_stage_order()
         except CycleError as e:
             raise BadParamError(f'Loop detected: {str(e)}')
-        self.log.info(f'Initializing spark job as {build_order}')
 
         spark_job_seq = self._process_spark_seq(build_order)
         result = self._get_seq_result(spark_job_seq)
@@ -227,8 +230,9 @@ class RMSEngine(SparkBaseEngine):
                 if relation_name:
                     rely_set.add(relation_name)
         self.log.debug(f"topological_map is {pformat(topological_map)}")
-        build_other = list(TopologicalSorter(topological_map).static_order())
-        return build_other
+        build_order = list(TopologicalSorter(topological_map).static_order())
+        self.log.debug(f'topological sort result: {build_order}')
+        return build_order
 
     def _process_spark_seq(self, build_order):
         job_seq = []
@@ -241,8 +245,11 @@ class RMSEngine(SparkBaseEngine):
             self.log.info('Dry run, skip export dataframe')
             return
         self.log.info('Generated spark job sequence, start exporting dataframe...')
-        for stage in job_seq:
-            stage.export_dataframe()
+
+        executors = int(self.spark.conf.get('spark.executor.instances', '1'))
+        with ThreadPoolExecutor(max_workers=executors) as executor:
+            for stage in job_seq:
+                executor.submit(stage.export_dataframe)
         return job_seq
 
     def _get_seq_result(self, seq):
