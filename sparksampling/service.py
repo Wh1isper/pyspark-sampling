@@ -52,11 +52,11 @@ class GRPCService(sampling_service_pb2_grpc.SparkSamplingServiceServicer, LogMix
         data = EngineFactory.message_to_dict(request)
         parent_request = RelationSamplingRequest(**data)
         engine = EngineFactory.get_engine(self.parent, RelationSamplingRequest, **data)
-        result = engine.submit()
+        results = engine.submit()
 
         return RelationSamplingResponse(code=0, message='',
                                         data=RelationSamplingResponse.ResponseData(parent_request=parent_request,
-                                                                                   result=result))
+                                                                                   results=results))
 
     def CancelJob(self, request: CancelRequest, context) -> CancelResponse:
         try:
