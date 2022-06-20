@@ -186,5 +186,35 @@ def test_chain_relation(grpc_stub):
     assert response.code == 0
 
 
+def test_dry_run(grpc_stub):
+    out_path = os.path.join(dir_prefix, './output/dry/a-sampled')
+    sampling_a = RelationSamplingRequest.SamplingStage(
+        input_path=input_a,
+        output_path=out_path,
+        name='a',
+    )
+
+    request = RelationSamplingRequest(
+        sampling_stages=[sampling_a],
+        relation_stages=[],
+        job_id='dry-run-job',
+        default_sampling_method=RANDOM_SAMPLING_METHOD,
+        default_file_format=FILE_FORMAT_CSV,
+        default_sampling_conf=SamplingConf(
+            fraction='0.5',
+            with_replacement=True,
+        ),
+        default_format_conf=FileFormatConf(
+            with_header=True,
+            sep=','
+        ),
+        dry_run=True,
+    )
+
+    response = grpc_stub.RelationSamplingJob(request)
+    assert response.code == 0
+    assert not os.path.exists(out_path)
+
+
 if __name__ == '__main__':
     pytest.main()

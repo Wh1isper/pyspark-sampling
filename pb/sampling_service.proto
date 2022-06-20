@@ -161,6 +161,9 @@ message RelationSamplingRequest{
     SamplingConf default_sampling_conf = 5;
     FileFormatType default_file_format = 6;
     FileFormatConf default_format_conf = 7;
+
+    // Only build dataframe, not export dataframe
+    bool dry_run = 8;
 }
 
 
@@ -178,6 +181,6 @@ message RelationSamplingResponse{
         // Original request
         RelationSamplingRequest parent_request = 1;
         // Sample output file path
-        repeated SampleResult result = 2;
+        repeated SampleResult results = 2;
     }
 }

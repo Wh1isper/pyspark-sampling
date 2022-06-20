@@ -174,12 +174,14 @@ class RMSEngine(SparkBaseEngine):
                  sampling_stages: List[Dict],
                  relation_stages: List[Dict],
                  job_id: str,
+                 dry_run: bool,
                  ):
         super(RMSEngine, self).__init__()
         self.parent = parent
         self.sampling_stages = sampling_stages
         self.relation_stages = relation_stages
         self.job_id = job_id
+        self.dry_run = dry_run
 
         self.name_stage_map = dict()
         self._init_name_stage_map()
@@ -235,13 +237,19 @@ class RMSEngine(SparkBaseEngine):
             stage = JobStage(self.spark, self.name_stage_map[name], name_df_map)
             stage.build_dataframe()
             job_seq.append(stage)
+        if self.dry_run:
+            self.log.info('Dry run, skip export dataframe')
+            return
         self.log.info('Generated spark job sequence, start exporting dataframe...')
         for stage in job_seq:
             stage.export_dataframe()
         return job_seq
 
     def _get_seq_result(self, seq):
-        self.log.info('Start collecting result...')
+        self.log.debug('Start collecting result...')
+        if self.dry_run:
+            self.log.info('Dry run, nothing output')
+            return []
         result = []
         for job in seq:
             if job.sampled_path:
@@ -257,6 +265,7 @@ class RMSEngine(SparkBaseEngine):
             sampling_stages = kwargs.pop('sampling_stages')
             relation_stages = kwargs.pop('relation_stages')
             job_id = kwargs.pop('job_id')
+            dry_run = kwargs.pop('dry_run', False)
         except KeyError as e:
             cls.log.info("Missing required parameters", e)
             raise BadParamError(f"Missing required parameters {str(e)}")
@@ -265,6 +274,7 @@ class RMSEngine(SparkBaseEngine):
             'sampling_stages': sampling_stages,
             'relation_stages': relation_stages,
             'job_id': job_id,
+            'dry_run': dry_run,
         }
         cls.log.info(f"Initializing job conf... \n {pformat(config_dict)}")
         return config_dict
