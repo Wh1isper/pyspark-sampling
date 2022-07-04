@@ -2,7 +2,6 @@ FROM wh1isper/pysparksampling-base:latest
 LABEL maintainer="wh1isper <9573586@qq.com>"
 
 WORKDIR /home/application
-COPY --chown=9999:9999 . /home/application
 # install using pypi
 RUN pip3 install sparksampling
 
