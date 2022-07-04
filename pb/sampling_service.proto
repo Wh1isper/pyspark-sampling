@@ -11,6 +11,7 @@ enum SamplingMethodType{
     RANDOM_SAMPLING_METHOD = 1;
     STRATIFIED_SAMPLING_METHOD = 2;
     SIMPLE_SAMPLING_METHOD = 3;
+    CLUSTER_SAMPLING_METHOD = 4;
 }
 
 enum FileFormatType{
@@ -93,6 +94,13 @@ message SamplingConf {
     // Sampled dataframe only has columns with sampling_col
     // In relationSampling, 'output_col' is a better choice if you don't know which columns need to be used in the association
     repeated string sampling_col = 6;
+
+    // For cluster sampling, column names to distinguish between groups
+    string group_by = 7;
+    // The number of clusters to be sampled for whole cluster sampling
+    // If the number of clusters to be extracted is not clear, use fraction as the scale input
+    // When used with fraction, group_by is sampled in scale, limiting the maximum number of groups to group_num
+    uint32 group_num = 8;
 }
 
 message FileFormatConf {

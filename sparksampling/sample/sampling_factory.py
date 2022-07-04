@@ -3,12 +3,14 @@ from sparksampling.error import BadParamError
 from sparksampling.proto.sampling_service_pb2 import (
     RANDOM_SAMPLING_METHOD,
     STRATIFIED_SAMPLING_METHOD,
-    SIMPLE_SAMPLING_METHOD
+    SIMPLE_SAMPLING_METHOD,
+    CLUSTER_SAMPLING_METHOD
 )
 from sparksampling.sample.base_sampling import SparkBaseSamplingJob
 from sparksampling.sample.random_sampling_imp import RandomSamplingImp
 from sparksampling.sample.simple_sampling_imp import SimpleSamplingImp
 from sparksampling.sample.stratified_sampling_imp import StratifiedSamplingImp
+from sparksampling.sample.cluster_sampling_imp import ClusterSamplingImp
 
 
 class SamplingFactory(object):
@@ -16,6 +18,7 @@ class SamplingFactory(object):
         RANDOM_SAMPLING_METHOD: RandomSamplingImp,
         STRATIFIED_SAMPLING_METHOD: StratifiedSamplingImp,
         SIMPLE_SAMPLING_METHOD: SimpleSamplingImp,
+        CLUSTER_SAMPLING_METHOD: ClusterSamplingImp,
     }
 
     @classmethod

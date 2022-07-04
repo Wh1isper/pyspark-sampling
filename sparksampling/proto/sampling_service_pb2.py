@@ -15,7 +15,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x16sampling_service.proto\"\xea\x01\n\x0fSamplingRequest\x12,\n\x0fsampling_method\x18\x01 \x01(\x0e\x32\x13.SamplingMethodType\x12$\n\x0b\x66ile_format\x18\x02 \x01(\x0e\x32\x0f.FileFormatType\x12$\n\rsampling_conf\x18\x03 \x01(\x0b\x32\r.SamplingConf\x12$\n\x0b\x66ormat_conf\x18\x04 \x01(\x0b\x32\x0f.FileFormatConf\x12\x12\n\ninput_path\x18\x05 \x01(\t\x12\x13\n\x0boutput_path\x18\x06 \x01(\t\x12\x0e\n\x06job_id\x18\x07 \x01(\t\"\x1f\n\rCancelRequest\x12\x0e\n\x06job_id\x18\x01 \x01(\t\"/\n\x0e\x43\x61ncelResponse\x12\x0c\n\x04\x63ode\x18\x01 \x01(\x05\x12\x0f\n\x07message\x18\x02 \x01(\t\"\xaf\x01\n\x10SamplingResponse\x12\x0c\n\x04\x63ode\x18\x01 \x01(\x05\x12\x0f\n\x07message\x18\x02 \x01(\t\x12,\n\x04\x64\x61ta\x18\x03 \x01(\x0b\x32\x1e.SamplingResponse.ResponseData\x1aN\n\x0cResponseData\x12(\n\x0eparent_request\x18\x01 \x01(\x0b\x32\x10.SamplingRequest\x12\x14\n\x0csampled_path\x18\x02 \x01(\t\"#\n\x04\x64ict\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t\"\x85\x01\n\x0cSamplingConf\x12\x10\n\x08\x66raction\x18\x01 \x01(\t\x12\x18\n\x10with_replacement\x18\x02 \x01(\x08\x12\x0c\n\x04seed\x18\x03 \x01(\r\x12\x16\n\x0estratified_key\x18\x04 \x01(\t\x12\r\n\x05\x63ount\x18\x05 \x01(\r\x12\x14\n\x0csampling_col\x18\x06 \x03(\t\"2\n\x0e\x46ileFormatConf\x12\x13\n\x0bwith_header\x18\x01 \x01(\x08\x12\x0b\n\x03sep\x18\x02 \x01(\t\"\xb0\x08\n\x17RelationSamplingRequest\x12?\n\x0fsampling_stages\x18\x01 \x03(\x0b\x32&.RelationSamplingRequest.SamplingStage\x12?\n\x0frelation_stages\x18\x02 \x03(\x0b\x32&.RelationSamplingRequest.RelationStage\x12\x0e\n\x06job_id\x18\x03 \x01(\t\x12\x34\n\x17\x64\x65\x66\x61ult_sampling_method\x18\x04 \x01(\x0e\x32\x13.SamplingMethodType\x12,\n\x15\x64\x65\x66\x61ult_sampling_conf\x18\x05 \x01(\x0b\x32\r.SamplingConf\x12,\n\x13\x64\x65\x66\x61ult_file_format\x18\x06 \x01(\x0e\x32\x0f.FileFormatType\x12,\n\x13\x64\x65\x66\x61ult_format_conf\x18\x07 \x01(\x0b\x32\x0f.FileFormatConf\x12\x0f\n\x07\x64ry_run\x18\x08 \x01(\x08\x1a\x8e\x02\n\rSamplingStage\x12\x12\n\ninput_path\x18\x01 \x01(\t\x12\x12\n\ninput_name\x18\x02 \x01(\t\x12\x13\n\x0boutput_path\x18\x03 \x01(\t\x12\x12\n\noutput_col\x18\x04 \x03(\t\x12\x0c\n\x04name\x18\x05 \x01(\t\x12,\n\x0fsampling_method\x18\x06 \x01(\x0e\x32\x13.SamplingMethodType\x12$\n\rsampling_conf\x18\x07 \x01(\x0b\x32\r.SamplingConf\x12$\n\x0b\x66ile_format\x18\x08 \x01(\x0e\x32\x0f.FileFormatType\x12$\n\x0b\x66ormat_conf\x18\t \x01(\x0b\x32\x0f.FileFormatConf\x1a\xad\x01\n\x08Relation\x12\x15\n\rrelation_path\x18\x01 \x01(\t\x12\x15\n\rrelation_name\x18\x02 \x01(\t\x12\x14\n\x0crelation_col\x18\x03 \x01(\t\x12\x11\n\tinput_col\x18\x04 \x01(\t\x12$\n\x0b\x66ile_format\x18\x05 \x01(\x0e\x32\x0f.FileFormatType\x12$\n\x0b\x66ormat_conf\x18\x06 \x01(\x0b\x32\x0f.FileFormatConf\x1a\xf0\x01\n\rRelationStage\x12\x12\n\ninput_path\x18\x01 \x01(\t\x12\x12\n\ninput_name\x18\x02 \x01(\t\x12\x13\n\x0boutput_path\x18\x03 \x01(\t\x12\x12\n\noutput_col\x18\x04 \x03(\t\x12\x0c\n\x04name\x18\x05 \x01(\t\x12\x34\n\trelations\x18\x06 \x03(\x0b\x32!.RelationSamplingRequest.Relation\x12$\n\x0b\x66ile_format\x18\x07 \x01(\x0e\x32\x0f.FileFormatType\x12$\n\x0b\x66ormat_conf\x18\x08 \x01(\x0b\x32\x0f.FileFormatConf\"\x9e\x02\n\x18RelationSamplingResponse\x12\x0c\n\x04\x63ode\x18\x01 \x01(\x05\x12\x0f\n\x07message\x18\x02 \x01(\t\x12\x34\n\x04\x64\x61ta\x18\x03 \x01(\x0b\x32&.RelationSamplingResponse.ResponseData\x1a\x32\n\x0cSampleResult\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x14\n\x0csampled_path\x18\x02 \x01(\t\x1ay\n\x0cResponseData\x12\x30\n\x0eparent_request\x18\x01 \x01(\x0b\x32\x18.RelationSamplingRequest\x12\x37\n\x07results\x18\x02 \x03(\x0b\x32&.RelationSamplingResponse.SampleResult*\x80\x01\n\x12SamplingMethodType\x12\x12\n\x0eUNKNOWN_METHOD\x10\x00\x12\x1a\n\x16RANDOM_SAMPLING_METHOD\x10\x01\x12\x1e\n\x1aSTRATIFIED_SAMPLING_METHOD\x10\x02\x12\x1a\n\x16SIMPLE_SAMPLING_METHOD\x10\x03*9\n\x0e\x46ileFormatType\x12\x12\n\x0eUNKNOWN_FORMAT\x10\x00\x12\x13\n\x0f\x46ILE_FORMAT_CSV\x10\x01\x32\xca\x01\n\x14SparkSamplingService\x12\x34\n\x0bSamplingJob\x12\x10.SamplingRequest\x1a\x11.SamplingResponse\"\x00\x12L\n\x13RelationSamplingJob\x12\x18.RelationSamplingRequest\x1a\x19.RelationSamplingResponse\"\x00\x12.\n\tCancelJob\x12\x0e.CancelRequest\x1a\x0f.CancelResponse\"\x00\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x16sampling_service.proto\"\xea\x01\n\x0fSamplingRequest\x12,\n\x0fsampling_method\x18\x01 \x01(\x0e\x32\x13.SamplingMethodType\x12$\n\x0b\x66ile_format\x18\x02 \x01(\x0e\x32\x0f.FileFormatType\x12$\n\rsampling_conf\x18\x03 \x01(\x0b\x32\r.SamplingConf\x12$\n\x0b\x66ormat_conf\x18\x04 \x01(\x0b\x32\x0f.FileFormatConf\x12\x12\n\ninput_path\x18\x05 \x01(\t\x12\x13\n\x0boutput_path\x18\x06 \x01(\t\x12\x0e\n\x06job_id\x18\x07 \x01(\t\"\x1f\n\rCancelRequest\x12\x0e\n\x06job_id\x18\x01 \x01(\t\"/\n\x0e\x43\x61ncelResponse\x12\x0c\n\x04\x63ode\x18\x01 \x01(\x05\x12\x0f\n\x07message\x18\x02 \x01(\t\"\xaf\x01\n\x10SamplingResponse\x12\x0c\n\x04\x63ode\x18\x01 \x01(\x05\x12\x0f\n\x07message\x18\x02 \x01(\t\x12,\n\x04\x64\x61ta\x18\x03 \x01(\x0b\x32\x1e.SamplingResponse.ResponseData\x1aN\n\x0cResponseData\x12(\n\x0eparent_request\x18\x01 \x01(\x0b\x32\x10.SamplingRequest\x12\x14\n\x0csampled_path\x18\x02 \x01(\t\"#\n\x04\x64ict\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t\"\xaa\x01\n\x0cSamplingConf\x12\x10\n\x08\x66raction\x18\x01 \x01(\t\x12\x18\n\x10with_replacement\x18\x02 \x01(\x08\x12\x0c\n\x04seed\x18\x03 \x01(\r\x12\x16\n\x0estratified_key\x18\x04 \x01(\t\x12\r\n\x05\x63ount\x18\x05 \x01(\r\x12\x14\n\x0csampling_col\x18\x06 \x03(\t\x12\x10\n\x08group_by\x18\x07 \x01(\t\x12\x11\n\tgroup_num\x18\x08 \x01(\r\"2\n\x0e\x46ileFormatConf\x12\x13\n\x0bwith_header\x18\x01 \x01(\x08\x12\x0b\n\x03sep\x18\x02 \x01(\t\"\xb0\x08\n\x17RelationSamplingRequest\x12?\n\x0fsampling_stages\x18\x01 \x03(\x0b\x32&.RelationSamplingRequest.SamplingStage\x12?\n\x0frelation_stages\x18\x02 \x03(\x0b\x32&.RelationSamplingRequest.RelationStage\x12\x0e\n\x06job_id\x18\x03 \x01(\t\x12\x34\n\x17\x64\x65\x66\x61ult_sampling_method\x18\x04 \x01(\x0e\x32\x13.SamplingMethodType\x12,\n\x15\x64\x65\x66\x61ult_sampling_conf\x18\x05 \x01(\x0b\x32\r.SamplingConf\x12,\n\x13\x64\x65\x66\x61ult_file_format\x18\x06 \x01(\x0e\x32\x0f.FileFormatType\x12,\n\x13\x64\x65\x66\x61ult_format_conf\x18\x07 \x01(\x0b\x32\x0f.FileFormatConf\x12\x0f\n\x07\x64ry_run\x18\x08 \x01(\x08\x1a\x8e\x02\n\rSamplingStage\x12\x12\n\ninput_path\x18\x01 \x01(\t\x12\x12\n\ninput_name\x18\x02 \x01(\t\x12\x13\n\x0boutput_path\x18\x03 \x01(\t\x12\x12\n\noutput_col\x18\x04 \x03(\t\x12\x0c\n\x04name\x18\x05 \x01(\t\x12,\n\x0fsampling_method\x18\x06 \x01(\x0e\x32\x13.SamplingMethodType\x12$\n\rsampling_conf\x18\x07 \x01(\x0b\x32\r.SamplingConf\x12$\n\x0b\x66ile_format\x18\x08 \x01(\x0e\x32\x0f.FileFormatType\x12$\n\x0b\x66ormat_conf\x18\t \x01(\x0b\x32\x0f.FileFormatConf\x1a\xad\x01\n\x08Relation\x12\x15\n\rrelation_path\x18\x01 \x01(\t\x12\x15\n\rrelation_name\x18\x02 \x01(\t\x12\x14\n\x0crelation_col\x18\x03 \x01(\t\x12\x11\n\tinput_col\x18\x04 \x01(\t\x12$\n\x0b\x66ile_format\x18\x05 \x01(\x0e\x32\x0f.FileFormatType\x12$\n\x0b\x66ormat_conf\x18\x06 \x01(\x0b\x32\x0f.FileFormatConf\x1a\xf0\x01\n\rRelationStage\x12\x12\n\ninput_path\x18\x01 \x01(\t\x12\x12\n\ninput_name\x18\x02 \x01(\t\x12\x13\n\x0boutput_path\x18\x03 \x01(\t\x12\x12\n\noutput_col\x18\x04 \x03(\t\x12\x0c\n\x04name\x18\x05 \x01(\t\x12\x34\n\trelations\x18\x06 \x03(\x0b\x32!.RelationSamplingRequest.Relation\x12$\n\x0b\x66ile_format\x18\x07 \x01(\x0e\x32\x0f.FileFormatType\x12$\n\x0b\x66ormat_conf\x18\x08 \x01(\x0b\x32\x0f.FileFormatConf\"\x9e\x02\n\x18RelationSamplingResponse\x12\x0c\n\x04\x63ode\x18\x01 \x01(\x05\x12\x0f\n\x07message\x18\x02 \x01(\t\x12\x34\n\x04\x64\x61ta\x18\x03 \x01(\x0b\x32&.RelationSamplingResponse.ResponseData\x1a\x32\n\x0cSampleResult\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x14\n\x0csampled_path\x18\x02 \x01(\t\x1ay\n\x0cResponseData\x12\x30\n\x0eparent_request\x18\x01 \x01(\x0b\x32\x18.RelationSamplingRequest\x12\x37\n\x07results\x18\x02 \x03(\x0b\x32&.RelationSamplingResponse.SampleResult*\x9d\x01\n\x12SamplingMethodType\x12\x12\n\x0eUNKNOWN_METHOD\x10\x00\x12\x1a\n\x16RANDOM_SAMPLING_METHOD\x10\x01\x12\x1e\n\x1aSTRATIFIED_SAMPLING_METHOD\x10\x02\x12\x1a\n\x16SIMPLE_SAMPLING_METHOD\x10\x03\x12\x1b\n\x17\x43LUSTER_SAMPLING_METHOD\x10\x04*9\n\x0e\x46ileFormatType\x12\x12\n\x0eUNKNOWN_FORMAT\x10\x00\x12\x13\n\x0f\x46ILE_FORMAT_CSV\x10\x01\x32\xca\x01\n\x14SparkSamplingService\x12\x34\n\x0bSamplingJob\x12\x10.SamplingRequest\x1a\x11.SamplingResponse\"\x00\x12L\n\x13RelationSamplingJob\x12\x18.RelationSamplingRequest\x1a\x19.RelationSamplingResponse\"\x00\x12.\n\tCancelJob\x12\x0e.CancelRequest\x1a\x0f.CancelResponse\"\x00\x62\x06proto3')
 
 _SAMPLINGMETHODTYPE = DESCRIPTOR.enum_types_by_name['SamplingMethodType']
 SamplingMethodType = enum_type_wrapper.EnumTypeWrapper(_SAMPLINGMETHODTYPE)
@@ -25,6 +25,7 @@ UNKNOWN_METHOD = 0
 RANDOM_SAMPLING_METHOD = 1
 STRATIFIED_SAMPLING_METHOD = 2
 SIMPLE_SAMPLING_METHOD = 3
+CLUSTER_SAMPLING_METHOD = 4
 UNKNOWN_FORMAT = 0
 FILE_FORMAT_CSV = 1
 
@@ -159,10 +160,10 @@ _SPARKSAMPLINGSERVICE = DESCRIPTOR.services_by_name['SparkSamplingService']
 if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
-  _SAMPLINGMETHODTYPE._serialized_start=2113
-  _SAMPLINGMETHODTYPE._serialized_end=2241
-  _FILEFORMATTYPE._serialized_start=2243
-  _FILEFORMATTYPE._serialized_end=2300
+  _SAMPLINGMETHODTYPE._serialized_start=2150
+  _SAMPLINGMETHODTYPE._serialized_end=2307
+  _FILEFORMATTYPE._serialized_start=2309
+  _FILEFORMATTYPE._serialized_end=2366
   _SAMPLINGREQUEST._serialized_start=27
   _SAMPLINGREQUEST._serialized_end=261
   _CANCELREQUEST._serialized_start=263
@@ -176,23 +177,23 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _DICT._serialized_start=523
   _DICT._serialized_end=558
   _SAMPLINGCONF._serialized_start=561
-  _SAMPLINGCONF._serialized_end=694
-  _FILEFORMATCONF._serialized_start=696
-  _FILEFORMATCONF._serialized_end=746
-  _RELATIONSAMPLINGREQUEST._serialized_start=749
-  _RELATIONSAMPLINGREQUEST._serialized_end=1821
-  _RELATIONSAMPLINGREQUEST_SAMPLINGSTAGE._serialized_start=1132
-  _RELATIONSAMPLINGREQUEST_SAMPLINGSTAGE._serialized_end=1402
-  _RELATIONSAMPLINGREQUEST_RELATION._serialized_start=1405
-  _RELATIONSAMPLINGREQUEST_RELATION._serialized_end=1578
-  _RELATIONSAMPLINGREQUEST_RELATIONSTAGE._serialized_start=1581
-  _RELATIONSAMPLINGREQUEST_RELATIONSTAGE._serialized_end=1821
-  _RELATIONSAMPLINGRESPONSE._serialized_start=1824
-  _RELATIONSAMPLINGRESPONSE._serialized_end=2110
-  _RELATIONSAMPLINGRESPONSE_SAMPLERESULT._serialized_start=1937
-  _RELATIONSAMPLINGRESPONSE_SAMPLERESULT._serialized_end=1987
-  _RELATIONSAMPLINGRESPONSE_RESPONSEDATA._serialized_start=1989
-  _RELATIONSAMPLINGRESPONSE_RESPONSEDATA._serialized_end=2110
-  _SPARKSAMPLINGSERVICE._serialized_start=2303
-  _SPARKSAMPLINGSERVICE._serialized_end=2505
+  _SAMPLINGCONF._serialized_end=731
+  _FILEFORMATCONF._serialized_start=733
+  _FILEFORMATCONF._serialized_end=783
+  _RELATIONSAMPLINGREQUEST._serialized_start=786
+  _RELATIONSAMPLINGREQUEST._serialized_end=1858
+  _RELATIONSAMPLINGREQUEST_SAMPLINGSTAGE._serialized_start=1169
+  _RELATIONSAMPLINGREQUEST_SAMPLINGSTAGE._serialized_end=1439
+  _RELATIONSAMPLINGREQUEST_RELATION._serialized_start=1442
+  _RELATIONSAMPLINGREQUEST_RELATION._serialized_end=1615
+  _RELATIONSAMPLINGREQUEST_RELATIONSTAGE._serialized_start=1618
+  _RELATIONSAMPLINGREQUEST_RELATIONSTAGE._serialized_end=1858
+  _RELATIONSAMPLINGRESPONSE._serialized_start=1861
+  _RELATIONSAMPLINGRESPONSE._serialized_end=2147
+  _RELATIONSAMPLINGRESPONSE_SAMPLERESULT._serialized_start=1974
+  _RELATIONSAMPLINGRESPONSE_SAMPLERESULT._serialized_end=2024
+  _RELATIONSAMPLINGRESPONSE_RESPONSEDATA._serialized_start=2026
+  _RELATIONSAMPLINGRESPONSE_RESPONSEDATA._serialized_end=2147
+  _SPARKSAMPLINGSERVICE._serialized_start=2369
+  _SPARKSAMPLINGSERVICE._serialized_end=2571
 # @@protoc_insertion_point(module_scope)

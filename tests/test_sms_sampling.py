@@ -8,6 +8,7 @@ from sparksampling.error import BAD_PARAM_ERROR, PROCESS_ERROR
 from sparksampling.proto.sampling_service_pb2 import (
     SamplingRequest,
     RANDOM_SAMPLING_METHOD,
+    CLUSTER_SAMPLING_METHOD,
     SIMPLE_SAMPLING_METHOD,
     STRATIFIED_SAMPLING_METHOD,
     UNKNOWN_METHOD,
@@ -22,7 +23,7 @@ dir_prefix = os.path.abspath(os.path.dirname(__file__))
 input_path = os.path.join(dir_prefix, '../data/10w_x_10.csv')
 
 
-def test_random_sampling(grpc_stub):
+def test_random_sampling_fraction(grpc_stub):
     sampling_col = ['# id', 'X_0', 'X_1', 'X_2', 'y']
     sampling_conf = SamplingConf(
         fraction='0.2',
@@ -34,7 +35,7 @@ def test_random_sampling(grpc_stub):
         sep=','
     )
 
-    output_path = os.path.join(dir_prefix, './output/test_random_sampling')
+    output_path = os.path.join(dir_prefix, './output/test_random_sampling_fraction')
     request = SamplingRequest(
         sampling_method=RANDOM_SAMPLING_METHOD,
         file_format=FILE_FORMAT_CSV,
@@ -50,6 +51,126 @@ def test_random_sampling(grpc_stub):
     assert response.data.sampled_path.endswith('.csv')
     if os.path.exists(response.data.sampled_path):
         assert sorted(list(pandas.read_csv(response.data.sampled_path).columns)) == sorted(list(sampling_col))
+
+
+def test_random_sampling_count(grpc_stub):
+    sampling_col = ['# id', 'X_0', 'X_1', 'X_2', 'y']
+    sampling_conf = SamplingConf(
+        count=200,
+        with_replacement=False,
+        sampling_col=sampling_col
+    )
+    format_conf = FileFormatConf(
+        with_header=True,
+        sep=','
+    )
+
+    output_path = os.path.join(dir_prefix, './output/test_random_sampling_count')
+    request = SamplingRequest(
+        sampling_method=RANDOM_SAMPLING_METHOD,
+        file_format=FILE_FORMAT_CSV,
+        sampling_conf=sampling_conf,
+        format_conf=format_conf,
+        input_path=input_path,
+        output_path=output_path,
+        job_id='test_random_sampling'
+    )
+
+    response = grpc_stub.SamplingJob(request)
+    assert response.code == 0
+    assert response.data.sampled_path.endswith('.csv')
+    if os.path.exists(response.data.sampled_path):
+        assert sorted(list(pandas.read_csv(response.data.sampled_path).columns)) == sorted(list(sampling_col))
+
+def test_cluster_sampling_num(grpc_stub):
+    iris_path = os.path.join(dir_prefix, '../data/iris.csv')
+
+    sampling_conf = SamplingConf(
+        group_num=1,
+        group_by='Species',
+        seed=1,
+    )
+    format_conf = FileFormatConf(
+        with_header=True,
+        sep=','
+    )
+
+    output_path = os.path.join(dir_prefix, './output/iris_num_group_sampling')
+    request = SamplingRequest(
+        sampling_method=CLUSTER_SAMPLING_METHOD,
+        file_format=FILE_FORMAT_CSV,
+        sampling_conf=sampling_conf,
+        format_conf=format_conf,
+        input_path=iris_path,
+        output_path=output_path,
+        job_id='test_cluster_sampling_n'
+    )
+
+    response = grpc_stub.SamplingJob(request)
+    assert response.code == 0
+    assert response.data.sampled_path.endswith('.csv')
+    # todo add more test for output file
+
+
+def test_cluster_sampling_fraction(grpc_stub):
+    iris_path = os.path.join(dir_prefix, '../data/iris.csv')
+
+    sampling_conf = SamplingConf(
+        fraction='0.5',
+        group_by='Species',
+        seed=1,
+    )
+    format_conf = FileFormatConf(
+        with_header=True,
+        sep=','
+    )
+
+    output_path = os.path.join(dir_prefix, './output/iris_fraction_group_sampling')
+    request = SamplingRequest(
+        sampling_method=CLUSTER_SAMPLING_METHOD,
+        file_format=FILE_FORMAT_CSV,
+        sampling_conf=sampling_conf,
+        format_conf=format_conf,
+        input_path=iris_path,
+        output_path=output_path,
+        job_id='test_cluster_sampling_f'
+    )
+
+    response = grpc_stub.SamplingJob(request)
+    assert response.code == 0
+    assert response.data.sampled_path.endswith('.csv')
+    # todo add more test for output file
+
+
+def test_cluster_sampling_fraction_num(grpc_stub):
+    iris_path = os.path.join(dir_prefix, '../data/iris.csv')
+
+    sampling_conf = SamplingConf(
+        fraction='0.5',
+        group_by='Species',
+        group_num=2,
+        seed=1,
+    )
+    format_conf = FileFormatConf(
+        with_header=True,
+        sep=','
+    )
+
+    output_path = os.path.join(dir_prefix, './output/iris_fraction_num_group_sampling')
+    request = SamplingRequest(
+        sampling_method=CLUSTER_SAMPLING_METHOD,
+        file_format=FILE_FORMAT_CSV,
+        sampling_conf=sampling_conf,
+        format_conf=format_conf,
+        input_path=iris_path,
+        output_path=output_path,
+        job_id='test_cluster_sampling_fn'
+    )
+
+    response = grpc_stub.SamplingJob(request)
+    assert response.code == 0
+    assert response.data.sampled_path.endswith('.csv')
+    # todo add more test for output file
 
 
 def test_generate_path(grpc_stub):

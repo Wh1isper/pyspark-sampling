@@ -4,11 +4,11 @@ from typing import List, Dict
 
 from pyspark.sql import DataFrame
 
-from sparksampling.engine.base_engine import SparkBaseEngine, record_job_id
+from sparksampling.engine.base_engine import SparkBaseEngine
 from sparksampling.engine_factory import EngineFactory
 from sparksampling.error import BadParamError
 from sparksampling.file_format import FileFormatFactory
-from sparksampling.mixin import acquire_worker, LogMixin
+from sparksampling.mixin import acquire_worker, LogMixin, record_job_id
 from sparksampling.proto.sampling_service_pb2 import RelationSamplingRequest
 from sparksampling.sample import SamplingFactory
 from sparksampling.utilities import check_spark_session

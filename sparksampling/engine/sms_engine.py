@@ -3,11 +3,11 @@ from pprint import pformat
 from typing import Dict
 from uuid import uuid4
 
-from sparksampling.engine.base_engine import SparkBaseEngine, record_job_id
+from sparksampling.engine.base_engine import SparkBaseEngine
 from sparksampling.engine_factory import EngineFactory
 from sparksampling.error import CustomErrorWithCode, BadParamError, ProcessError
 from sparksampling.file_format.file_factory import FileFormatFactory
-from sparksampling.mixin import acquire_worker
+from sparksampling.mixin import acquire_worker, record_job_id
 from sparksampling.proto.sampling_service_pb2 import SamplingRequest
 from sparksampling.sample import SamplingFactory
 from sparksampling.utilities import check_spark_session

@@ -1,9 +1,9 @@
 from pyspark.sql import DataFrame
 
-from sparksampling.mixin import LogMixin
+from sparksampling.mixin import SparkMixin, LogMixin
 
 
-class SparkBaseSamplingJob(LogMixin):
+class SparkBaseSamplingJob(SparkMixin, LogMixin):
     cls_args = []
 
     def __init__(self, *args, **kwargs):

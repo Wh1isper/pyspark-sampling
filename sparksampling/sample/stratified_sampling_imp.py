@@ -40,7 +40,9 @@ class StratifiedSamplingImp(SparkBaseSamplingJob):
         if isinstance(fraction, Dict):
             return fraction
 
-        y = df.select(stratified_key)
+        # https://stackoverflow.com/questions/44367019/column-name-with-dot-spark
+        # Prevent .(dot) breaking select
+        y = df.select(f"`{stratified_key}`")
         labels = y.distinct().toPandas().to_numpy().reshape(-1)
         convert_fraction = dict()
         for label in labels:
