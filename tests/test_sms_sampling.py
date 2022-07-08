@@ -15,7 +15,8 @@ from sparksampling.proto.sampling_service_pb2 import (
     FILE_FORMAT_CSV,
     UNKNOWN_FORMAT,
     SamplingConf,
-    FileFormatConf, CancelRequest
+    FileFormatConf,
+    CancelRequest
 )
 from utilities import JobThread
 
@@ -82,12 +83,15 @@ def test_random_sampling_count(grpc_stub):
     if os.path.exists(response.data.sampled_path):
         assert sorted(list(pandas.read_csv(response.data.sampled_path).columns)) == sorted(list(sampling_col))
 
+
 def test_cluster_sampling_num(grpc_stub):
     iris_path = os.path.join(dir_prefix, '../data/iris.csv')
+    group_num = 1
+    group_by = 'Species'
 
     sampling_conf = SamplingConf(
-        group_num=1,
-        group_by='Species',
+        group_num=group_num,
+        group_by=group_by,
         seed=1,
     )
     format_conf = FileFormatConf(
@@ -109,7 +113,9 @@ def test_cluster_sampling_num(grpc_stub):
     response = grpc_stub.SamplingJob(request)
     assert response.code == 0
     assert response.data.sampled_path.endswith('.csv')
-    # todo add more test for output file
+    import pandas as pd
+    pdf = pd.read_csv(response.data.sampled_path)
+    assert int(pdf[[group_by]].drop_duplicates().count()) == group_num
 
 
 def test_cluster_sampling_fraction(grpc_stub):
@@ -139,16 +145,17 @@ def test_cluster_sampling_fraction(grpc_stub):
     response = grpc_stub.SamplingJob(request)
     assert response.code == 0
     assert response.data.sampled_path.endswith('.csv')
-    # todo add more test for output file
 
 
 def test_cluster_sampling_fraction_num(grpc_stub):
     iris_path = os.path.join(dir_prefix, '../data/iris.csv')
+    group_num = 2
+    group_by = 'Species'
 
     sampling_conf = SamplingConf(
         fraction='0.5',
-        group_by='Species',
-        group_num=2,
+        group_by=group_by,
+        group_num=group_num,
         seed=1,
     )
     format_conf = FileFormatConf(
@@ -170,7 +177,9 @@ def test_cluster_sampling_fraction_num(grpc_stub):
     response = grpc_stub.SamplingJob(request)
     assert response.code == 0
     assert response.data.sampled_path.endswith('.csv')
-    # todo add more test for output file
+    import pandas as pd
+    pdf = pd.read_csv(response.data.sampled_path)
+    assert int(pdf[[group_by]].drop_duplicates().count()) <= group_num
 
 
 def test_generate_path(grpc_stub):
