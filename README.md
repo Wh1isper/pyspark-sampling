@@ -1,3 +1,8 @@
+![](https://img.shields.io/github/license/wh1isper/pyspark-sampling)
+![](https://img.shields.io/docker/image-size/wh1isper/pysparksampling)
+![](https://img.shields.io/pypi/pyversions/sparksampling)
+
+
 # pyspark-sampling
 
 ``sparksampling`` is a PySpark-based sampling and data quality assessment GRPC service that supports containerized
