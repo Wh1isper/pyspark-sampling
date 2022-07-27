@@ -1,7 +1,7 @@
 ![](https://img.shields.io/github/license/wh1isper/pyspark-sampling)
 ![](https://img.shields.io/docker/image-size/wh1isper/pysparksampling)
 ![](https://img.shields.io/pypi/pyversions/sparksampling)
-
+![](https://img.shields.io/pypi/dm/sparksampling)
 
 # pyspark-sampling
 
