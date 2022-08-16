@@ -274,7 +274,7 @@ class RMSEngine(SparkBaseEngine):
             job_id = kwargs.pop('job_id')
             dry_run = kwargs.pop('dry_run', False)
         except KeyError as e:
-            cls.log.info("Missing required parameters", e)
+            cls.log.info(f"Missing required parameters {str(e)}")
             raise BadParamError(f"Missing required parameters {str(e)}")
 
         config_dict = {
