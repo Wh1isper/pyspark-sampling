@@ -91,7 +91,7 @@ class SMSEngine(SparkBaseEngine):
                 'job_id': kwargs.pop('job_id')
             }
         except KeyError as e:
-            cls.log.info("Missing required parameters", e)
+            cls.log.info(f"Missing required parameters {str(e)}")
             raise BadParamError(f"Missing required parameters {str(e)}")
 
         # Detailed configuration depends on the specific implementation
