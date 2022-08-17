@@ -24,9 +24,12 @@ class ClusterSamplingImp(SparkBaseSamplingJob):
         # Prevent .(dot) breaking select
         group = df.select(f"`{self.group_by}`").distinct()
         group_sampled = self.get_group_sampled(group)
+
+        # equal to df.join(group_sampled, df.group_by == group_sampled.group_by, 'semi'), this will keep column in order
+        cond = [getattr(df, self.group_by) == getattr(group_sampled, self.group_by)]
         df = df.join(
             group_sampled,
-            on=self.group_by,
+            cond,
             how='semi'
         )
         if self.count:
