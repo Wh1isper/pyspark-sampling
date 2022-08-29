@@ -261,7 +261,7 @@ class RMSEngine(SparkBaseEngine):
         for job in seq:
             if job.sampled_path:
                 result.append({'name': job.name, 'sampled_path': job.sampled_path})
-        self.log.info(f'result collectd: \n{pformat(result)}')
+        self.log.info(f'result collected: \n{pformat(result)}')
         return result
 
     @classmethod
