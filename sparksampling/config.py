@@ -95,7 +95,7 @@ def get_platform_config():
         # as standalone
         SCHEDULER_CONFIG = {
             "spark.master": os.environ.get('SPARK_MASTER', 'local[*]'),
-            "spark.driver.memory": "512m",
+            "spark.driver.memory": os.environ.get('SPARK_DRIVER_MEMORY', '512m'),
         }
     return SCHEDULER_CONFIG
 
