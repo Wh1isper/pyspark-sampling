@@ -47,5 +47,5 @@ class StratifiedSamplingImp(SparkBaseSamplingJob):
         convert_fraction = dict()
         for label in labels:
             convert_fraction[label] = fraction
-        StratifiedSamplingImp.log.info(f"Convert fraction {fraction} to dict", convert_fraction)
+        StratifiedSamplingImp.log.info(f"Convert fraction {fraction} to dict {convert_fraction}")
         return convert_fraction
