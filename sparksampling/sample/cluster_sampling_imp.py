@@ -48,5 +48,10 @@ class ClusterSamplingImp(SparkBaseSamplingJob):
             # Cluster sampling expects to get the exact number of groups
             self.log.info(f'No fraction specified, using rdd.takeSample to get the exact number of groups')
             subset = group.rdd.takeSample(False, self.group_num, seed=self.seed)
-            group_df = self.spark.sparkContext.parallelize(subset).toDF()
+            try:
+                group_df = self.spark.sparkContext.parallelize(subset).toDF()
+            except ValueError as e:
+                self.log.info(f'Exception when rdd -> df, {e}, will use group df without being sampled')
+                self.log.exception(e)
+                group_df = group
         return group_df

@@ -181,6 +181,38 @@ def test_cluster_sampling_fraction_num(grpc_stub):
     pdf = pd.read_csv(response.data.sampled_path)
     assert int(pdf[[group_by]].drop_duplicates().count()) <= group_num
 
+def test_cluster_sampling_empty(grpc_stub):
+    iris_path = os.path.join(dir_prefix, '../data/empty.csv')
+    group_num = 1
+    group_by = 'user'
+
+    sampling_conf = SamplingConf(
+        group_num=group_num,
+        group_by=group_by,
+        seed=1,
+    )
+    format_conf = FileFormatConf(
+        with_header=True,
+        sep=','
+    )
+
+    output_path = os.path.join(dir_prefix, './output/empty')
+    request = SamplingRequest(
+        sampling_method=CLUSTER_SAMPLING_METHOD,
+        file_format=FILE_FORMAT_CSV,
+        sampling_conf=sampling_conf,
+        format_conf=format_conf,
+        input_path=iris_path,
+        output_path=output_path,
+        job_id='test_cluster_sampling_empty'
+    )
+
+    response = grpc_stub.SamplingJob(request)
+    assert response.code == 0
+    assert response.data.sampled_path.endswith('.csv')
+    import pandas as pd
+    pdf = pd.read_csv(response.data.sampled_path)
+    assert int(pdf[[group_by]].drop_duplicates().count()) == 0
 
 def test_generate_path(grpc_stub):
     sampling_conf = SamplingConf(
