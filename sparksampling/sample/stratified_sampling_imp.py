@@ -50,9 +50,9 @@ class StratifiedSamplingImp(SparkBaseSamplingJob):
 
         # https://stackoverflow.com/questions/44367019/column-name-with-dot-spark
         # Prevent .(dot) breaking select
+        StratifiedSamplingImp.log.info(f"Convert fraction {fraction} to dict...")
         y = df.select(f"`{stratified_key}`")
         convert_fraction = {label[0]: fraction for label in y.distinct().toLocalIterator()}
-        StratifiedSamplingImp.log.info(f"Convert fraction {fraction} to dict {convert_fraction}")
         return convert_fraction
 
     @staticmethod
