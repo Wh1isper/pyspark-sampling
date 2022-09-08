@@ -101,6 +101,11 @@ message SamplingConf {
     // If the number of clusters to be extracted is not clear, use fraction as the scale input
     // When used with fraction, group_by is sampled in scale, limiting the maximum number of groups to group_num
     uint32 group_num = 8;
+
+    // When sampling in stratification, passing in True will guarantee at least one sample per stratum
+    // Will ignore count if it's True
+    // set env FORCE_STRATIFILED_ENSURE_COL 'true' or 'True' will force set it's True, otherwise default False
+    bool ensure_col = 9;
 }
 
 message FileFormatConf {

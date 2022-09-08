@@ -9,12 +9,15 @@ from sparksampling.proto.sampling_service_pb2 import (
     RANDOM_SAMPLING_METHOD,
     FILE_FORMAT_CSV,
     SamplingConf,
-    FileFormatConf,
+    FileFormatConf, STRATIFIED_SAMPLING_METHOD,
 )
 from utilities import JobThread
 
+dir_prefix = os.path.abspath(os.path.dirname(__file__))
+input_path = os.path.join(dir_prefix, '../data/unbalance_500v50_10.csv')
 
-@pytest.fixture(autouse=True)
+
+@pytest.fixture
 def exhausted_worker():
     from sparksampling.engine_factory import EngineFactory
 
@@ -26,7 +29,7 @@ def exhausted_worker():
         engine.guarantee_worker = 10
 
 
-def test_worker_limit(grpc_stub):
+def test_worker_limit(grpc_stub, exhausted_worker):
     # 本来想多线程测试，但是pytest似乎只能线性执行，所以上面把guarantee_worker设置为0，一定会触发EXHAUSTED_ERROR
     sampling_conf = SamplingConf(
         fraction='0.2',
@@ -65,6 +68,40 @@ def test_worker_limit(grpc_stub):
         t.join()
     results = [t.get_result() for t in threads]
     assert reduce(lambda x, y: x or y, results)
+
+
+def test_stratified_sampling_reserve(grpc_stub):
+    fraction = '0.5'
+
+    sampling_conf = SamplingConf(
+        fraction=fraction,
+        with_replacement=True,
+        stratified_key='# id',
+        ensure_col=True,
+    )
+    format_conf = FileFormatConf(
+        with_header=True,
+        sep=','
+    )
+    output_path = os.path.join(dir_prefix, './output/test_simply_stratified_sampling_reserve')
+
+    request = SamplingRequest(
+        sampling_method=STRATIFIED_SAMPLING_METHOD,
+        file_format=FILE_FORMAT_CSV,
+        sampling_conf=sampling_conf,
+        format_conf=format_conf,
+        input_path=input_path,
+        output_path=output_path,
+        job_id='test_simply_stratified_sampling_feature'
+    )
+
+    response = grpc_stub.SamplingJob(request)
+    assert response.code == 0
+    assert response.data.sampled_path.endswith('.csv')
+
+    import pandas as pd
+    df = pd.read_csv(response.data.sampled_path, sep=',', index_col='# id')
+    assert df.shape[0] == 550
 
 
 if __name__ == '__main__':
