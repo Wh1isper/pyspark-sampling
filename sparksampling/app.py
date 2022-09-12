@@ -11,6 +11,7 @@ import logging
 import grpc
 from sparksampling.config import SPARK_CONF
 from sparksampling.service import GRPCService
+from sparksampling._version import __version__
 from traitlets.config import Application
 from traitlets import (
     Integer,
@@ -88,6 +89,7 @@ class SparkSamplingAPP(Application):
     def initialize(self, *args, **kwargs):
         super().initialize(*args, **kwargs)
         self.init_logger()
+        self.log.info(f'Current pyspark-sampling version: {__version__}')
         self.init_spark()
 
     def init_logger(self):

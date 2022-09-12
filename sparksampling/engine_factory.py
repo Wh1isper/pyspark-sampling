@@ -51,13 +51,6 @@ class EngineFactory(LogMixin):
     def register_all_engine():
         importlib.import_module('sparksampling.engine')
 
-    @staticmethod
-    def register_customer_engine(packages):
-        if not packages:
-            return
-        for package in packages.split(','):
-            importlib.import_module(package)
-
     @classmethod
     def get_engine_total_worker(cls):
         return sum(engine.guarantee_worker for engine in cls.engine_cls)

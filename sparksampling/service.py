@@ -20,7 +20,6 @@ class GRPCService(sampling_service_pb2_grpc.SparkSamplingServiceServicer, LogMix
     @staticmethod
     def register_engine(parent):
         EngineFactory.register_all_engine()
-        EngineFactory.register_customer_engine(parent.customer_engine_package)
 
     @staticmethod
     def get_worker_num():

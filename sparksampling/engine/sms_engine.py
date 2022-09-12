@@ -58,7 +58,6 @@ class SMSEngine(SparkBaseEngine):
 
     @record_job_id
     def submit_spark_job(self, sampling_imp, file_imp):
-        # 进入spark处理，以下内容抛出错误5000
         df = file_imp.read(self.input_path)
         output_df = sampling_imp.run(df)
         output_path = file_imp.write(output_df, self.output_path)

@@ -4,7 +4,7 @@
 
 from setuptools import setup, find_packages
 
-from sparksampling import VERSION
+from sparksampling._version import __version__
 
 with open('README.rst') as readme_file:
     readme = readme_file.read()
@@ -54,6 +54,6 @@ setup(
     test_suite='tests',
     tests_require=test_requirements,
     url='https://github.com/Wh1isper/pyspark-sampling',
-    version=VERSION,
+    version=__version__,
     zip_safe=False,
 )
