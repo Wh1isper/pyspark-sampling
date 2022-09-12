@@ -4,6 +4,8 @@
 
 from setuptools import setup, find_packages
 
+from sparksampling import VERSION
+
 with open('README.rst') as readme_file:
     readme = readme_file.read()
 
@@ -13,7 +15,7 @@ requirements = [
     'pyspark',
     'findspark',
     'traitlets',
-    'pandas >= 1.2',
+    'pandas>=1.2',
     'requests',
     'kubernetes',
     'boto3',
@@ -52,6 +54,6 @@ setup(
     test_suite='tests',
     tests_require=test_requirements,
     url='https://github.com/Wh1isper/pyspark-sampling',
-    version='0.1.7.7',
+    version=VERSION,
     zip_safe=False,
 )
