@@ -59,8 +59,10 @@ class SMSEngine(SparkBaseEngine):
     @record_job_id
     def submit_spark_job(self, sampling_imp, file_imp):
         df = file_imp.read(self.input_path)
-        output_df = sampling_imp.run(df)
-        output_path = file_imp.write(output_df, self.output_path)
+        df = self.pre_hook(df)
+        df = sampling_imp.run(df)
+        df = self.post_hook(df)
+        output_path = file_imp.write(df, self.output_path)
         self.log.info(f"The task is completed and the output file or directory is: {output_path}")
         return output_path
 

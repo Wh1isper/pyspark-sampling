@@ -6,4 +6,4 @@ class ExampleExtensionHook(BaseEvaluationHook):
     pass
 
 
-DummyEngine.register(ExampleExtensionHook)
+DummyEngine.register_pre_hook(ExampleExtensionHook)

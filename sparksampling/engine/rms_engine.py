@@ -108,18 +108,24 @@ class JobStage(LogMixin):
         cond = [getattr(input_df, relation['input_col']) == getattr(relation_df, relation['relation_col'])]
         return input_df.join(relation_df, cond, how='semi')
 
-    def build_dataframe(self):
+    def build_dataframe(self, pre_hook=None, post_hook=None):
         self.log.debug(f'Starting building stage {self.name}')
         if self.input_name:
             self._df = self.name_df_map[self.input_name]
         else:
             self._df = self.file_format_imp.read(self.input_path)
 
+        if pre_hook:
+            self._df = pre_hook(self._df)
+
         if self.sample_imp:
             self._df = self.sample_imp.run(self._df)
 
         for relation in self.relations:
             self._df = self._build_relation_dataframe(self._df, relation)
+
+        if post_hook:
+            self._df = pre_hook(self._df)
 
         self.name_df_map[self.name] = self._df
 
@@ -239,7 +245,7 @@ class RMSEngine(SparkBaseEngine):
         name_df_map = dict()
         for name in build_order:
             stage = JobStage(self.spark, self.name_stage_map[name], name_df_map)
-            stage.build_dataframe()
+            stage.build_dataframe(self.pre_hook, self.post_hook)
             job_seq.append(stage)
         if self.dry_run:
             self.log.info('Dry run, skip export dataframe')

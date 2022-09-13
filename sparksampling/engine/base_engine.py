@@ -1,9 +1,14 @@
+import weakref
+
+from sparksampling.error import ProcessPreHookError, ProcessPostHookError
 from sparksampling.mixin import WorkerManagerMixin, SparkMixin
 
 
 class BaseEngine(WorkerManagerMixin):
     guarantee_worker = 10
-    evaluation_hook = set()
+    evaluation_pre_hook = dict()
+    evaluation_post_hook = dict()
+    _cache_hook_instance = weakref.WeakValueDictionary()
 
     def submit(self, *args, **kwargs):
         raise NotImplementedError
@@ -21,11 +26,48 @@ class BaseEngine(WorkerManagerMixin):
         return False
 
     @classmethod
-    def register(cls, hook):
-        if hook in cls.evaluation_hook:
+    def register_pre_hook(cls, hook):
+        evaluation_pre_hook = cls.evaluation_pre_hook.setdefault(cls, set())
+        if hook in evaluation_pre_hook:
             return
-        cls.log.info(f'Adding evaluation hook: {hook.__name__} to {cls.__name__}')
-        cls.evaluation_hook.add(hook)
+        cls.log.info(f'Adding pre evaluation hook: {hook.__name__} to {cls.__name__}')
+        evaluation_pre_hook.add(hook)
+
+    @classmethod
+    def register_post_hook(cls, hook):
+        evaluation_post_hook = cls.evaluation_post_hook.setdefault(cls, set())
+
+        if hook in evaluation_post_hook:
+            return
+        cls.log.info(f'Adding post evaluation hook: {hook.__name__} to {cls.__name__}')
+        evaluation_post_hook.add(hook)
+
+    @classmethod
+    def _process_hook(cls, df, hooks, exception):
+        for hook in hooks:
+            try:
+                # TODO design evalution info protocols, get info every hook, represent to client
+                df = cls.get_hook_instance(hook).process(df)
+            except NotImplementedError:
+                raise exception(f'Not implemented hook:{hook} found in {hooks}')
+            except Exception as e:
+                cls.log.info(f'Exception when processing df: {df} with hook: {hook}')
+                cls.logger.exception(e)
+                raise exception(str(e))
+
+        return df
+
+    @classmethod
+    def pre_hook(cls, df):
+        return cls._process_hook(df, cls.evaluation_pre_hook.get(cls, set()), ProcessPreHookError)
+
+    @classmethod
+    def post_hook(cls, df):
+        return cls._process_hook(df, cls.evaluation_post_hook.get(cls, set()), ProcessPostHookError)
+
+    @classmethod
+    def get_hook_instance(cls, hook):
+        return cls._cache_hook_instance.setdefault(hook, hook())
 
 
 class SparkBaseEngine(BaseEngine, SparkMixin):

@@ -1,5 +1,7 @@
 BAD_PARAM_ERROR = 4000
 PROCESS_ERROR = 4004
+PROCESS_PRE_HOOK_ERROR = 4011
+PROCESS_POST_HOOK_ERROR = 4012
 EXHAUSTED_ERROR = 4006
 SERVER_ERROR = 5000
 
@@ -33,3 +35,13 @@ class BadParamError(CustomErrorWithCode):
 class ProcessError(CustomErrorWithCode):
     def __init__(self, msg: str):
         super(ProcessError, self).__init__(PROCESS_ERROR, msg)
+
+
+class ProcessPreHookError(CustomErrorWithCode):
+    def __init__(self, msg: str):
+        super(ProcessPreHookError, self).__init__(PROCESS_PRE_HOOK_ERROR, msg)
+
+
+class ProcessPostHookError(CustomErrorWithCode):
+    def __init__(self, msg: str):
+        super(ProcessPostHookError, self).__init__(PROCESS_POST_HOOK_ERROR, msg)
