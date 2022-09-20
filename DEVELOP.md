@@ -9,3 +9,12 @@ twine upload dist/*
 twine upload -r local dist/*
 
 ```
+
+or
+
+```bash
+chmod +x ./publish.sh
+./publish.sh
+```
+
+this will only publish to pypi repo
