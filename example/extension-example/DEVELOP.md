@@ -21,4 +21,16 @@ ln -s ${PWD}/sparksampling/evaluation_extension/{EXTENSION_NAME} ${SPARK_SAMPLIN
 
 ```
 
+# How to make an extension package
 
+``` bash
+├── setup.py
+├── sparksampling                                       # do not change it
+│   └── __init__.py
+│   ├── evaluation_extension                      # do not change it
+│   │   └── __init__.py
+│   │   ├── example_extension               # your extension package start from here
+│   │   │   ├── example_extension.py
+│   │   │   ├── __init__.py
+
+```
