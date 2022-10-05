@@ -16,26 +16,9 @@ from traitlets.config import Application
 from traitlets import (
     Integer,
     Unicode,
-    Dict,
     default,
     Instance
 )
-
-_ONE_DAY_IN_SECONDS = 60 * 60 * 24
-
-aliases = {
-    'log-level': 'Application.log_level',
-    'ip': 'SparkSamplingAPP.ip',
-    'port': 'SparkSamplingAPP.port',
-    'workers': 'SparkSamplingAPP.workers',
-}
-
-flags = {
-    'debug': (
-        {'Application': {'log_level': logging.DEBUG}},
-        "set log level to logging.DEBUG (maximize logging output)",
-    ),
-}
 
 
 class SparkSamplingAPP(Application):
@@ -44,10 +27,6 @@ class SparkSamplingAPP(Application):
     description = """An application for starting a spark sampling server"""
     # the grpc server handle
     server = None
-
-    # application config
-    aliases = Dict(aliases)
-    flags = Dict(flags)
 
     ip = Unicode(
         os.getenv('SERVICE_HOST', '0.0.0.0'), help="Host IP address for listening (default 0.0.0.0)."
@@ -86,7 +65,14 @@ class SparkSamplingAPP(Application):
         """override default log format to include time"""
         return "[%(levelname)1.1s %(asctime)s %(module)s:%(lineno)d] %(message)s"
 
+    def load_config(self):
+        dir_prefix = os.path.abspath(os.path.dirname(__file__))
+        self.load_config_file(os.path.join(dir_prefix, 'default_app_config.py'))
+        self.log.info('Loading user defined config from ~/.ss/config')
+        self.load_config_file(os.path.expanduser('~/.ss/config.py'))
+
     def initialize(self, *args, **kwargs):
+        self.load_config()
         super().initialize(*args, **kwargs)
         self.init_logger()
         self.log.info(f'Current pyspark-sampling version: {__version__}')
