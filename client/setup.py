@@ -12,6 +12,7 @@ with open('README.rst') as readme_file:
 requirements = [
     'grpcio>=1.35.0',
     'protobuf<4',
+    'click'
 ]
 
 test_requirements = ['pytest>=3']
@@ -38,7 +39,7 @@ setup(
     name='sparksampling_client',
     entry_points={
         'console_scripts': [
-            'ssc = sparksampling_client.cli:main',
+            'ssc = sparksampling_client.cli:cli',
         ],
     },
     packages=find_packages(include=['sparksampling_client', 'sparksampling_client.*']),

@@ -20,7 +20,7 @@ requirements = [
     'kubernetes',
     'boto3',
     'grpcio-tools',
-    'graphlib_backport'
+    'graphlib_backport',
 ]
 
 test_requirements = ['pytest>=3', 'pytest-grpc', ]
