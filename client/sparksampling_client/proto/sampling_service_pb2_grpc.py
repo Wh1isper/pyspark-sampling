@@ -2,7 +2,7 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-import sampling_service_pb2 as sampling__service__pb2
+from . import sampling_service_pb2 as sampling__service__pb2
 
 
 class SparkSamplingServiceStub(object):
