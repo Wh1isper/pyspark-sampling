@@ -23,7 +23,6 @@ from traitlets import (
 
 class SparkSamplingAPP(Application):
     name = 'sparksampling'
-    version = "0.1.0"
     description = """An application for starting a spark sampling server"""
     # the grpc server handle
     server = None
