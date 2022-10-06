@@ -38,9 +38,10 @@ class SparkSamplingAPP(Application):
 
     spark_config = Instance(SparkConf)
     spark = Instance(SparkSession)
-    customer_engine_package = Unicode(
-        os.getenv('SERVICE_CUSTOMER_ENGINE_PACKAGES', ''),
-        help="Third part engine packages, like 'package_a.engine,package_b.engine'"
+
+    config_file_path = Unicode(
+        os.path.expanduser('~/.ss/config.py'),
+        help="User defined app config path"
     ).tag(config=True)
 
     @default('spark_config')
@@ -68,8 +69,8 @@ class SparkSamplingAPP(Application):
     def load_config(self):
         dir_prefix = os.path.abspath(os.path.dirname(__file__))
         self.load_config_file(os.path.join(dir_prefix, 'default_app_config.py'))
-        self.log.info('Loading user defined config from ~/.ss/config')
-        self.load_config_file(os.path.expanduser('~/.ss/config.py'))
+        self.log.info(f'Loading user defined config from {self.config_file_path}')
+        self.load_config_file(self.config_file_path)
 
     def initialize(self, *args, **kwargs):
         self.load_config()
