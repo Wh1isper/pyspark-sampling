@@ -64,4 +64,4 @@ class StratifiedSamplingImp(SparkBaseSamplingJob):
         stratified_window = Window.partitionBy(f"`{stratified_key}`").orderBy(rand())
         missing_layer = missing_df.withColumn("_", row_number().over(stratified_window)).filter(col("_") == 1).drop(
             "_")
-        return sampled_df.unionAll(missing_layer)
+        return sampled_df.unionByName(missing_layer, allowMissingColumns=True)
