@@ -125,7 +125,7 @@ class JobStage(LogMixin):
             self._df = self._build_relation_dataframe(self._df, relation)
 
         if post_hook:
-            self._df = pre_hook(self._df)
+            self._df = post_hook(self._df)
 
         self.name_df_map[self.name] = self._df
 
