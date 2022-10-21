@@ -43,27 +43,30 @@ class BaseEngine(WorkerManagerMixin):
         evaluation_post_hook.add(hook)
 
     @classmethod
-    def _process_hook(cls, df, hooks, exception):
+    def _process_hook(cls, df, hooks, exception, period):
+        metas = []
         for hook in hooks:
             try:
-                # TODO design evalution info protocols, get info every hook, represent to client
-                df = cls.get_hook_instance(hook).process(df)
+                df, meta = cls.get_hook_instance(hook).process(df)
+                meta['hook_name'] = hook
+                meta['period'] = period
+                metas.append(meta)
             except NotImplementedError:
-                raise exception(f'Not implemented hook:{hook} found in {hooks}')
+                raise exception(f'{period} hook raised, Not implemented hook:{hook} found in {hooks}')
             except Exception as e:
-                cls.log.info(f'Exception when processing df: {df} with hook: {hook}')
+                cls.log.info(f'Exception when processing df: {df} with hook: {hook} in period {period}')
                 cls.logger.exception(e)
                 raise exception(str(e))
 
-        return df
+        return df, metas
 
     @classmethod
     def pre_hook(cls, df):
-        return cls._process_hook(df, cls.evaluation_pre_hook.get(cls, set()), ProcessPreHookError)
+        return cls._process_hook(df, cls.evaluation_pre_hook.get(cls, set()), ProcessPreHookError, 'pre')
 
     @classmethod
     def post_hook(cls, df):
-        return cls._process_hook(df, cls.evaluation_post_hook.get(cls, set()), ProcessPostHookError)
+        return cls._process_hook(df, cls.evaluation_post_hook.get(cls, set()), ProcessPostHookError, 'post')
 
     @classmethod
     def get_hook_instance(cls, hook):

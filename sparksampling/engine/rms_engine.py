@@ -2,7 +2,7 @@ from concurrent.futures import ThreadPoolExecutor
 from pprint import pformat
 from typing import List, Dict
 
-from pyspark.sql import DataFrame
+from graphlib import TopologicalSorter, CycleError
 
 from sparksampling.engine.base_engine import SparkBaseEngine
 from sparksampling.engine_factory import EngineFactory
@@ -12,7 +12,6 @@ from sparksampling.mixin import acquire_worker, LogMixin, record_job_id
 from sparksampling.proto.sampling_service_pb2 import RelationSamplingRequest
 from sparksampling.sample import SamplingFactory
 from sparksampling.utilities import check_spark_session
-from graphlib import TopologicalSorter, CycleError
 
 
 def _check_param(conf):
@@ -115,8 +114,10 @@ class JobStage(LogMixin):
         else:
             self._df = self.file_format_imp.read(self.input_path)
 
+        pre_metas = dict()
+        post_metas = dict()
         if pre_hook:
-            self._df = pre_hook(self._df)
+            self._df, pre_metas = pre_hook(self._df)
 
         if self.sample_imp:
             self._df = self.sample_imp.run(self._df)
@@ -125,9 +126,10 @@ class JobStage(LogMixin):
             self._df = self._build_relation_dataframe(self._df, relation)
 
         if post_hook:
-            self._df = post_hook(self._df)
+            self._df, post_metas = post_hook(self._df)
 
         self.name_df_map[self.name] = self._df
+        return pre_metas, post_metas
 
     @property
     def relations(self):
