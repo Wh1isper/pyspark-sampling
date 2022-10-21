@@ -6,7 +6,7 @@ class HookMsg(object):
     def generate_proto_msg(self, period):
         proto_pair_msg = []
         for k, v in self.msg.items():
-            proto_pair_msg.append({'key': k, 'value': v})
+            proto_pair_msg.append({'key': str(k), 'value': str(v)})
 
         return {
             'hook_name': self.hook_name,

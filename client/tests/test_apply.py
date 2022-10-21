@@ -1,9 +1,9 @@
+import json
 import os
+import pathlib
 import subprocess
 
 import pytest
-import json
-import pathlib
 
 from sparksampling_client.proto.sampling_service_pb2 import RANDOM_SAMPLING_METHOD, FILE_FORMAT_CSV
 
@@ -43,3 +43,7 @@ def json_request_file(tmpdir, request_dict):
 
 def test_apply(json_request_file):
     subprocess.run(['ssc', 'apply', json_request_file], check=True)
+
+
+if __name__ == '__main__':
+    pytest.main()

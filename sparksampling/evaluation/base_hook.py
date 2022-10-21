@@ -1,3 +1,5 @@
+from typing import Dict
+
 from pyspark.sql import DataFrame
 
 from sparksampling.engine_factory import EngineFactory
@@ -6,12 +8,10 @@ from sparksampling.evaluation.hook_msg import HookMsg
 
 class BaseEvaluationHook():
     def process(self, df: DataFrame) -> (DataFrame, HookMsg):
-        """
-        :param df:
-        :return:
-            a processed dataframe
-            a dict shows hooks metadata
-        """
+        df, msg = self._process(df)
+        return df, HookMsg(self, msg)
+
+    def _process(self, df) -> (DataFrame, Dict):
         raise NotImplementedError
 
     @classmethod
@@ -38,11 +38,11 @@ class BaseEvaluationHook():
 
 
 class ByPassEvaluationHook(BaseEvaluationHook):
-    def process(self, df):
-        return df, HookMsg(self, {
+    # this hook for test use
+    def _process(self, df):
+        return df, {
             'msg': 'bypass'
-        })
+        }
 
-
-ByPassEvaluationHook.register_pre_hook_all()
-ByPassEvaluationHook.register_post_hook_all()
+# ByPassEvaluationHook.register_pre_hook_all()
+# ByPassEvaluationHook.register_post_hook_all()
