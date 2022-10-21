@@ -64,7 +64,7 @@ class SMSEngine(SparkBaseEngine):
         df, post_metas = self.post_hook(df)
         output_path = file_imp.write(df, self.output_path)
         self.log.info(f"The task is completed and the output file or directory is: {output_path}")
-        return output_path
+        return output_path, pre_metas + post_metas
 
     @classmethod
     def config(cls, kwargs):

@@ -63,6 +63,7 @@ message SamplingResponse {
         SamplingRequest parent_request = 1;
         // Sample output file path
         string sampled_path = 2;
+        repeated HookMessage hook_msg = 3;
     }
 }
 
@@ -184,6 +185,7 @@ message RelationSamplingResponse{
     message SampleResult{
         string name = 1;
         string sampled_path = 2;
+        repeated HookMessage hook_msg = 3;
     }
 
     // Status code, return 0 for success
@@ -196,4 +198,16 @@ message RelationSamplingResponse{
         // Sample output file path
         repeated SampleResult results = 2;
     }
+}
+
+
+message HookMessage{
+    string hook_name = 1;
+    string period = 2;
+    repeated pair meta = 3;
+}
+
+message pair{
+    string key = 1;
+    string value = 2;
 }

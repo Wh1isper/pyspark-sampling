@@ -77,6 +77,8 @@ class JobStage(LogMixin):
         self.sampled_path = None
         self.file_format_imp = None
         self.sample_imp = None
+        self.pre_metas = []
+        self.post_metas = []
 
         self._init_sample_imp()
         self._init_file_format()
@@ -114,10 +116,8 @@ class JobStage(LogMixin):
         else:
             self._df = self.file_format_imp.read(self.input_path)
 
-        pre_metas = dict()
-        post_metas = dict()
         if pre_hook:
-            self._df, pre_metas = pre_hook(self._df)
+            self._df, self.pre_metas = pre_hook(self._df)
 
         if self.sample_imp:
             self._df = self.sample_imp.run(self._df)
@@ -126,10 +126,9 @@ class JobStage(LogMixin):
             self._df = self._build_relation_dataframe(self._df, relation)
 
         if post_hook:
-            self._df, post_metas = post_hook(self._df)
+            self._df, self.post_metas = post_hook(self._df)
 
         self.name_df_map[self.name] = self._df
-        return pre_metas, post_metas
 
     @property
     def relations(self):
@@ -268,7 +267,11 @@ class RMSEngine(SparkBaseEngine):
         result = []
         for job in seq:
             if job.sampled_path:
-                result.append({'name': job.name, 'sampled_path': job.sampled_path})
+                result.append({
+                    'name': job.name,
+                    'sampled_path': job.sampled_path,
+                    'hook_msg': job.pre_metas + job.post_metas
+                })
         self.log.info(f'result collected: \n{pformat(result)}')
         return result
 

@@ -41,10 +41,11 @@ class GRPCService(sampling_service_pb2_grpc.SparkSamplingServiceServicer, LogMix
         data = EngineFactory.message_to_dict(request)
         parent_request = SamplingRequest(**data)
         engine = EngineFactory.get_engine(self.parent, SamplingRequest, **data)
-        output_path = engine.submit()
+        output_path, hook_msg = engine.submit()
         return SamplingResponse(code=0, message='',
                                 data=SamplingResponse.ResponseData(parent_request=parent_request,
-                                                                   sampled_path=output_path))
+                                                                   sampled_path=output_path,
+                                                                   hook_msg=hook_msg))
 
     @throw_exception
     def RelationSamplingJob(self, request: RelationSamplingRequest, context) -> RelationSamplingResponse:

@@ -1,12 +1,11 @@
-from typing import Dict
-
 from pyspark.sql import DataFrame
 
 from sparksampling.engine_factory import EngineFactory
+from sparksampling.evaluation.hook_msg import HookMsg
 
 
 class BaseEvaluationHook():
-    def process(self, df: DataFrame) -> (DataFrame, Dict):
+    def process(self, df: DataFrame) -> (DataFrame, HookMsg):
         """
         :param df:
         :return:
@@ -40,9 +39,9 @@ class BaseEvaluationHook():
 
 class ByPassEvaluationHook(BaseEvaluationHook):
     def process(self, df):
-        return df, {
-            'msg': 'bypassed'
-        }
+        return df, HookMsg(self, {
+            'msg': 'bypass'
+        })
 
 
 ByPassEvaluationHook.register_pre_hook_all()

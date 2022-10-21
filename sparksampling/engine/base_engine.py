@@ -48,9 +48,7 @@ class BaseEngine(WorkerManagerMixin):
         for hook in hooks:
             try:
                 df, meta = cls.get_hook_instance(hook).process(df)
-                meta['hook_name'] = hook
-                meta['period'] = period
-                metas.append(meta)
+                metas.append(meta.generate_proto_msg(period))
             except NotImplementedError:
                 raise exception(f'{period} hook raised, Not implemented hook:{hook} found in {hooks}')
             except Exception as e:
