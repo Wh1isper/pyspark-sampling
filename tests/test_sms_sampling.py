@@ -181,6 +181,7 @@ def test_cluster_sampling_fraction_num(grpc_stub):
     pdf = pd.read_csv(response.data.sampled_path)
     assert int(pdf[[group_by]].drop_duplicates().count()) <= group_num
 
+
 def test_cluster_sampling_empty(grpc_stub):
     iris_path = os.path.join(dir_prefix, '../data/empty.csv')
     group_num = 1
@@ -213,6 +214,12 @@ def test_cluster_sampling_empty(grpc_stub):
     import pandas as pd
     pdf = pd.read_csv(response.data.sampled_path)
     assert int(pdf[[group_by]].drop_duplicates().count()) == 0
+    for hook_msg in response.data.hook_msg:
+        if hook_msg.hook_name == 'EmptyDetectHook':
+            for meta in hook_msg.meta:
+                if meta.key == 'is_not_empty':
+                    assert meta.value == 'False'
+
 
 def test_generate_path(grpc_stub):
     sampling_conf = SamplingConf(
