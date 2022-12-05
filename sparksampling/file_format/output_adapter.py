@@ -1,11 +1,30 @@
 import os
-import uuid
+import errno
 from concurrent.futures import ThreadPoolExecutor as PoolExecutor
 
 from sparksampling.error import ProcessError
 import pandas as pd
 
 from sparksampling.mixin import LogMixin
+
+
+def fsync_dir(dir_path):
+    """
+    Execute fsync on a directory ensuring it is synced to disk
+
+    :param str dir_path: The directory to sync
+    :raise OSError: If fail opening the directory
+    """
+    dir_fd = os.open(dir_path, os.O_DIRECTORY)
+    try:
+        os.fsync(dir_fd)
+    except OSError as e:
+        # On some filesystem doing a fsync on a directory
+        # raises an EINVAL error. Ignoring it is usually safe.
+        if e.errno != errno.EINVAL:
+            raise
+    finally:
+        os.close(dir_fd)
 
 
 class LocalAdapterMixin(LogMixin):
@@ -67,6 +86,7 @@ class LocalAdapterMixin(LogMixin):
         else:
             csv_file = csv_files[0]
         cls.log.debug(f"Output one file: {csv_file}")
+        fsync_dir(abs_dir)
         return os.path.join(abs_dir, csv_file)
 
 
