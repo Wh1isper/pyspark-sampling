@@ -1,8 +1,10 @@
+import os
+
 from sparksampling.mixin import WorkerManagerMixin, SparkMixin
 
 
 class BaseEngine(WorkerManagerMixin):
-    guarantee_worker = 10
+    guarantee_worker = int(os.getenv("ENGINE_DEFAULT_WORKER_NUM", 10))
 
     def submit(self, *args, **kwargs):
         raise NotImplementedError
