@@ -1,11 +1,12 @@
 import weakref
+import os
 
 from sparksampling.error import ProcessPreHookError, ProcessPostHookError
 from sparksampling.mixin import WorkerManagerMixin, SparkMixin
 
 
 class BaseEngine(WorkerManagerMixin):
-    guarantee_worker = 10
+    guarantee_worker = int(os.getenv("ENGINE_DEFAULT_WORKER_NUM", 10))
     evaluation_pre_hook = dict()
     evaluation_post_hook = dict()
     _cache_hook_instance = weakref.WeakValueDictionary()
