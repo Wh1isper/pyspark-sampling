@@ -12,7 +12,8 @@ with open('README.rst') as readme_file:
 requirements = [
     'grpcio>=1.35.0',
     'protobuf<4',
-    'click'
+    'click',
+    'sparksampling_proto',
 ]
 
 test_requirements = ['pytest>=3']

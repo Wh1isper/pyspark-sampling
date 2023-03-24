@@ -10,6 +10,7 @@ with open('README.rst') as readme_file:
     readme = readme_file.read()
 
 requirements = [
+    "sparksampling-proto",
     'grpcio>=1.35.0',
     'protobuf<4',
     'pyspark',
