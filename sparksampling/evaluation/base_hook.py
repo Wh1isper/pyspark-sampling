@@ -6,7 +6,7 @@ from sparksampling.engine_factory import EngineFactory
 from sparksampling.evaluation.hook_msg import HookMsg
 
 
-class BaseEvaluationHook():
+class BaseEvaluationHook:
     def process(self, df: DataFrame) -> (DataFrame, HookMsg):
         df, msg = self._process(df)
         return df, HookMsg(self, msg)
@@ -40,9 +40,8 @@ class BaseEvaluationHook():
 class ByPassEvaluationHook(BaseEvaluationHook):
     # this hook for test use
     def _process(self, df):
-        return df, {
-            'msg': 'bypass'
-        }
+        return df, {"msg": "bypass"}
+
 
 # ByPassEvaluationHook.register_pre_hook_all()
 # ByPassEvaluationHook.register_post_hook_all()

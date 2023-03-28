@@ -1,5 +1,5 @@
-from pprint import pformat
 import importlib
+from pprint import pformat
 
 from google.protobuf.json_format import MessageToDict
 
@@ -16,7 +16,9 @@ class EngineFactory(LogMixin):
         for engine in cls.engine_cls:
             if engine.is_matching(request_type):
                 if engine_cls:
-                    raise ProcessError(f"Duplicated Engine Found: {engine.__name__} and {engine_cls.__name__}")
+                    raise ProcessError(
+                        f"Duplicated Engine Found: {engine.__name__} and {engine_cls.__name__}"
+                    )
                 engine_cls = engine
         return engine_cls
 
@@ -24,15 +26,13 @@ class EngineFactory(LogMixin):
     def get_engine(cls, parent, request_type, **kwargs):
         engine_cls = cls.choose_engine(request_type)
         if not engine_cls:
-            raise BadParamError(f'No matching engine for this job, \n{pformat(kwargs, indent=2)}')
+            raise BadParamError(f"No matching engine for this job, \n{pformat(kwargs, indent=2)}")
         cls.log.info(f"Using {engine_cls.__name__}")
         return engine_cls(parent, **engine_cls.config(kwargs))
 
     @classmethod
     def message_to_dict(cls, message):
-        data = MessageToDict(message,
-                             use_integers_for_enums=True,
-                             preserving_proto_field_name=True)
+        data = MessageToDict(message, use_integers_for_enums=True, preserving_proto_field_name=True)
         return data
 
     @classmethod
@@ -44,12 +44,14 @@ class EngineFactory(LogMixin):
     def register(cls, engine_class):
         if engine_class in cls.engine_cls:
             return
-        cls.log.info(f'Register engine: {engine_class.__name__}, allocate {engine_class.guarantee_worker} workers')
+        cls.log.info(
+            f"Register engine: {engine_class.__name__}, allocate {engine_class.guarantee_worker} workers"
+        )
         cls.engine_cls.add(engine_class)
 
     @staticmethod
     def register_all_engine():
-        importlib.import_module('sparksampling.engine')
+        importlib.import_module("sparksampling.engine")
 
     @classmethod
     def get_engine_total_worker(cls):

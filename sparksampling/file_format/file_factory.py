@@ -1,12 +1,8 @@
 from sparksampling.error import BadParamError
-
-from sparksampling.proto.sampling_service_pb2 import (
-    FILE_FORMAT_CSV
-)
 from sparksampling.file_format.base_file_format import SparkBaseFileFormat
 from sparksampling.file_format.csv_file_imp import CsvFileImpSpark
-
 from sparksampling.mixin import LogMixin
+from sparksampling.proto.sampling_service_pb2 import FILE_FORMAT_CSV
 
 
 class FileFormatFactory(LogMixin):
@@ -27,4 +23,6 @@ class FileFormatFactory(LogMixin):
 
     @classmethod
     def get_file_imp(cls, spark, file_format, format_conf) -> SparkBaseFileFormat:
-        return cls._get_imp_class(file_format)(spark, **cls._get_format_conf(file_format, format_conf))
+        return cls._get_imp_class(file_format)(
+            spark, **cls._get_format_conf(file_format, format_conf)
+        )

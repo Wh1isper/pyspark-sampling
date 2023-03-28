@@ -1,8 +1,8 @@
-import weakref
 import os
+import weakref
 
-from sparksampling.error import ProcessPreHookError, ProcessPostHookError
-from sparksampling.mixin import WorkerManagerMixin, SparkMixin
+from sparksampling.error import ProcessPostHookError, ProcessPreHookError
+from sparksampling.mixin import SparkMixin, WorkerManagerMixin
 
 
 class BaseEngine(WorkerManagerMixin):
@@ -31,7 +31,7 @@ class BaseEngine(WorkerManagerMixin):
         evaluation_pre_hook = cls.evaluation_pre_hook.setdefault(cls, set())
         if hook in evaluation_pre_hook:
             return
-        cls.log.info(f'Adding pre evaluation hook: {hook.__name__} to {cls.__name__}')
+        cls.log.info(f"Adding pre evaluation hook: {hook.__name__} to {cls.__name__}")
         evaluation_pre_hook.add(hook)
 
     @classmethod
@@ -40,7 +40,7 @@ class BaseEngine(WorkerManagerMixin):
 
         if hook in evaluation_post_hook:
             return
-        cls.log.info(f'Adding post evaluation hook: {hook.__name__} to {cls.__name__}')
+        cls.log.info(f"Adding post evaluation hook: {hook.__name__} to {cls.__name__}")
         evaluation_post_hook.add(hook)
 
     @classmethod
@@ -51,9 +51,13 @@ class BaseEngine(WorkerManagerMixin):
                 df, meta = cls.get_hook_instance(hook).process(df)
                 metas.append(meta.generate_proto_msg(period))
             except NotImplementedError:
-                raise exception(f'{period} hook raised, Not implemented hook:{hook} found in {hooks}')
+                raise exception(
+                    f"{period} hook raised, Not implemented hook:{hook} found in {hooks}"
+                )
             except Exception as e:
-                cls.log.info(f'Exception when processing df: {df} with hook: {hook} in period {period}')
+                cls.log.info(
+                    f"Exception when processing df: {df} with hook: {hook} in period {period}"
+                )
                 cls.logger.exception(e)
                 raise exception(str(e))
 
@@ -61,11 +65,15 @@ class BaseEngine(WorkerManagerMixin):
 
     @classmethod
     def pre_hook(cls, df):
-        return cls._process_hook(df, cls.evaluation_pre_hook.get(cls, set()), ProcessPreHookError, 'pre')
+        return cls._process_hook(
+            df, cls.evaluation_pre_hook.get(cls, set()), ProcessPreHookError, "pre"
+        )
 
     @classmethod
     def post_hook(cls, df):
-        return cls._process_hook(df, cls.evaluation_post_hook.get(cls, set()), ProcessPostHookError, 'post')
+        return cls._process_hook(
+            df, cls.evaluation_post_hook.get(cls, set()), ProcessPostHookError, "post"
+        )
 
     @classmethod
     def get_hook_instance(cls, hook):
@@ -73,7 +81,6 @@ class BaseEngine(WorkerManagerMixin):
 
 
 class SparkBaseEngine(BaseEngine, SparkMixin):
-
     @classmethod
     def stop(cls, parent, job_id=None):
         # SparkStopEngine will cancel spark job

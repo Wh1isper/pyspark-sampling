@@ -1,4 +1,4 @@
-from pyspark.sql import SparkSession, DataFrame
+from pyspark.sql import DataFrame, SparkSession
 
 from sparksampling.mixin import LogMixin
 
@@ -9,7 +9,7 @@ class SparkBaseFileFormat(LogMixin):
     @classmethod
     def get_init_conf(cls, conf):
         if not cls.cls_args:
-            cls.log.warning('No parameters to initialize?')
+            cls.log.warning("No parameters to initialize?")
             return dict
         init_conf = dict()
         for arg in cls.cls_args:

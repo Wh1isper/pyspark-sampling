@@ -38,7 +38,8 @@ sparksampling = "sparksampling.app:main"
 [project.optional-dependencies]
 test = [
     "pytest",
-    "pytest-grpc"
+    "pytest-grpc",
+    "pre-commit",
 ]
 
 [[project.authors]]

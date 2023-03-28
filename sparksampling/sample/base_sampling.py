@@ -1,6 +1,6 @@
 from pyspark.sql import DataFrame
 
-from sparksampling.mixin import SparkMixin, LogMixin
+from sparksampling.mixin import LogMixin, SparkMixin
 
 
 class SparkBaseSamplingJob(SparkMixin, LogMixin):
@@ -12,7 +12,7 @@ class SparkBaseSamplingJob(SparkMixin, LogMixin):
     @classmethod
     def get_init_conf(cls, conf):
         if not cls.cls_args:
-            cls.log.warning('No parameters to initialize ?')
+            cls.log.warning("No parameters to initialize ?")
             return dict
         init_conf = dict()
         for arg in cls.cls_args:

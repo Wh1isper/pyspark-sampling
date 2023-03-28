@@ -17,8 +17,8 @@ class CustomErrorWithCode(Exception):
 
     def error_response(self):
         return {
-            'code': self.code,
-            'message': self.errorinfo,
+            "code": self.code,
+            "message": self.errorinfo,
         }
 
 

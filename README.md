@@ -14,3 +14,36 @@ deployments and Spark On K8S
 - Relationship Sampling based on DAG and Topological sorting
 - Cloud Native and Spark on K8S support
 
+# QUICK START
+
+## Installation
+
+The trial only requires direct installation using pypi
+
+``pip install sparksampling``
+
+run as
+
+``sparksampling``
+
+The service will start and listen on port 8530
+
+## Docker
+
+``docker run -p 8530:8530 wh1isper/pysparksampling:latest``
+
+
+# Development
+
+Using dev install
+
+```shell
+pip install -e .[test]
+pre-commit install
+```
+
+run test
+
+```shell
+pytest -v
+```

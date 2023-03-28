@@ -3,20 +3,20 @@ import os
 import re
 import signal
 import time
-from functools import wraps, partial
+from functools import partial, wraps
 
 import requests
 from google.protobuf.json_format import MessageToDict
 from pyspark.sql import SparkSession
 
-from sparksampling.error import CustomErrorWithCode, SERVER_ERROR
+from sparksampling.error import SERVER_ERROR, CustomErrorWithCode
 
 logger = logging.getLogger("sparksampling")
 
 
 def hump2underline(hunp_str):
-    p = re.compile(r'([a-z]|\d)([A-Z])')
-    sub = re.sub(p, r'\1_\2', hunp_str).lower()
+    p = re.compile(r"([a-z]|\d)([A-Z])")
+    sub = re.sub(p, r"\1_\2", hunp_str).lower()
     return sub
 
 
@@ -31,7 +31,7 @@ def hump2underline_dict(data):
 
 
 def underline2hump(underline_str):
-    sub = re.sub(r'(_\w)', lambda x: x.group(1)[1].upper(), underline_str)
+    sub = re.sub(r"(_\w)", lambda x: x.group(1)[1].upper(), underline_str)
     return sub
 
 
@@ -40,10 +40,10 @@ def throw_exception(func=None, *, request_type=None, response_type=None):
         return partial(throw_exception, request_type=request_type, response_type=response_type)
 
     if not request_type:
-        request_type = func.__annotations__['request']
+        request_type = func.__annotations__["request"]
 
     if not response_type:
-        response_type = func.__annotations__['return']
+        response_type = func.__annotations__["return"]
 
     @wraps(func)
     def wrapper(self, request, context):
@@ -54,15 +54,19 @@ def throw_exception(func=None, *, request_type=None, response_type=None):
             return func(self, request, context)
         except CustomErrorWithCode as e:
             logger.exception(e)
-            return response_type(**e.error_response(),
-                                 data=response_type.ResponseData(parent_request=parent_request))
+            return response_type(
+                **e.error_response(), data=response_type.ResponseData(parent_request=parent_request)
+            )
         except Exception as e:
             logger.exception(e)
-            return response_type(code=SERVER_ERROR, message=str(e),
-                                 data=response_type.ResponseData(parent_request=parent_request))
+            return response_type(
+                code=SERVER_ERROR,
+                message=str(e),
+                data=response_type.ResponseData(parent_request=parent_request),
+            )
         finally:
             end_time = time.time()
-            cls_logger = getattr(self, 'logger', logger)
+            cls_logger = getattr(self, "logger", logger)
             cls_logger.debug(f"execute in {str(end_time - start_time).split('.')[0]} seconds")
 
     return wrapper
@@ -73,10 +77,10 @@ def async_throw_exception(func=None, *, request_type=None, response_type=None):
         return partial(throw_exception, request_type=request_type, response_type=response_type)
 
     if not request_type:
-        request_type = func.__annotations__['request']
+        request_type = func.__annotations__["request"]
 
     if not response_type:
-        response_type = func.__annotations__['return']
+        response_type = func.__annotations__["return"]
 
     @wraps(func)
     async def wrapper(self, request, context):
@@ -87,15 +91,19 @@ def async_throw_exception(func=None, *, request_type=None, response_type=None):
             return await func(self, request, context)
         except CustomErrorWithCode as e:
             logger.exception(e)
-            return response_type(**e.error_response(),
-                                 data=response_type.ResponseData(parent_request=parent_request))
+            return response_type(
+                **e.error_response(), data=response_type.ResponseData(parent_request=parent_request)
+            )
         except Exception as e:
             logger.exception(e)
-            return response_type(code=SERVER_ERROR, message=str(e),
-                                 data=response_type.ResponseData(parent_request=parent_request))
+            return response_type(
+                code=SERVER_ERROR,
+                message=str(e),
+                data=response_type.ResponseData(parent_request=parent_request),
+            )
         finally:
             end_time = time.time()
-            cls_logger = getattr(self, 'logger', logger)
+            cls_logger = getattr(self, "logger", logger)
             cls_logger.debug(f"execute in {str(end_time - start_time).split('.')[0]} seconds")
 
     return wrapper
@@ -106,14 +114,14 @@ def check_spark_session(func):
     # Server will be redeployed under K8S deployment
     def _check_spark_ui(logger, spark: SparkSession):
         try:
-            if not spark.conf.get('spark.submit.deployMode') == 'client':
+            if not spark.conf.get("spark.submit.deployMode") == "client":
                 return True
         except Exception as e:
             logger.exception(e)
             logger.warning(f"can't access spark.conf")
             return False
 
-        ui_port = spark.conf.get('spark.ui.port')
+        ui_port = spark.conf.get("spark.ui.port")
         url = f"http://localhost:{ui_port}"
         logger.debug(f"Check Spark is alive: {url}")
         try:
@@ -126,7 +134,7 @@ def check_spark_session(func):
 
     def exit_if_spark_dead(self):
         if not _check_spark_ui(self.logger, self.spark):
-            cls_logger = getattr(self, 'logger') or logger
+            cls_logger = getattr(self, "logger") or logger
             cls_logger.critical("Spark is dead, exiting...")
             os.kill(os.getpid(), signal.SIGINT)
 
