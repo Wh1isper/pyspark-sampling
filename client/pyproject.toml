@@ -1,0 +1,53 @@
+[build-system]
+requires = ["hatchling", ]
+build-backend = "hatchling.build"
+
+[project]
+name = "sparksampling_client"
+description = "client for sparksampling"
+keywords = ["sparksampling_client", "pyspark-sampling"]
+requires-python = ">=3.7"
+dependencies = [
+    'click',
+    'sparksampling_proto',
+]
+dynamic = ["version", ]
+classifiers = [
+    'Development Status :: 2 - Pre-Alpha',
+    'Intended Audience :: Developers',
+    'Natural Language :: English',
+    'Programming Language :: Python :: 3',
+    'Programming Language :: Python :: 3.5',
+    'Programming Language :: Python :: 3.6',
+    'Programming Language :: Python :: 3.7',
+    'Programming Language :: Python :: 3.8',
+]
+
+[project.scripts]
+ssc = "sparksampling_client.cli:cli"
+
+
+[project.optional-dependencies]
+test = [
+    "pytest",
+]
+
+[[project.authors]]
+name = "Wh1isper"
+email = "9573586@qq.com"
+
+[project.readme]
+file = "README.md"
+content-type = "text/markdown"
+
+[project.license]
+text = "Apache License 2.0"
+
+[project.urls]
+Source = "https://github.com/Wh1isper/pyspark-sampling"
+
+[tool.check-manifest]
+ignore = [".*", ]
+
+[tool.hatch.version]
+path = "sparksampling_client/__init__.py"

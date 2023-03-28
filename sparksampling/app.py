@@ -11,7 +11,7 @@ import logging
 import grpc
 from sparksampling.config import SPARK_CONF
 from sparksampling.service import GRPCService
-from sparksampling._version import __version__
+from sparksampling import __version__
 from traitlets.config import Application
 from traitlets import (
     Integer,
