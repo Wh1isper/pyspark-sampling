@@ -9,7 +9,7 @@ keywords = ["sparksampling_client", "pyspark-sampling"]
 requires-python = ">=3.7"
 dependencies = [
     'click',
-    'sparksampling_proto',
+    'sparksampling_proto==0.0.1',
 ]
 dynamic = ["version", ]
 classifiers = [
