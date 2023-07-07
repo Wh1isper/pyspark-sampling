@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 name = "sparksampling-proto"
 description = "python proto for sparksampling"
 keywords = ["sparksampling"]
-requires-python = ">=3.7"
+requires-python = ">=3.8"
 dependencies = [
     'grpcio>=1.51.0',
     'grpcio-tools>=1.15.0',
