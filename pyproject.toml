@@ -18,6 +18,7 @@ dependencies = [
     'boto3',
     'grpcio-tools',
     "graphlib-backport;python_version<='3.8'",
+    "sparglim",
 ]
 dynamic = ["version"]
 classifiers = [
