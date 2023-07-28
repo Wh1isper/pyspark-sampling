@@ -23,11 +23,11 @@ spec:
             - containerPort: 8530
           imagePullPolicy: IfNotPresent
           env:
-            - name: SPARK_DRIVER_BINDADDRESS
+            - name: SPARGLIM_DRIVER_HOST
               valueFrom:
                 fieldRef:
                   fieldPath: status.podIP
-            - name: SPARK_DRIVER_POD_NAME
+            - name: SPARGLIM_DRIVER_POD_NAME
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.name
