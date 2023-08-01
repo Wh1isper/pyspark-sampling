@@ -23,10 +23,20 @@ class CsvFileImpSpark(SparkBaseFileFormat, OutputAdapterMixin):
         # When repartition(1), spark will write to a single file
         # Usually this is better for other applications, but there is a performance penalty
         if os.getenv("NO_REPARTITION"):
-            df.write.csv(output_path, sep=self.sep, header=self.with_header, mode="overwrite")
+            df.write.csv(
+                output_path,
+                sep=self.sep,
+                header=self.with_header,
+                escapeQuotes=False,
+                mode="overwrite",
+            )
         else:
             df.repartition(1).write.csv(
-                output_path, sep=self.sep, header=self.with_header, mode="overwrite"
+                output_path,
+                sep=self.sep,
+                header=self.with_header,
+                escapeQuotes=False,
+                mode="overwrite",
             )
 
         return self._get_sampled_file(output_path, sep=self.sep, spark=self.spark)
