@@ -71,7 +71,6 @@ class LocalAdapterMixin(LogMixin):
 
     @classmethod
     def _merge_local_file(cls, abs_output_path, csv_files, sep):
-
         if not cls.MERGE_CHUNK_SIZE or cls.MERGE_CHUNK_SIZE == 1:
             return os.path.join(
                 abs_output_path,
