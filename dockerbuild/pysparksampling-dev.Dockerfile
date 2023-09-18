@@ -1,4 +1,4 @@
-FROM wh1isper/pyspark-app-base:3.4.1
+FROM wh1isper/pyspark-app-base:3.5.0
 LABEL maintainer="wh1isper <9573586@qq.com>"
 
 COPY --chown=9999:9999 . /home/application
