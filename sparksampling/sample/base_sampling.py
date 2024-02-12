@@ -6,8 +6,7 @@ from sparksampling.mixin import LogMixin, SparkMixin
 class SparkBaseSamplingJob(SparkMixin, LogMixin):
     cls_args = []
 
-    def __init__(self, *args, **kwargs):
-        ...
+    def __init__(self, *args, **kwargs): ...
 
     @classmethod
     def get_init_conf(cls, conf):
